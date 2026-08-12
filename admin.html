@@ -899,7 +899,8 @@ html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!imp
 </style>
 
 <style id="v34-active-training-mobile-layout">
-.activePanel{padding:14px!important}
+#activeTraining{display:flex;flex-direction:column;gap:12px;margin-bottom:13px}
+#activeTraining .activePanel{margin:0!important;padding:14px!important}
 .activeScheduleRow{position:relative;z-index:1;display:flex;align-items:baseline;gap:12px;margin-top:13px}
 .activeScheduleDate{color:#149458;font-size:30px;line-height:1;font-weight:950;letter-spacing:-.055em}
 .activeScheduleTime{color:#20262a;font-size:24px;line-height:1;font-weight:950;letter-spacing:-.04em}
@@ -1120,30 +1121,30 @@ function closeSettings(){settingsOv.classList.remove('open')}
 let data=loadData(),editId=null,deleteId=null,mode='new';function stateText(s){return{open:'Отворено',upcoming:'Предстояща',closed:'Затворено',completed:'Проведена'}[s]}function renderStats(){}
 function renderActiveTraining(){
   const box=document.getElementById('activeTraining');
-  const active=data.sessions
+  const activeSessions=data.sessions
     .filter(s=>bookingState(s)==='open')
-    .sort((a,b)=>sessionStart(a)-sessionStart(b))[0];
+    .sort((a,b)=>sessionStart(a)-sessionStart(b));
 
-  if(!active){
+  if(!activeSessions.length){
     box.innerHTML='<div class="noActive">В момента няма активна тренировка за записване.</div>';
     return;
   }
 
-  const list=active.registrations||[];
-  const regs=list.length;
-  const cap=Math.max(1,active.capacity||1);
-  const free=Math.max(0,cap-regs);
-  const pct=Math.min(100,regs/cap*100);
+  box.innerHTML=activeSessions.map(active=>{
+    const list=active.registrations||[];
+    const regs=list.length;
+    const cap=Math.max(1,active.capacity||1);
+    const free=Math.max(0,cap-regs);
+    const pct=Math.min(100,regs/cap*100);
+    const people=list.length
+      ? list.map((p,i)=>`<div class="activePerson">
+          <span class="n">${i+1}.</span>
+          <span class="activePersonIdentity"><span class="personName">${esc(p.name)}</span>${p.hasMultisport?'<span class="multiSportStamp" title="Има карта MultiSport">MultiSport</span>':''}</span>
+          <button class="activeRemove" title="Премахни" aria-label="Премахни записването на ${esc(p.name)}" onclick="askRemoveReg(${i},'${active.id}')">×</button>
+        </div>`).join('')
+      : '<div class="activeEmpty">Все още няма записани участници.</div>';
 
-  const people=list.length
-    ? list.map((p,i)=>`<div class="activePerson">
-        <span class="n">${i+1}.</span>
-        <span class="activePersonIdentity"><span class="personName">${esc(p.name)}</span>${p.hasMultisport?'<span class="multiSportStamp" title="Има карта MultiSport">MultiSport</span>':''}</span>
-        <button class="activeRemove" title="Премахни" aria-label="Премахни записването на ${esc(p.name)}" onclick="askRemoveReg(${i},'${active.id}')">×</button>
-      </div>`).join('')
-    : '<div class="activeEmpty">Все още няма записани участници.</div>';
-
-  box.innerHTML=`
+    return `
     <div class="activePanel">
       <div class="activeTop">
         <span class="liveLabel"><i class="liveDot"></i> АКТИВНА ТРЕНИРОВКА</span>
@@ -1168,6 +1169,7 @@ function renderActiveTraining(){
         <div class="activePeopleGrid">${people}</div>
       </div>
     </div>`;
+  }).join('');
 }
 
 function startSessionBookings(id){
