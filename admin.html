@@ -893,9 +893,35 @@ html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!imp
 .adminSettingsIcon{width:38px;padding:8px!important;font-size:17px!important;line-height:1}
 .newTrainingRow{display:flex;justify-content:flex-end;margin:-3px 0 13px}
 .newTrainingRow .btn{min-height:42px;padding:10px 16px}
-.multiCardMini{display:inline-block;width:48px;height:auto;aspect-ratio:335/216;object-fit:contain;margin-left:7px;border:1px solid #d3d9dd;border-radius:5px;box-shadow:0 2px 6px rgba(20,30,25,.12);vertical-align:middle;transform:rotate(-2deg)}
-.personWithCard{display:inline-flex;align-items:center;flex-wrap:wrap;gap:2px}
+.multiSportStamp{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;padding:3px 6px;border:1.5px solid #738079;border-radius:4px;background:#f8faf9;color:#455049;font-size:6.5px;line-height:1;font-weight:950;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;transform:rotate(-1deg)}
+.personWithCard{display:inline-flex;align-items:center;gap:6px;min-width:0}
 @media(max-width:430px){#adminAuthGate{padding:12px}.adminLoginCard{padding:22px 16px 18px;border-radius:18px}}
+</style>
+
+<style id="v34-active-training-mobile-layout">
+.activePanel{padding:14px!important}
+.activeScheduleRow{position:relative;z-index:1;display:flex;align-items:baseline;gap:12px;margin-top:13px}
+.activeScheduleDate{color:#149458;font-size:30px;line-height:1;font-weight:950;letter-spacing:-.055em}
+.activeScheduleTime{color:#20262a;font-size:24px;line-height:1;font-weight:950;letter-spacing:-.04em}
+.activeSessionLine{position:relative;z-index:1;margin-top:8px;color:#4f5b55;font-size:11px;line-height:1.4;font-weight:850}
+.activePanel .activeProgressFull{margin-top:13px!important;padding-top:11px!important;border-top:1px solid rgba(30,165,99,.16)!important}
+.activePanel .activePeopleSide{position:relative;z-index:1;margin-top:14px;padding:12px 0 0!important;border-top:1px solid rgba(30,165,99,.18)!important;border-left:0!important}
+.activePanel .activePeopleHeading{margin-bottom:8px!important}
+.activePanel .activePeopleGrid{display:flex!important;flex-direction:column!important;gap:5px!important;padding:0!important;overflow:visible!important}
+.activePanel .activePerson{display:grid!important;grid-template-columns:18px minmax(0,1fr) auto 24px;align-items:center!important;gap:6px!important;min-height:30px;padding:3px 0;border-bottom:1px solid rgba(30,165,99,.08);font-size:10px!important}
+.activePanel .activePerson:last-child{border-bottom:0}
+.activePanel .activePerson .n{min-width:0!important}
+.activePanel .activePerson .personName{min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;font-weight:850}
+.activePanel .activeRemove{margin-left:0}
+@media(max-width:430px){
+  .activePanel{padding:13px 12px!important}
+  .activeScheduleRow{gap:10px;margin-top:12px}
+  .activeScheduleDate{font-size:27px}
+  .activeScheduleTime{font-size:22px}
+  .activeSessionLine{font-size:10px}
+  .activePanel .activePerson{grid-template-columns:16px minmax(0,1fr) auto 24px;gap:5px}
+  .multiSportStamp{padding:3px 5px;font-size:6px}
+}
 </style>
 
 </head><body>
@@ -1111,8 +1137,9 @@ function renderActiveTraining(){
   const people=list.length
     ? list.map((p,i)=>`<div class="activePerson">
         <span class="n">${i+1}.</span>
-        <span class="personName personWithCard">${esc(p.name)}${p.hasMultisport?'<img class="multiCardMini" src="assets/multisport-card.webp" alt="Има карта MultiSport" title="Има карта MultiSport">':''}</span>
-        <button class="activeRemove" title="Премахни" onclick="askRemoveReg(${i},'${active.id}')">×</button>
+        <span class="personName">${esc(p.name)}</span>
+        ${p.hasMultisport?'<span class="multiSportStamp" title="Има карта MultiSport">MultiSport</span>':'<span></span>'}
+        <button class="activeRemove" title="Премахни" aria-label="Премахни записването на ${esc(p.name)}" onclick="askRemoveReg(${i},'${active.id}')">×</button>
       </div>`).join('')
     : '<div class="activeEmpty">Все още няма записани участници.</div>';
 
@@ -1122,34 +1149,23 @@ function renderActiveTraining(){
         <span class="liveLabel"><i class="liveDot"></i> АКТИВНА ТРЕНИРОВКА</span>
       </div>
 
-      <div class="activeBody">
-        <div class="activeSummary">
-          <div class="activeWhen">
-            <span class="activeWhenDate">${fmtDDMM(active.date)}</span>
-            <span class="activeWhenTime">${esc(active.time)}</span>
-          </div>
-
-          <div class="activeName">${esc(active.title)} with ${esc(active.trainer)}</div>
-          <div class="activeMeta">${esc(active.location)} · ${active.duration} минути</div>
-
-          <div class="activeNumbers">
-            <div class="bigCount">${regs}<small> / ${cap}</small></div>
-            <div class="freeCount"><strong>${free}</strong><span>свободни места</span></div>
-          </div>
-        </div>
-
-        <div class="activePeopleSide">
-          <div class="activePeopleHeading">
-            <span>Записали се</span>
-            <span>${regs} души</span>
-          </div>
-          <div class="activePeopleGrid">${people}</div>
-        </div>
+      <div class="activeScheduleRow">
+        <span class="activeScheduleDate">${fmtDDMM(active.date)}</span>
+        <span class="activeScheduleTime">${esc(active.time)}</span>
       </div>
+      <div class="activeSessionLine">${esc(active.title)} with ${esc(active.trainer)} | ${esc(active.location)} · ${active.duration} минути</div>
 
       <div class="activeProgressFull">
-        <div class="liveBarLabel"><span>Запълване</span><span>${Math.round(pct)}%</span></div>
+        <div class="liveBarLabel"><span>${regs} от ${cap} записани · ${free} свободни</span><span>${Math.round(pct)}%</span></div>
         <div class="liveBar"><i style="width:${pct}%"></i></div>
+      </div>
+
+      <div class="activePeopleSide">
+        <div class="activePeopleHeading">
+          <span>Записали се</span>
+          <span>${regs} души</span>
+        </div>
+        <div class="activePeopleGrid">${people}</div>
       </div>
     </div>`;
 }
@@ -1386,7 +1402,7 @@ function renderRegs(s){
     const tr=document.createElement('tr');
     tr.innerHTML=`
       <td>${i+1}</td>
-      <td><span class="personWithCard">${esc(x.name)}${x.hasMultisport?'<img class="multiCardMini" src="assets/multisport-card.webp" alt="Има карта MultiSport" title="Има карта MultiSport">':''}</span></td>
+      <td><span class="personWithCard">${esc(x.name)}${x.hasMultisport?'<span class="multiSportStamp" title="Има карта MultiSport">MultiSport</span>':''}</span></td>
       <td>${esc(x.phone)}</td>
       <td style="white-space:nowrap;font-weight:800;color:#686d75">${fmtRegistrationAt(x.createdAt)}</td>
       <td><button class="remove" onclick="askRemoveReg(${i},'${s.id}')">Премахни</button></td>`;
