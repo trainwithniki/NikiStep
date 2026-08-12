@@ -2,7 +2,15 @@
   'use strict';
   const cfg = window.NIKI_CONFIG;
   if (!cfg || !window.supabase) return console.error('Supabase configuration is missing.');
-  const client = window.supabase.createClient(cfg.supabaseUrl, cfg.supabasePublishableKey);
+  const rememberKey = 'niki-remember-admin';
+  const authStorage = {
+    getItem(key) { return (localStorage.getItem(rememberKey) !== '0' ? localStorage : sessionStorage).getItem(key); },
+    setItem(key, value) { return (localStorage.getItem(rememberKey) !== '0' ? localStorage : sessionStorage).setItem(key, value); },
+    removeItem(key) { localStorage.removeItem(key); sessionStorage.removeItem(key); }
+  };
+  const client = window.supabase.createClient(cfg.supabaseUrl, cfg.supabasePublishableKey, {
+    auth: { persistSession: true, storage: authStorage }
+  });
   const isAdminPage = /admin(?:\.html)?$/.test(location.pathname);
   let cache = { sessions: [] };
   let ready = false;
@@ -52,15 +60,18 @@
   }
 
   window.loadData = () => JSON.parse(JSON.stringify(cache));
-  window.saveData = function (next) {
+  window.saveData = async function (next) {
     const before = cache;
     cache = JSON.parse(JSON.stringify(next));
-    void persist(before, cache).catch(error => {
+    try {
+      await persist(before, cache);
+      return true;
+    } catch (error) {
       console.error(error); cache = before;
       if (typeof window.showToast === 'function') window.showToast('Промяната не беше записана.');
-      void refresh();
-    });
-    return true;
+      await refresh().catch(console.error);
+      return false;
+    }
   };
 
   async function persist(before, after) {
@@ -101,10 +112,33 @@
     }
   }
 
+  async function verifyAdmin() {
+    const sessionResult = await client.auth.getSession();
+    if (sessionResult.error || !sessionResult.data.session) return { authorized: false, error: sessionResult.error };
+    const result = await client.rpc('is_app_admin');
+    return { authorized: !result.error && result.data === true, error: result.error, session: sessionResult.data.session };
+  }
+
   window.nikiAdmin = {
-    login: (email, password) => client.auth.signInWithPassword({ email, password }),
+    async login(email, password, remember = true) {
+      localStorage.setItem(rememberKey, remember ? '1' : '0');
+      const result = await client.auth.signInWithPassword({ email, password });
+      if (result.error) return result;
+      const access = await verifyAdmin();
+      if (!access.authorized) {
+        await client.auth.signOut();
+        return { error: access.error || new Error('Този профил няма администраторски достъп.') };
+      }
+      await refresh();
+      return result;
+    },
     logout: () => client.auth.signOut(),
-    session: () => client.auth.getSession()
+    async session() {
+      const access = await verifyAdmin();
+      if (access.authorized) await refresh();
+      return access;
+    },
+    refresh
   };
 
   window.undoBooking = async function () {
@@ -134,7 +168,7 @@
     document.body.appendChild(footer);
   });
 
-  refresh().catch(error => {
+  if (!isAdminPage) refresh().catch(error => {
     console.error(error);
     if (!ready && typeof window.showToast === 'function') window.showToast('Няма връзка с базата данни.');
   });

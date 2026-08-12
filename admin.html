@@ -851,7 +851,11 @@ html.authLocked,html.authLocked body{overflow:hidden!important}
 .adminLoginBtn:disabled{opacity:.55;cursor:not-allowed}
 .adminLoginError{display:none;margin-top:11px;padding:9px 10px;border-radius:10px;background:#fff0f3;color:#b62a45;font-size:11px;font-weight:850;text-align:center}
 .adminLoginError.show{display:block}
+.adminRemember{display:flex;align-items:center;gap:9px;margin-top:13px;color:#626970;font-size:11px;font-weight:800;cursor:pointer}
+.adminRemember input{width:18px;height:18px;accent-color:#18a65d}
 .adminLogoutBtn{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:7px 11px;border:1px solid #ffd4dc;border-radius:9px;background:#fff3f5;color:#bd2946;font-size:9px;font-weight:950;cursor:pointer}
+.adminNavActions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.adminNavBtn{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:8px 12px;border:1px solid #dce4df;border-radius:10px;background:#fff;color:#343a3f;font-size:10px;font-weight:950;text-decoration:none;cursor:pointer}
 @media(max-width:430px){#adminAuthGate{padding:12px}.adminLoginCard{padding:22px 16px 18px;border-radius:18px}}
 </style>
 
@@ -875,11 +879,12 @@ html.authLocked,html.authLocked body{overflow:hidden!important}
         <button type="button" class="adminPasswordToggle" id="adminPasswordToggle" aria-label="Покажи паролата">👁</button>
       </div>
     </div>
+    <label class="adminRemember"><input id="adminRemember" type="checkbox" checked> Запомни ме на това устройство</label>
     <button class="adminLoginBtn" id="adminLoginBtn" type="submit">Вход</button>
     <div class="adminLoginError" id="adminLoginError">Грешно потребителско име или парола.</div>
   </form>
 </div>
-<div class="shell"><div class="head"><div><div class="eye">STEP AEROBICS WITH NIKI • FIT BODY CENTER</div><h1>Админ панел</h1></div><div class="headActions"><button class="btn settingsBtn" onclick="openSettings()">⚙ Настройки</button><button class="btn primary" onclick="openNew()">+ Нова тренировка</button></div></div><div id="activeTraining"></div>
+<div class="shell"><div class="head"><div><div class="eye">STEP AEROBICS WITH NIKI • FIT BODY CENTER</div><h1>Админ панел</h1></div><div class="headActions"><div class="adminNavActions"><a class="adminNavBtn" href="./">← Към сайта</a><button class="adminLogoutBtn" type="button" onclick="adminLogout()">Изход</button></div><button class="btn settingsBtn" onclick="openSettings()">⚙ Настройки</button><button class="btn primary" onclick="openNew()">+ Нова тренировка</button></div></div><div id="activeTraining"></div>
 <div class="quickTemplates"><div class="quickTemplatesTop"><strong>Бърза тренировка от шаблон</strong><span>Шаблон → избери дата → активирай</span></div><div class="quickTemplateChips" id="quickTemplateChips"></div></div>
 <div class="card">
   <h2>Тренировки</h2>
@@ -1246,7 +1251,7 @@ function resetForm(){const n=new Date();const defaultIso=`${n.getFullYear()}-${S
 function openNew(){mode='new';editId=null;resetForm();renderTplSelect();fTemplate.value='';editorTitle.textContent='Нова тренировка';activateNowBtn.textContent='Създай и активирай';editorOverlay.classList.add('open')}
 function openEdit(id){data=loadData();renderTplSelect();fTemplate.value='';const s=data.sessions.find(x=>x.id===id);if(!s)return;mode='edit';editId=id;editorTitle.textContent='Редакция на тренировка';setPickerDate(s.date);setTimePicker(s.time);fDuration.value=s.duration||60;fTitle.value=s.title||'Step Aerobics';fTrainer.value=s.trainer||'Ники';fLocation.value=s.location||'Fit Body Center';fCapacity.value=s.capacity||20;fBooking.value=s.bookingClosed?'closed':(s.forceOpen?'openNow':String(bookingDaysFor(s)));fBookingCloseHours.value=String(bookingCloseHoursFor(s));fAnnouncement.value=s.announcement||'';fDescription.value=s.description||'';renderRegs(s);activateNowBtn.textContent='Активирай записването';datePicker.classList.remove('open');editorOverlay.classList.add('open')}
 function closeEditor(){editorOverlay.classList.remove('open');datePicker.classList.remove('open')}
-function saveEditor(activateNow=false){
+async function saveEditor(activateNow=false){
   const date=fDate.value;
   if(!date){showToast('Избери дата от календара.');return}
 
@@ -1293,7 +1298,7 @@ function saveEditor(activateNow=false){
     Object.assign(s,vals);
   }
 
-  saveData(data);
+  if(!(await saveData(data)))return;
   closeEditor();
   renderAll();
 
@@ -1425,19 +1430,20 @@ function askDelete(id){const s=data.sessions.find(x=>x.id===id);if(!s)return;del
   const error=document.getElementById('adminLoginError');
   const btn=document.getElementById('adminLoginBtn');
   const toggle=document.getElementById('adminPasswordToggle');
+  const remember=document.getElementById('adminRemember');
   function showAdmin(){document.documentElement.classList.remove('authLocked');gate.classList.add('hidden')}
   function lockAdmin(){document.documentElement.classList.add('authLocked');gate.classList.remove('hidden');setTimeout(()=>username.focus(),50)}
   function setErr(message){error.textContent=message;error.classList.add('show')}
   form.addEventListener('submit',async event=>{
     event.preventDefault();error.classList.remove('show');btn.disabled=true;btn.textContent='Проверка...';
-    const result=await window.nikiAdmin.login((username.value||'').trim(),password.value||'');
-    if(result.error){setErr('Грешен имейл или парола.');password.select()}
+    const result=await window.nikiAdmin.login((username.value||'').trim(),password.value||'',remember.checked);
+    if(result.error){setErr(result.error.message==='Този профил няма администраторски достъп.'?result.error.message:'Грешен имейл или парола.');password.select()}
     else{password.value='';showAdmin();if(window.renderAll)window.renderAll()}
     btn.disabled=false;btn.textContent='Вход';
   });
   toggle.addEventListener('click',()=>{const hidden=password.type==='password';password.type=hidden?'text':'password';toggle.textContent=hidden?'🙈':'👁'});
   window.adminLogout=async function(){await window.nikiAdmin.logout();username.value='';password.value='';lockAdmin()};
-  window.nikiAdmin.session().then(({data})=>data.session?showAdmin():lockAdmin()).catch(lockAdmin);
+  window.nikiAdmin.session().then(access=>access.authorized?showAdmin():lockAdmin()).catch(lockAdmin);
 })();
 </script>
 
