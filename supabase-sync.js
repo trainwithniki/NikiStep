@@ -130,7 +130,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     const footer = document.createElement('footer');
     footer.style.cssText = 'padding:24px 12px 28px;text-align:center;font:800 11px/1.4 system-ui;color:#8a9098;letter-spacing:.06em';
-    footer.innerHTML = '<a href="/admin.html" style="color:inherit;text-decoration:none">Powered by Niki</a>';
+    footer.innerHTML = '<a href="https://trainwithniki.github.io/NikiStep/admin" style="color:inherit;text-decoration:none"><strong>Powered by Niki Ilieva</strong></a>';
     document.body.appendChild(footer);
   });
 
