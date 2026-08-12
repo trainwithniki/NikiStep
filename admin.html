@@ -868,6 +868,7 @@ html.authLocked,html.authLocked body,html.authChecking,html.authChecking body{ov
 html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!important}
 #adminAuthGate{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;background:linear-gradient(145deg,#f4f7f5,#fff)}
 #adminAuthGate.hidden{display:none!important}
+.adminBackToSite{position:absolute;top:max(14px,env(safe-area-inset-top));left:max(14px,env(safe-area-inset-left));display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:9px 13px;border:1px solid #dce4df;border-radius:11px;background:rgba(255,255,255,.92);box-shadow:0 7px 20px rgba(22,55,38,.08);color:#343a3f;font-size:11px;font-weight:900;text-decoration:none}
 .adminLoginCard{width:min(100%,390px);padding:24px 20px;border-radius:22px;background:#fff;border:1px solid #e1e7e3;box-shadow:0 20px 55px rgba(22,55,38,.14)}
 .adminLoginBrand{text-align:center;margin-bottom:18px}
 .loginMark{width:56px;height:56px;margin:0 auto 12px;display:grid;place-items:center;border-radius:17px;background:linear-gradient(145deg,#13a45b,#29d17a);color:#fff;font-size:30px;font-weight:950}
@@ -898,6 +899,7 @@ html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!imp
 </head><body>
 
 <div id="adminAuthGate">
+  <a class="adminBackToSite" href="./" aria-label="Назад към публичния сайт">← Назад към сайта</a>
   <form class="adminLoginCard" id="adminLoginForm" autocomplete="on">
     <div class="adminLoginBrand">
       <div class="loginMark">N</div>
