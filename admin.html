@@ -832,6 +832,35 @@
 
 
 <script>document.documentElement.classList.remove('authLocked');document.documentElement.classList.add('authChecking')</script>
+<style id="admin-responsive-final">
+html{-webkit-text-size-adjust:100%}html,body{max-width:100%;overflow-x:hidden}button,a,input,select,textarea{touch-action:manipulation}
+.shell,.head,.adminNavActions,.card,.session,.main{min-width:0}.adminNavBtn,.adminLogoutBtn,.adminSettingsIcon,.btn{min-height:42px}
+@media(max-width:650px){
+  .shell{padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) calc(18px + env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}
+  .head{align-items:flex-start;flex-direction:column;margin-bottom:10px}
+  .head h1{font-size:25px}.eye{line-height:1.4}
+  .adminNavActions{display:grid;grid-template-columns:1fr 44px 74px;width:100%;gap:7px}
+  .adminNavBtn,.adminLogoutBtn,.adminSettingsIcon{width:100%;min-height:44px}
+  .newTrainingRow{margin:0 0 12px}.newTrainingRow .btn{width:100%;min-height:48px;font-size:13px}
+  .session{padding:12px}.acts{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px!important}
+  .acts .btn{width:100%!important;min-width:0!important;min-height:44px!important}
+  .editor{height:auto;max-height:96dvh;padding:12px 12px calc(16px + env(safe-area-inset-bottom))}
+  .field input,.field select,.field textarea,.tplForm input,.tplForm select,.tplForm textarea{font-size:16px!important;min-height:46px}
+  .edActs{display:grid;grid-template-columns:1fr 1fr}.edActs .btn{min-height:46px}
+  .regs{overflow:hidden}.regs>div{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .regs table{min-width:620px}
+  .toast{left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));text-align:center;font-size:12px}
+  .settingsPanel{max-height:96dvh}.tplEditorActions,.tplConfirmActions,.cActs{flex-wrap:wrap}.tplEditorActions .btn{min-height:44px}
+}
+@media(max-width:360px){
+  .adminNavActions{grid-template-columns:1fr 44px 66px}.adminNavBtn{font-size:9px;padding:7px}.head h1{font-size:23px}
+  .edActs{grid-template-columns:1fr}.activeNumbers{flex-wrap:wrap}.bigCount{font-size:44px}
+}
+@media(min-width:651px){
+  .head{position:sticky;top:0;z-index:40;padding:12px 0;background:rgba(244,245,247,.94);backdrop-filter:blur(14px)}
+  .newTrainingRow{margin-top:-4px}
+}
+</style>
 <style id="v29-auth">
 html.authLocked,html.authLocked body,html.authChecking,html.authChecking body{overflow:hidden!important}
 html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!important}
