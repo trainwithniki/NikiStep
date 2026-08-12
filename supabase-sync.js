@@ -15,6 +15,7 @@
   let cache = { sessions: [] };
   let ready = false;
   const cancelTokens = new Map();
+  const isTrue = value => value === true || value === 'true' || value === 1 || value === '1';
 
   const fromRow = row => ({
     id: row.id, date: String(row.date), time: String(row.time).slice(0, 5),
@@ -43,7 +44,7 @@
       if (regs.error) throw regs.error;
       regs.data.forEach(row => {
         const session = sessions.find(item => item.id === row.session_id);
-        if (session) session.registrations.push({ id: row.id, name: row.name, phone: row.phone, hasMultisport: !!row.has_multisport, pending: row.pending, createdAt: row.created_at });
+        if (session) session.registrations.push({ id: row.id, name: row.name, phone: row.phone, hasMultisport: isTrue(row.has_multisport), pending: row.pending, createdAt: row.created_at });
       });
     } else {
       const result = await client.rpc('public_sessions');
@@ -69,7 +70,10 @@
       return true;
     } catch (error) {
       console.error(error); cache = before;
-      if (typeof window.showToast === 'function') window.showToast('Промяната не беше записана.');
+      if (typeof window.showToast === 'function') {
+        const multiSportColumnMissing = /has_multisport/i.test(String(error?.message || error?.details || ''));
+        window.showToast(multiSportColumnMissing ? 'MultiSport настройката още не е активирана в базата.' : 'Промяната не беше записана.');
+      }
       await refresh().catch(console.error);
       return false;
     }

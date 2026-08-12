@@ -959,9 +959,8 @@ button,a{min-height:44px}.calBtn{min-height:36px}.app{width:100%}
 .multisportChoice{display:grid;grid-template-columns:28px minmax(0,1fr) 118px;align-items:center;gap:10px;margin:13px 0 4px;padding:11px;border:1px solid #dce3df;border-radius:15px;background:linear-gradient(145deg,#fbfffc,#f5faf7);cursor:pointer}
 .multisportChoice input{width:22px;height:22px;margin:0;accent-color:#16975a}
 .multisportChoiceText strong{display:block;font-size:12px;color:#27302b}.multisportChoiceText span{display:block;margin-top:3px;font-size:9px;line-height:1.3;color:#747c77}
-.multiCardPreview{height:62px;border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#fff 0 55%,#e8233e 56% 72%,#176bc0 73%);border:1px solid #d6dbe0;box-shadow:0 5px 13px rgba(22,34,28,.12);transform:rotate(-2deg)}
-.multiCardPreview b{font-size:13px;letter-spacing:-.04em;color:#20252a}.multiCardPreview small{font-size:7px;font-weight:900;color:#687078}
-@media(max-width:370px){.multisportChoice{grid-template-columns:25px minmax(0,1fr) 94px;gap:7px}.multiCardPreview{height:54px}.multisportChoiceText strong{font-size:11px}}
+.multiCardPreview{display:block;width:118px;height:auto;aspect-ratio:335/216;object-fit:contain;border-radius:9px;border:1px solid #d6dbe0;box-shadow:0 5px 13px rgba(22,34,28,.12);transform:rotate(-2deg)}
+@media(max-width:370px){.multisportChoice{grid-template-columns:25px minmax(0,1fr) 94px;gap:7px}.multiCardPreview{width:94px}.multisportChoiceText strong{font-size:11px}}
 
 @media(max-width:390px){
   .featuredDateTime{
@@ -2212,7 +2211,7 @@ img{max-width:100%;height:auto}
 </section>
 <section class="sec"><h3>Календар</h3><div class="cal"><div class="calHead"><button class="calBtn" onclick="moveMonth(-1)">‹</button><div class="calTitle" id="calTitle"></div><button class="calBtn" onclick="moveMonth(1)">›</button></div><div class="week"><div>ПН</div><div>ВТ</div><div>СР</div><div>ЧТ</div><div>ПТ</div><div>СБ</div><div>НД</div></div><div class="days" id="calendar"></div><div id="calendarCountdown"></div><div class="legend"><span><b class="legend-green"></b>Активна</span><span><b class="legend-red"></b>До записване</span><span><b class="legend-orange"></b>Проведена</span></div></div></section>
 <section class="sec"><h3>Тази и следващата седмица</h3><p class="sub">Тук се показват само тренировките от текущата седмица и следващата. Календарът по-горе остава пълен.</p><div id="sessionList"></div></section></main></div><div class="sticky" id="sticky"></div>
-<div class="modal" id="bookModal"><div class="sheet"><h3>Запиши своето място</h3><div id="bookSummary" class="bookHero"></div><div class="field"><label>Име</label><input id="personName" autocomplete="name" placeholder="Име"></div><div class="field"><label>Телефон за контакт</label><input id="personPhone" inputmode="tel" autocomplete="tel" placeholder="тел. номер"><div class="phoneError" id="phoneError"></div><div class="phoneNotice">Моля въвеждайте актуални телефонни номера, за да важи записът.</div></div><label class="multisportChoice"><input id="personMultisport" type="checkbox"><span class="multisportChoiceText"><strong>Имам карта MultiSport</strong><span>Отбележи, ако ще използваш картата.</span></span><span class="multiCardPreview" aria-hidden="true"><b>MultiSport</b><small>CARD</small></span></label><div class="actions"><button class="cancel" onclick="closeBook()">Отказ</button><button class="confirm" onclick="submitBooking()">Потвърди</button></div></div></div>
+<div class="modal" id="bookModal"><div class="sheet"><h3>Запиши своето място</h3><div id="bookSummary" class="bookHero"></div><div class="field"><label>Име</label><input id="personName" autocomplete="name" placeholder="Име"></div><div class="field"><label>Телефон за контакт</label><input id="personPhone" inputmode="tel" autocomplete="tel" placeholder="тел. номер"><div class="phoneError" id="phoneError"></div><div class="phoneNotice">Моля въвеждайте актуални телефонни номера, за да важи записът.</div></div><label class="multisportChoice"><input id="personMultisport" type="checkbox"><span class="multisportChoiceText"><strong>Имам карта MultiSport</strong><span>Отбележи, ако ще използваш картата.</span></span><img class="multiCardPreview" src="assets/multisport-card.webp" alt="Карта MultiSport"></label><div class="actions"><button class="cancel" onclick="closeBook()">Отказ</button><button class="confirm" onclick="submitBooking()">Потвърди</button></div></div></div>
 
 <div class="modal" id="inactiveModal">
   <div class="sheet inactiveSheet">
@@ -2830,5 +2829,5 @@ renderAll();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="supabase-sync.js"></script>
+<script src="supabase-sync.js?v=20260812-2"></script>
 </body></html>

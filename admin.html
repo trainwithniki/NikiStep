@@ -893,7 +893,7 @@ html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!imp
 .adminSettingsIcon{width:38px;padding:8px!important;font-size:17px!important;line-height:1}
 .newTrainingRow{display:flex;justify-content:flex-end;margin:-3px 0 13px}
 .newTrainingRow .btn{min-height:42px;padding:10px 16px}
-.multiCardMini{display:inline-flex;align-items:center;justify-content:center;width:42px;height:23px;margin-left:7px;border:1px solid #d3d9dd;border-radius:5px;background:linear-gradient(135deg,#fff 0 55%,#e8233e 56% 72%,#176bc0 73%);box-shadow:0 2px 6px rgba(20,30,25,.12);color:#20252a;font-size:6px;font-weight:950;letter-spacing:-.02em;vertical-align:middle;transform:rotate(-2deg)}
+.multiCardMini{display:inline-block;width:48px;height:auto;aspect-ratio:335/216;object-fit:contain;margin-left:7px;border:1px solid #d3d9dd;border-radius:5px;box-shadow:0 2px 6px rgba(20,30,25,.12);vertical-align:middle;transform:rotate(-2deg)}
 .personWithCard{display:inline-flex;align-items:center;flex-wrap:wrap;gap:2px}
 @media(max-width:430px){#adminAuthGate{padding:12px}.adminLoginCard{padding:22px 16px 18px;border-radius:18px}}
 </style>
@@ -1111,7 +1111,7 @@ function renderActiveTraining(){
   const people=list.length
     ? list.map((p,i)=>`<div class="activePerson">
         <span class="n">${i+1}.</span>
-        <span class="personName personWithCard">${esc(p.name)}${p.hasMultisport?'<span class="multiCardMini" title="Има карта MultiSport">MultiSport</span>':''}</span>
+        <span class="personName personWithCard">${esc(p.name)}${p.hasMultisport?'<img class="multiCardMini" src="assets/multisport-card.webp" alt="Има карта MultiSport" title="Има карта MultiSport">':''}</span>
         <button class="activeRemove" title="Премахни" onclick="askRemoveReg(${i},'${active.id}')">×</button>
       </div>`).join('')
     : '<div class="activeEmpty">Все още няма записани участници.</div>';
@@ -1386,7 +1386,7 @@ function renderRegs(s){
     const tr=document.createElement('tr');
     tr.innerHTML=`
       <td>${i+1}</td>
-      <td><span class="personWithCard">${esc(x.name)}${x.hasMultisport?'<span class="multiCardMini" title="Има карта MultiSport">MultiSport</span>':''}</span></td>
+      <td><span class="personWithCard">${esc(x.name)}${x.hasMultisport?'<img class="multiCardMini" src="assets/multisport-card.webp" alt="Има карта MultiSport" title="Има карта MultiSport">':''}</span></td>
       <td>${esc(x.phone)}</td>
       <td style="white-space:nowrap;font-weight:800;color:#686d75">${fmtRegistrationAt(x.createdAt)}</td>
       <td><button class="remove" onclick="askRemoveReg(${i},'${s.id}')">Премахни</button></td>`;
@@ -1460,7 +1460,7 @@ function confirmRemoveReg(){
 function askDelete(id){const s=data.sessions.find(x=>x.id===id);if(!s)return;deleteId=id;deleteText.textContent=`Сигурни ли сте, че искате да изтриете тренировката на ${fmtDDMM(s.date)} в ${s.time}? Действието не може да бъде отменено.`;deleteConfirm.classList.add('open')}function closeDelete(){deleteId=null;deleteConfirm.classList.remove('open')}function confirmDelete(){if(!deleteId)return;data=loadData();data.sessions=data.sessions.filter(s=>s.id!==deleteId);saveData(data);closeDelete();renderAll();showToast('Тренировката е изтрита.')}function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}function renderAll(){data=loadData();renderActiveTraining();renderList()}window.addEventListener('storage',renderAll);buildTimePicker();setTimePicker('18:30');buildTplTime();renderTemplatesAll();renderAll();</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="supabase-sync.js"></script>
+<script src="supabase-sync.js?v=20260812-2"></script>
 <script id="supabase-auth-js">
 (function(){
   const gate=document.getElementById('adminAuthGate');
