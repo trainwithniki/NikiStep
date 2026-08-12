@@ -843,7 +843,8 @@ html{-webkit-text-size-adjust:100%}html,body{max-width:100%;overflow-x:hidden}bu
   .adminNavBtn,.adminLogoutBtn,.adminSettingsIcon{width:100%;min-height:44px}
   .newTrainingRow{margin:0 0 12px}.newTrainingRow .btn{width:100%;min-height:48px;font-size:13px}
   .session{padding:12px}.acts{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px!important}
-  .acts .btn{width:100%!important;min-width:0!important;min-height:44px!important}
+  .acts{display:flex!important;flex-wrap:wrap;gap:5px!important}
+  .acts .btn{width:auto!important;min-width:0!important;min-height:36px!important;padding:6px 9px!important;font-size:9px!important;flex:1 1 calc(50% - 5px)}
   .editor{height:auto;max-height:96dvh;padding:12px 12px calc(16px + env(safe-area-inset-bottom))}
   .field input,.field select,.field textarea,.tplForm input,.tplForm select,.tplForm textarea{font-size:16px!important;min-height:46px}
   .edActs{display:grid;grid-template-columns:1fr 1fr}.edActs .btn{min-height:46px}
@@ -856,6 +857,7 @@ html{-webkit-text-size-adjust:100%}html,body{max-width:100%;overflow-x:hidden}bu
   .adminNavActions{grid-template-columns:1fr 44px 66px}.adminNavBtn{font-size:9px;padding:7px}.head h1{font-size:23px}
   .edActs{grid-template-columns:1fr}.activeNumbers{flex-wrap:wrap}.bigCount{font-size:44px}
 }
+@media(min-width:651px){.acts .btn{min-height:34px!important;padding:6px 8px!important;font-size:9px!important}}
 @media(min-width:651px){
   .head{position:sticky;top:0;z-index:40;padding:12px 0;background:rgba(244,245,247,.94);backdrop-filter:blur(14px)}
   .newTrainingRow{margin-top:-4px}
