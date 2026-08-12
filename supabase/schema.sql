@@ -66,7 +66,7 @@ create policy "registrations admin write" on public.registrations for all to aut
 
 create or replace function public.public_sessions()
 returns table (
-  id text, date date, time time, title text, trainer text, location text,
+  id text, date date, "time" time, title text, trainer text, location text,
   duration integer, capacity integer, booking_closed boolean, force_open boolean,
   booking_days integer, booking_close_hours numeric, announcement text,
   description text, registration_count bigint
