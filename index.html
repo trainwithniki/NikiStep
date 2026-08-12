@@ -2107,6 +2107,44 @@ img{max-width:100%;height:auto}
 }
 </style>
 
+<style id="v30-signature-emphasis">
+/* Stronger, more distinctive Niki signature in header and training names */
+.top .brandStep{font-size:19px!important;letter-spacing:-.035em!important}
+.top .brandWith{font-size:14px!important;margin-top:4px!important}
+.top .brandNiki{
+  font-size:34px!important;
+  margin-top:-3px!important;
+  margin-left:34px!important;
+  transform:rotate(-5deg) skewX(-4deg)!important;
+  transform-origin:left center;
+  text-shadow:0 4px 14px rgba(17,154,86,.2)!important;
+}
+.featuredText .trainingBrandNiki{
+  font-size:clamp(42px,11vw,58px)!important;
+  margin-top:0!important;
+  margin-left:36px!important;
+  transform:rotate(-5deg) skewX(-4deg)!important;
+  transform-origin:left center;
+}
+.sessionMainInfo .trainingBrandNiki{
+  font-size:32px!important;
+  margin-left:27px!important;
+  transform:rotate(-4deg) skewX(-3deg)!important;
+  transform-origin:left center;
+}
+@media(max-width:430px){
+  .top .brandStep{font-size:17px!important}.top .brandWith{font-size:13px!important}
+  .top .brandNiki{font-size:31px!important;margin-left:29px!important}
+  .featuredText .trainingBrandNiki{font-size:43px!important;margin-left:30px!important}
+  .sessionMainInfo .trainingBrandNiki{font-size:30px!important;margin-left:24px!important}
+}
+@media(max-width:350px){
+  .top .brandStep{font-size:16px!important}.top .brandNiki{font-size:28px!important;margin-left:24px!important}
+  .featuredText .trainingBrandNiki{font-size:38px!important;margin-left:24px!important}
+  .sessionMainInfo .trainingBrandNiki{font-size:27px!important;margin-left:20px!important}
+}
+</style>
+
 </head><body><div class="app"><header class="top">
   <div class="mark">N</div>
   <div class="brand brandTwoLine">
