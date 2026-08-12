@@ -893,6 +893,8 @@ html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!imp
 .adminSettingsIcon{width:38px;padding:8px!important;font-size:17px!important;line-height:1}
 .newTrainingRow{display:flex;justify-content:flex-end;margin:-3px 0 13px}
 .newTrainingRow .btn{min-height:42px;padding:10px 16px}
+.multiCardMini{display:inline-flex;align-items:center;justify-content:center;width:42px;height:23px;margin-left:7px;border:1px solid #d3d9dd;border-radius:5px;background:linear-gradient(135deg,#fff 0 55%,#e8233e 56% 72%,#176bc0 73%);box-shadow:0 2px 6px rgba(20,30,25,.12);color:#20252a;font-size:6px;font-weight:950;letter-spacing:-.02em;vertical-align:middle;transform:rotate(-2deg)}
+.personWithCard{display:inline-flex;align-items:center;flex-wrap:wrap;gap:2px}
 @media(max-width:430px){#adminAuthGate{padding:12px}.adminLoginCard{padding:22px 16px 18px;border-radius:18px}}
 </style>
 
@@ -1109,7 +1111,7 @@ function renderActiveTraining(){
   const people=list.length
     ? list.map((p,i)=>`<div class="activePerson">
         <span class="n">${i+1}.</span>
-        <span class="personName">${esc(p.name)}</span>
+        <span class="personName personWithCard">${esc(p.name)}${p.hasMultisport?'<span class="multiCardMini" title="Има карта MultiSport">MultiSport</span>':''}</span>
         <button class="activeRemove" title="Премахни" onclick="askRemoveReg(${i},'${active.id}')">×</button>
       </div>`).join('')
     : '<div class="activeEmpty">Все още няма записани участници.</div>';
@@ -1384,7 +1386,7 @@ function renderRegs(s){
     const tr=document.createElement('tr');
     tr.innerHTML=`
       <td>${i+1}</td>
-      <td>${esc(x.name)}</td>
+      <td><span class="personWithCard">${esc(x.name)}${x.hasMultisport?'<span class="multiCardMini" title="Има карта MultiSport">MultiSport</span>':''}</span></td>
       <td>${esc(x.phone)}</td>
       <td style="white-space:nowrap;font-weight:800;color:#686d75">${fmtRegistrationAt(x.createdAt)}</td>
       <td><button class="remove" onclick="askRemoveReg(${i},'${s.id}')">Премахни</button></td>`;

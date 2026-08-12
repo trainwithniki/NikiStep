@@ -26,6 +26,7 @@ create table if not exists public.registrations (
   session_id text not null references public.sessions(id) on delete cascade,
   name text not null check (char_length(trim(name)) between 2 and 80),
   phone text not null check (char_length(phone) between 7 and 24),
+  has_multisport boolean not null default false,
   pending boolean not null default false,
   cancel_token uuid not null default gen_random_uuid(),
   created_at timestamptz not null default now()
@@ -38,6 +39,9 @@ create table if not exists public.app_admins (
 alter table public.sessions enable row level security;
 alter table public.registrations enable row level security;
 alter table public.app_admins enable row level security;
+
+-- Safe migration for projects created with an earlier version of this file.
+alter table public.registrations add column if not exists has_multisport boolean not null default false;
 
 create or replace function public.is_app_admin()
 returns boolean language sql stable security definer set search_path = public

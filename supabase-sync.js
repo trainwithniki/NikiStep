@@ -43,7 +43,7 @@
       if (regs.error) throw regs.error;
       regs.data.forEach(row => {
         const session = sessions.find(item => item.id === row.session_id);
-        if (session) session.registrations.push({ id: row.id, name: row.name, phone: row.phone, pending: row.pending, createdAt: row.created_at });
+        if (session) session.registrations.push({ id: row.id, name: row.name, phone: row.phone, hasMultisport: !!row.has_multisport, pending: row.pending, createdAt: row.created_at });
       });
     } else {
       const result = await client.rpc('public_sessions');
@@ -104,7 +104,8 @@
           const cancelToken = crypto.randomUUID();
           const inserted = await client.from('registrations').insert({
             id: registration.id, session_id: session.id, name: registration.name,
-            phone: registration.phone, pending: false, cancel_token: cancelToken
+            phone: registration.phone, has_multisport: !!registration.hasMultisport,
+            pending: false, cancel_token: cancelToken
           });
           if (inserted.error) throw inserted.error;
           cancelTokens.set(registration.id, cancelToken);
