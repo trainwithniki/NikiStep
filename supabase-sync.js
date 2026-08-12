@@ -56,6 +56,7 @@
     }
     cache = { sessions };
     ready = true;
+    document.documentElement.classList.remove('appLoading');
     if (typeof window.renderAll === 'function') window.renderAll();
   }
 
@@ -170,6 +171,7 @@
 
   if (!isAdminPage) refresh().catch(error => {
     console.error(error);
+    document.documentElement.classList.remove('appLoading');
     if (!ready && typeof window.showToast === 'function') window.showToast('Няма връзка с базата данни.');
   });
 })();
