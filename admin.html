@@ -235,6 +235,11 @@
   color:#25282e;
   letter-spacing:-.03em;
 }
+.adminWeekday{
+  color:#12345b;
+  font-size:14px;
+  font-weight:950;
+}
 
 @media(max-width:720px){
   .activeBody{
@@ -903,7 +908,7 @@ html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!imp
 #activeTraining .activePanel{margin:0!important;padding:14px!important}
 .activeScheduleRow{position:relative;z-index:1;display:flex;align-items:baseline;gap:12px;margin-top:13px}
 .activeScheduleDate{color:#149458;font-size:30px;line-height:1;font-weight:950;letter-spacing:-.055em}
-.activeScheduleWeekday{color:#20262a;font-size:18px;line-height:1;font-weight:850}
+.activeScheduleWeekday{color:#12345b;font-size:22px;line-height:1;font-weight:950}
 .activeScheduleSep{color:#7a8288;font-size:18px;font-weight:800}
 .activeScheduleTime{color:#20262a;font-size:24px;line-height:1;font-weight:950;letter-spacing:-.04em}
 .activeSessionLine{position:relative;z-index:1;margin-top:8px;color:#4f5b55;font-size:11px;line-height:1.4;font-weight:850}
@@ -921,7 +926,8 @@ html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!imp
   .activePanel{padding:13px 12px!important}
   .activeScheduleRow{gap:10px;margin-top:12px}
   .activeScheduleDate{font-size:27px}
-  .activeScheduleWeekday,.activeScheduleSep{font-size:16px}
+  .activeScheduleWeekday{font-size:20px}
+  .activeScheduleSep{font-size:16px}
   .activeScheduleTime{font-size:22px}
   .activeSessionLine{font-size:10px}
   .activePanel .activePerson{grid-template-columns:16px minmax(0,1fr) 24px;gap:5px}
@@ -1222,7 +1228,7 @@ function adminSessionRow(s){
   e.innerHTML=`
     <div class="main">
       <strong>
-        <span class="adminDate">${fmtDDMM(s.date)}</span> - ${fmtWeekday(s.date)} - ${esc(s.time)}
+        <span class="adminDate">${fmtDDMM(s.date)}</span> - <span class="adminWeekday">${fmtWeekday(s.date)}</span> - ${esc(s.time)}
         — ${esc(s.title)} with ${esc(s.trainer)}
       </strong>
       <p>${esc(s.location)} · ${s.duration} мин. · ${regs}/${s.capacity} записани</p>
