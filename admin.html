@@ -903,7 +903,7 @@ html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!imp
 #activeTraining .activePanel{margin:0!important;padding:14px!important}
 .activeScheduleRow{position:relative;z-index:1;display:flex;align-items:baseline;gap:12px;margin-top:13px}
 .activeScheduleDate{color:#149458;font-size:30px;line-height:1;font-weight:950;letter-spacing:-.055em}
-.activeScheduleWeekday{color:#20262a;font-size:18px;line-height:1;font-weight:850;text-transform:lowercase}
+.activeScheduleWeekday{color:#20262a;font-size:18px;line-height:1;font-weight:850}
 .activeScheduleSep{color:#7a8288;font-size:18px;font-weight:800}
 .activeScheduleTime{color:#20262a;font-size:24px;line-height:1;font-weight:950;letter-spacing:-.04em}
 .activeSessionLine{position:relative;z-index:1;margin-top:8px;color:#4f5b55;font-size:11px;line-height:1.4;font-weight:850}
@@ -1062,7 +1062,7 @@ function fmtRegistrationAt(value){
   if(Number.isNaN(d.getTime()))return'—';
   return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
 }
-function fmtDDMM(iso){const[y,m,d]=iso.split('-');return `${d}.${m}`}function fmtDDMMYYYY(iso){const[y,m,d]=iso.split('-');return `${d}.${m}.${y}`}function fmtWeekday(iso){const[y,m,d]=iso.split('-').map(Number);return['неделя','понеделник','вторник','сряда','четвъртък','петък','събота'][new Date(Date.UTC(y,m-1,d)).getUTCDay()]}
+function fmtDDMM(iso){const[y,m,d]=iso.split('-');return `${d}.${m}`}function fmtDDMMYYYY(iso){const[y,m,d]=iso.split('-');return `${d}.${m}.${y}`}function fmtWeekday(iso){const[y,m,d]=iso.split('-').map(Number);return['Неделя','Понеделник','Вторник','Сряда','Четвъртък','Петък','Събота'][new Date(Date.UTC(y,m-1,d)).getUTCDay()]}
 function fmtOpenAt(s){const d=bookingOpenAt(s);return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')} в ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`}
 function dayName(iso){return new Intl.DateTimeFormat('bg-BG',{weekday:'long'}).format(new Date(iso+'T12:00:00'))}
 function monthName(m,y){return new Intl.DateTimeFormat('bg-BG',{month:'long',year:'numeric'}).format(new Date(y,m,1))}
