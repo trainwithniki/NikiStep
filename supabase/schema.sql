@@ -29,6 +29,7 @@ create table if not exists public.registrations (
   has_multisport boolean not null default false,
   pending boolean not null default false,
   cancel_token uuid not null default gen_random_uuid(),
+  cancelled_at timestamptz,
   created_at timestamptz not null default now()
 );
 
@@ -42,6 +43,10 @@ alter table public.app_admins enable row level security;
 
 -- Safe migration for projects created with an earlier version of this file.
 alter table public.registrations add column if not exists has_multisport boolean not null default false;
+alter table public.registrations add column if not exists cancelled_at timestamptz;
+create unique index if not exists registrations_one_active_phone_per_session
+  on public.registrations (session_id, (regexp_replace(phone, '\D', '', 'g')))
+  where cancelled_at is null;
 
 create or replace function public.is_app_admin()
 returns boolean language sql stable security definer set search_path = public
@@ -81,7 +86,7 @@ language sql stable security definer set search_path = public
 as $$
   select s.id,s.date,s.time,s.title,s.trainer,s.location,s.duration,s.capacity,
          s.booking_closed,s.force_open,s.booking_days,s.booking_close_hours,
-         s.announcement,s.description,count(r.id)
+         s.announcement,s.description,count(r.id) filter (where r.cancelled_at is null)
   from public.sessions s left join public.registrations r on r.session_id=s.id
   group by s.id;
 $$;
@@ -91,8 +96,8 @@ create or replace function public.cancel_registration(registration_id text, toke
 returns boolean language plpgsql security definer set search_path = public
 as $$
 begin
-  delete from public.registrations
-  where id = registration_id and cancel_token = token and created_at > now() - interval '2 minutes';
+  update public.registrations set cancelled_at = now()
+  where id = registration_id and cancel_token = token and cancelled_at is null;
   return found;
 end;
 $$;

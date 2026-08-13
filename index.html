@@ -2219,6 +2219,13 @@ img{max-width:100%;height:auto}
 }
 </style>
 
+<style id="self-cancellation-ui">
+.mainBtn.cancelBookingBtn,.sessionBookBtn.cancelBookingBtn,.sticky .cancelBookingBtn{background:#fff1f3!important;color:#b4233d!important;border:1px solid #f2a8b5!important;box-shadow:none!important}
+.cancelConfirmText{color:#656a72;font-size:13px;line-height:1.5;margin:8px 0 18px}
+.cancelConfirmActions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.cancelConfirmActions button{min-height:48px;border-radius:13px;font-weight:900;border:1px solid var(--line)}
+.cancelConfirmBack{background:#fff;color:#34383e}.cancelConfirmGo{background:#b4233d;color:#fff;border-color:#b4233d!important}
+</style>
 </head><body><div class="app"><header class="top">
   <div class="mark">N</div>
   <div class="brand brandTwoLine">
@@ -2277,6 +2284,17 @@ img{max-width:100%;height:auto}
       <button class="undoOk" onclick="confirmBookingNow()">OK</button>
     </div>
     <div class="undoTimerHint">Ако не натиснеш нищо, записът ще се потвърди автоматично.</div>
+  </div>
+</div>
+<div class="modal" id="cancelBookingModal">
+  <div class="sheet" style="text-align:center">
+    <div class="handle"></div>
+    <h3>Отписване от тренировка</h3>
+    <p class="cancelConfirmText" id="cancelBookingText">Сигурни ли сте, че искате да се отпишете? Мястото ще бъде освободено веднага.</p>
+    <div class="cancelConfirmActions">
+      <button class="cancelConfirmBack" onclick="closeCancelBooking()">Назад</button>
+      <button class="cancelConfirmGo" id="cancelBookingConfirm" onclick="confirmSelfCancellation()">Да, отпиши ме</button>
+    </div>
   </div>
 </div>
 <div class="toast" id="toast"></div><script>const STORAGE_KEY='stepAerobicsNikiDataV9';const DEFAULT_DATA={"sessions": [{"id": "s-2026-08-06", "date": "2026-08-06", "time": "18:30", "title": "Step Aerobics", "trainer": "Niki", "location": "Fit Body Center", "duration": 60, "capacity": 20, "bookingClosed": false, "description": "Енергична Step Aerobics тренировка с Niki във Fit Body Center.", "registrations": []}, {"id": "s-2026-08-13", "date": "2026-08-13", "time": "18:30", "title": "Step Aerobics", "trainer": "Niki", "location": "Fit Body Center", "duration": 60, "capacity": 20, "bookingClosed": false, "description": "Енергия, музика и движение. Запази своето място за Step Aerobics с Niki.", "registrations": []}, {"id": "s-2026-08-20", "date": "2026-08-20", "time": "18:30", "title": "Step Aerobics", "trainer": "Niki", "location": "Fit Body Center", "duration": 60, "capacity": 20, "bookingClosed": false, "description": "Предстояща Step Aerobics тренировка във Fit Body Center.", "registrations": []}, {"id": "s-2026-08-27", "date": "2026-08-27", "time": "18:30", "title": "Step Aerobics", "trainer": "Niki", "location": "Fit Body Center", "duration": 60, "capacity": 20, "bookingClosed": false, "description": "Предстояща Step Aerobics тренировка във Fit Body Center.", "registrations": []}]};
@@ -2435,7 +2453,10 @@ function renderFeatured(){
   const [yy,mm,dd]=s.date.split('-');
   const announcement=String(s.announcement||'').trim();
   const featuredClass=st==='open'?'featured-open':st==='completed'?'featured-completed':st==='closed'?'featured-closed':'featured-upcoming';
-  const button = st==='open'
+  const ownBooking=!!window.nikiBookings?.has(s.id);
+  const button = ownBooking
+    ? `<button class="mainBtn cancelBookingBtn" onclick="openCancelBooking('${s.id}')">ОТПИШИ СЕ</button>`
+    : st==='open'
     ? `<button class="mainBtn" ${free>0?`onclick="openBook('${s.id}')"`:'disabled'}>${free>0?'ЗАПИШИ СЕ':'НЯМА СВОБОДНИ МЕСТА'}</button>`
     : st==='upcoming'
       ? `<button class="mainBtn waiting" onclick="showInactive('${s.id}')">ЗАПИСВАНЕ ОТ ${fmtOpenAt(s)}</button>`
@@ -2482,7 +2503,9 @@ function renderFeatured(){
   </div>${button}`;
 
   const stickyDate=`${fmtDDMM(s.date)} · ${esc(s.time)}`;
-  sticky.innerHTML = st==='open'
+  sticky.innerHTML = ownBooking
+    ? `<button class="cancelBookingBtn" onclick="openCancelBooking('${s.id}')"><span class="stickyDate">ТРЕНИРОВКА НА ${stickyDate}</span><span class="stickyAction">ОТПИШИ СЕ</span></button>`
+    : st==='open'
     ? `<button ${free>0?`onclick="openBook('${s.id}')"`:'disabled'}><span class="stickyDate">ТРЕНИРОВКА НА ${stickyDate}</span><span class="stickyAction">${free>0?'ЗАПИШИ СЕ · '+free+' СВОБОДНИ МЕСТА':'НЯМА СВОБОДНИ МЕСТА'}</span></button>`
     : st==='upcoming'
       ? `<button class="waiting" onclick="showInactive('${s.id}')"><span class="stickyDate">ТРЕНИРОВКА НА ${stickyDate}</span><span class="stickyAction">ЗАПИСВАНЕ ОТ ${fmtOpenAt(s)}</span></button>`
@@ -2608,7 +2631,10 @@ function sessionCard(s){
   el.className='session '+st;
   const announcement=String(s.announcement||'').trim();
 
-  const bookingAction = st==='open'
+  const ownBooking=!!window.nikiBookings?.has(s.id);
+  const bookingAction = ownBooking
+    ? `<div class="sessionBookAction"><button class="sessionBookBtn cancelBookingBtn" onclick="event.stopPropagation();openCancelBooking('${s.id}')">ОТПИШИ СЕ</button></div>`
+    : st==='open'
     ? `<div class="sessionBookAction"><button class="sessionBookBtn" ${free>0?`onclick="event.stopPropagation();openBook('${s.id}')"`:'disabled'}>${free>0?'ЗАПИШИ СЕ':'НЯМА МЕСТА'}</button></div>`
     : '';
 
@@ -2724,6 +2750,24 @@ function renderSessions(){
     doneGroup.appendChild(empty);
   }
   b.appendChild(doneGroup);
+}
+let selfCancelSessionId=null;
+function openCancelBooking(id){
+  const s=loadData().sessions.find(x=>x.id===id);if(!s)return;
+  selfCancelSessionId=id;
+  cancelBookingText.textContent=`Сигурни ли сте, че искате да се отпишете от тренировката на ${fmtDDMM(s.date)} в ${s.time}? Мястото ще бъде освободено веднага.`;
+  cancelBookingModal.classList.add('open');
+}
+function closeCancelBooking(){selfCancelSessionId=null;cancelBookingModal.classList.remove('open')}
+async function confirmSelfCancellation(){
+  if(!selfCancelSessionId||!window.nikiBookings)return;
+  const id=selfCancelSessionId,button=document.getElementById('cancelBookingConfirm');
+  button.disabled=true;button.textContent='Отписване…';
+  const result=await window.nikiBookings.cancel(id);
+  button.disabled=false;button.textContent='Да, отпиши ме';
+  closeCancelBooking();
+  showToast(result.ok?'Успешно се отписахте. Мястото е освободено.':result.message);
+  renderAll();
 }
 function moveMonth(n){currentView=new Date(currentView.getFullYear(),currentView.getMonth()+n,1);renderCalendar()}function openBook(id){data=loadData();const s=data.sessions.find(x=>x.id===id);if(!s)return;if(bookingState(s)!=='open'){showInactive(id);return}if((s.registrations||[]).length>=s.capacity){showToast('Няма свободни места.');return}selectedId=id;setPhoneError('');document.getElementById('personMultisport').checked=false;document.getElementById('bookSummary').innerHTML=`<span class="bookHeroDate">${fmtDDMM(s.date)}</span><span class="bookHeroTime">${esc(s.time)}</span><span class="bookHeroPlace">${esc(s.location)}</span>`;document.getElementById('bookModal').classList.add('open')}function closeBook(){document.getElementById('bookModal').classList.remove('open');selectedId=null}var pendingBooking=null,countTimer=null,countLeft=5;
 async function submitBooking(){
@@ -2869,5 +2913,5 @@ renderAll();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="supabase-sync.js?v=20260812-2"></script>
+<script src="supabase-sync.js?v=20260813-3"></script>
 </body></html>

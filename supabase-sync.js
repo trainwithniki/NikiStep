@@ -3,6 +3,7 @@
   const cfg = window.NIKI_CONFIG;
   if (!cfg || !window.supabase) return console.error('Supabase configuration is missing.');
   const rememberKey = 'niki-remember-admin';
+  const bookingReceiptsKey = 'niki-booking-receipts-v1';
   const authStorage = {
     getItem(key) { return (localStorage.getItem(rememberKey) !== '0' ? localStorage : sessionStorage).getItem(key); },
     setItem(key, value) { return (localStorage.getItem(rememberKey) !== '0' ? localStorage : sessionStorage).setItem(key, value); },
@@ -16,6 +17,8 @@
   let ready = false;
   const cancelTokens = new Map();
   const isTrue = value => value === true || value === 'true' || value === 1 || value === '1';
+  const readReceipts = () => { try { return JSON.parse(localStorage.getItem(bookingReceiptsKey) || '{}'); } catch (_) { return {}; } };
+  const writeReceipts = receipts => localStorage.setItem(bookingReceiptsKey, JSON.stringify(receipts));
 
   const fromRow = row => ({
     id: row.id, date: String(row.date), time: String(row.time).slice(0, 5),
@@ -44,7 +47,7 @@
       if (regs.error) throw regs.error;
       regs.data.forEach(row => {
         const session = sessions.find(item => item.id === row.session_id);
-        if (session) session.registrations.push({ id: row.id, name: row.name, phone: row.phone, hasMultisport: isTrue(row.has_multisport), pending: row.pending, createdAt: row.created_at });
+        if (session) session.registrations.push({ id: row.id, name: row.name, phone: row.phone, hasMultisport: isTrue(row.has_multisport), pending: row.pending, createdAt: row.created_at, cancelledAt: row.cancelled_at || null });
       });
     } else {
       const result = await client.rpc('public_sessions');
@@ -72,7 +75,8 @@
       console.error(error); cache = before;
       if (typeof window.showToast === 'function') {
         const multiSportColumnMissing = /has_multisport/i.test(String(error?.message || error?.details || ''));
-        window.showToast(multiSportColumnMissing ? 'MultiSport настройката още не е активирана в базата.' : 'Промяната не беше записана.');
+        const duplicateBooking = error?.code === '23505' || /one_active_phone|duplicate key/i.test(String(error?.message || error?.details || ''));
+        window.showToast(multiSportColumnMissing ? 'MultiSport настройката още не е активирана в базата.' : duplicateBooking ? 'Този телефон вече е записан за тренировката.' : 'Промяната не беше записана.');
       }
       await refresh().catch(console.error);
       return false;
@@ -113,6 +117,9 @@
           });
           if (inserted.error) throw inserted.error;
           cancelTokens.set(registration.id, cancelToken);
+          const receipts = readReceipts();
+          receipts[session.id] = { registrationId: registration.id, token: cancelToken, sessionId: session.id, name: registration.name, createdAt: new Date().toISOString() };
+          writeReceipts(receipts);
         }
       }
     }
@@ -145,6 +152,23 @@
       return access;
     },
     refresh
+  };
+
+  window.nikiBookings = {
+    has(sessionId) { return !!readReceipts()[sessionId]; },
+    get(sessionId) { return readReceipts()[sessionId] || null; },
+    async cancel(sessionId) {
+      const receipts = readReceipts();
+      const receipt = receipts[sessionId];
+      if (!receipt) return { ok: false, message: 'На този телефон не е намерено записване за тренировката.' };
+      const result = await client.rpc('cancel_registration', { registration_id: receipt.registrationId, token: receipt.token });
+      if (result.error) return { ok: false, message: 'Отписването не беше извършено. Опитай отново.' };
+      if (!result.data) { delete receipts[sessionId]; writeReceipts(receipts); return { ok: false, message: 'Записването вече е отменено или не съществува.' }; }
+      delete receipts[sessionId];
+      writeReceipts(receipts);
+      await refresh();
+      return { ok: true };
+    }
   };
 
   window.undoBooking = async function () {

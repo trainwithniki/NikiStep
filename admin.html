@@ -920,6 +920,8 @@ html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!imp
 .activePanel .activePerson:last-child{border-bottom:0}
 .activePanel .activePerson .n{min-width:0!important}
 .activePersonIdentity{display:flex;align-items:center;gap:6px;min-width:0}
+.cancelledStamp{display:inline-flex;align-items:center;padding:2px 6px;border:2px solid #b4233d;border-radius:4px;color:#b4233d;background:#fff5f6;font-size:8px;font-weight:950;letter-spacing:.08em;line-height:1;transform:rotate(-2deg);white-space:nowrap}
+.activePerson.cancelledPerson{opacity:.78;background:#fff8f8}.activePerson.cancelledPerson .personName{text-decoration:line-through;text-decoration-color:#b4233d}
 .activePanel .activePerson .personName{flex:0 1 auto!important;min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;font-weight:850}
 .activePanel .activeRemove{margin-left:0}
 @media(max-width:430px){
@@ -1140,7 +1142,9 @@ function renderActiveTraining(){
   }
 
   box.innerHTML=activeSessions.map(active=>{
-    const list=active.registrations||[];
+    const allRegistrations=active.registrations||[];
+    const list=allRegistrations.filter(p=>!p.cancelledAt);
+    const cancelled=allRegistrations.filter(p=>p.cancelledAt);
     const regs=list.length;
     const cap=Math.max(1,active.capacity||1);
     const free=Math.max(0,cap-regs);
@@ -1152,6 +1156,9 @@ function renderActiveTraining(){
           <button class="activeRemove" title="Премахни" aria-label="Премахни записването на ${esc(p.name)}" onclick="askRemoveReg(${i},'${active.id}')">×</button>
         </div>`).join('')
       : '<div class="activeEmpty">Все още няма записани участници.</div>';
+    const cancelledPeople=cancelled.length
+      ? cancelled.map(p=>`<div class="activePerson cancelledPerson"><span class="n">—</span><span class="activePersonIdentity"><span class="personName">${esc(p.name)}</span><span class="cancelledStamp">ОТПИСАН</span></span><span></span></div>`).join('')
+      : '';
 
     return `
     <div class="activePanel">
@@ -1179,6 +1186,7 @@ function renderActiveTraining(){
           <span>${regs} души</span>
         </div>
         <div class="activePeopleGrid">${people}</div>
+        ${cancelledPeople?`<div class="activePeopleHeading" style="margin-top:10px"><span>Отписали се</span><span>${cancelled.length} души</span></div><div class="activePeopleGrid">${cancelledPeople}</div>`:''}
       </div>
     </div>`;
   }).join('');
@@ -1220,7 +1228,7 @@ function stopSessionBookings(id){
 
 function adminSessionRow(s){
   const st=bookingState(s);
-  const regs=(s.registrations||[]).length;
+  const regs=(s.registrations||[]).filter(r=>!r.cancelledAt).length;
   const isCompleted=st==='completed';
   const e=document.createElement('div');
   e.className='session'+(st==='open'?' live':'');
@@ -1405,7 +1413,8 @@ function renderRegs(s){
   regsBlock.style.display='block';
   regTable.innerHTML='';
   const r=s.registrations||[];
-  regCount.textContent=`${r.length} / ${s.capacity}`;
+  const activeCount=r.filter(x=>!x.cancelledAt).length;
+  regCount.textContent=`${activeCount} / ${s.capacity}`;
 
   if(!r.length){
     regTable.innerHTML='<tr><td colspan="5" style="color:#81858d">Няма записани участници.</td></tr>';
@@ -1416,10 +1425,10 @@ function renderRegs(s){
     const tr=document.createElement('tr');
     tr.innerHTML=`
       <td>${i+1}</td>
-      <td><span class="personWithCard">${esc(x.name)}${x.hasMultisport?'<span class="multiSportStamp" title="Има карта MultiSport">MultiSport</span>':''}</span></td>
+      <td><span class="personWithCard">${esc(x.name)}${x.hasMultisport?'<span class="multiSportStamp" title="Има карта MultiSport">MultiSport</span>':''}${x.cancelledAt?'<span class="cancelledStamp">ОТПИСАН</span>':''}</span></td>
       <td>${esc(x.phone)}</td>
       <td style="white-space:nowrap;font-weight:800;color:#686d75">${fmtRegistrationAt(x.createdAt)}</td>
-      <td><button class="remove" onclick="askRemoveReg(${i},'${s.id}')">Премахни</button></td>`;
+      <td>${x.cancelledAt?'—':`<button class="remove" onclick="askRemoveReg(${i},'${s.id}')">Премахни</button>`}</td>`;
     regTable.appendChild(tr);
   });
 }
@@ -1490,7 +1499,7 @@ function confirmRemoveReg(){
 function askDelete(id){const s=data.sessions.find(x=>x.id===id);if(!s)return;deleteId=id;deleteText.textContent=`Сигурни ли сте, че искате да изтриете тренировката на ${fmtDDMM(s.date)} в ${s.time}? Действието не може да бъде отменено.`;deleteConfirm.classList.add('open')}function closeDelete(){deleteId=null;deleteConfirm.classList.remove('open')}function confirmDelete(){if(!deleteId)return;data=loadData();data.sessions=data.sessions.filter(s=>s.id!==deleteId);saveData(data);closeDelete();renderAll();showToast('Тренировката е изтрита.')}function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}function renderAll(){data=loadData();renderActiveTraining();renderList()}window.addEventListener('storage',renderAll);buildTimePicker();setTimePicker('18:30');buildTplTime();renderTemplatesAll();renderAll();</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="supabase-sync.js?v=20260812-2"></script>
+<script src="supabase-sync.js?v=20260813-3"></script>
 <script id="supabase-auth-js">
 (function(){
   const gate=document.getElementById('adminAuthGate');
