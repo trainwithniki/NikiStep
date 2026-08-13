@@ -2192,11 +2192,11 @@ img{max-width:100%;height:auto}
 
 <style id="v35-header-neon-glow">
 .top .brandStep{
-  color:#fff!important;
-  -webkit-text-stroke:.35px rgba(255,255,255,.92);
-  text-shadow:0 0 3px rgba(255,255,255,.98),0 0 9px rgba(255,255,255,.74),0 0 18px rgba(255,255,255,.42)!important;
+  color:#725cff!important;
+  -webkit-text-stroke:0;
+  text-shadow:0 0 4px rgba(114,92,255,.72),0 0 10px rgba(114,92,255,.46),0 0 20px rgba(114,92,255,.28)!important;
 }
-.top{min-height:140px!important;background:linear-gradient(180deg,#08090c 0%,#0c0d12 100%)!important;border-bottom:0!important;box-shadow:0 12px 26px rgba(8,9,12,.22)}
+.top{min-height:140px!important}
 .top .brandSignatureLine{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:18px;min-width:0}
 .top .brandWith{
   margin:0!important;
@@ -2213,33 +2213,10 @@ img{max-width:100%;height:auto}
 @media(max-width:430px){
   .top{min-height:128px!important}
   .top .brandSignatureLine{margin-top:16px}
-  .top .brandStep{text-shadow:0 0 3px rgba(255,255,255,.96),0 0 7px rgba(255,255,255,.68),0 0 14px rgba(255,255,255,.38)!important}
+  .top .brandStep{text-shadow:0 0 3px rgba(114,92,255,.68),0 0 8px rgba(114,92,255,.42),0 0 16px rgba(114,92,255,.25)!important}
   .top .brandWith{text-shadow:0 0 3px rgba(255,63,145,.76),0 0 9px rgba(255,63,145,.44),0 0 17px rgba(255,63,145,.23)!important}
   .top .brandTwoLine small{text-shadow:0 0 3px rgba(32,140,255,.8),0 0 8px rgba(32,140,255,.48),0 0 16px rgba(32,140,255,.26)!important}
 }
-</style>
-
-<style id="v36-black-header-preview">
-.top{display:none!important}
-.content{padding-top:0!important}
-.hero{
-  height:min(92dvh,800px)!important;
-  min-height:690px!important;
-  background-color:#090a0e!important;
-  background-image:none!important;
-}
-.hero::before{content:"";position:absolute;z-index:0;left:0;right:0;top:165px;bottom:0;background-color:#090a0e;background-image:linear-gradient(180deg,rgba(8,9,13,.02) 0%,rgba(8,9,13,.03) 62%,rgba(8,9,13,.42) 100%),url("assets/hero-original-quality-preview.jpg");background-size:cover;background-repeat:no-repeat;background-position:center center}
-.hero::after{content:"";position:absolute;z-index:1;right:-2px;bottom:-2px;width:38%;height:18%;background:radial-gradient(ellipse at 100% 100%,#20212a 0%,#20212a 34%,rgba(31,32,41,.96) 52%,rgba(28,29,38,.72) 68%,rgba(24,25,33,0) 88%);pointer-events:none}
-.heroTitleBlock{position:absolute;z-index:3;left:18px;right:18px;top:18px;display:flex;flex-direction:column;align-items:center;text-align:center;pointer-events:none}
-.heroTitleStep{display:block;color:#fff;font-size:clamp(34px,9vw,50px);font-weight:950;line-height:.92;letter-spacing:.015em;-webkit-text-stroke:.3px rgba(255,255,255,.9);text-shadow:0 0 3px rgba(255,255,255,.96),0 0 8px rgba(255,255,255,.66),0 0 16px rgba(255,255,255,.36)}
-.heroTitleSignature{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:18px}
-.heroTitleWith{color:#ff3f91;font-size:13px;font-weight:950;line-height:1;letter-spacing:.15em;text-transform:uppercase;text-shadow:0 0 3px rgba(255,63,145,.76),0 0 9px rgba(255,63,145,.44)}
-.heroTitleNiki{color:#48e893;font-family:"Parisienne","Segoe Script","Brush Script MT",cursive;font-size:clamp(43px,12vw,62px);line-height:.8;transform:rotate(-5deg) skewX(-4deg);text-shadow:0 0 6px rgba(72,232,147,.9),0 0 16px rgba(41,210,120,.68)}
-.heroTitleVenue{margin-top:9px;color:#208cff;font-size:9px;font-weight:950;letter-spacing:.16em;text-shadow:0 0 3px rgba(32,140,255,.8),0 0 9px rgba(32,140,255,.48)}
-.heroCopy{z-index:2}.heroCopy .heroBrandBadge{display:none!important}
-@media(min-width:760px){.hero::before{background-size:contain;background-position:center center}}
-@media(max-width:759px){.desktop .hero{width:calc(100% + 26px);margin-left:-13px;border-radius:0 0 28px 28px}}
-@media(max-width:370px){.hero{min-height:650px!important}.hero::before{top:155px}.heroTitleBlock{top:15px}.heroTitleStep{font-size:30px;letter-spacing:.012em}.heroTitleSignature{margin-top:16px}.heroTitleNiki{font-size:42px}.heroTitleVenue{margin-top:7px}}
 </style>
 
 </head><body><div class="app"><header class="top">
@@ -2249,7 +2226,7 @@ img{max-width:100%;height:auto}
     <span class="brandSignatureLine"><span class="brandWith">With</span><span class="brandNiki">Niki</span></span>
     <small>FIT BODY CENTER</small>
   </div>
-</header><main class="content"><div class="desktop"><section class="hero"><div class="heroTitleBlock" aria-label="Step Aerobics With Niki, Fit Body Center"><span class="heroTitleStep">Step Aerobics</span><span class="heroTitleSignature"><span class="heroTitleWith">With</span><span class="heroTitleNiki">Niki</span></span><span class="heroTitleVenue">FIT BODY CENTER</span></div><div class="heroCopy"><div class="heroBrandBadge" aria-label="Step Aerobics With Niki">
+</header><main class="content"><div class="desktop"><section class="hero"><div class="heroCopy"><div class="heroBrandBadge" aria-label="Step Aerobics With Niki">
   <span class="heroBrandStep">Step Aerobics</span>
   <span class="heroBrandWith">With</span><span class="heroBrandNiki">Niki</span>
 </div><h1>MOVE. SWEAT.<br>FEEL GOOD.</h1><p>Енергична тренировка с музика, движение и настроение във Fit Body Center.</p><div class="chips"><span class="chip">⚡ Cardio</span><span class="chip">🔥 Tone</span><span class="chip">🎵 Music</span><span class="chip">⏱ 60 min</span></div></div></section><section class="next" id="featured"></section></div>
