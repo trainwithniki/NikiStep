@@ -2217,9 +2217,13 @@ img{max-width:100%;height:auto}
   -webkit-text-fill-color:transparent;
   text-shadow:none!important;
   filter:drop-shadow(0 0 3px rgba(32,140,255,.52)) drop-shadow(0 0 7px rgba(255,63,145,.28));
-  animation:addressableLedText 3.2s linear infinite;
+  animation:addressableLedText 11.6s linear infinite;
 }
-@keyframes addressableLedText{from{background-position:-100% 50%}to{background-position:200% 50%}}
+@keyframes addressableLedText{
+  0%{background-position:200% 50%}
+  82.76%{background-position:-100% 50%}
+  100%{background-position:-100% 50%}
+}
 @media(max-width:430px){
   .top{min-height:128px!important}
   .top .brandSignatureLine{margin-top:16px}
