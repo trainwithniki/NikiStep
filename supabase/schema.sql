@@ -80,6 +80,7 @@ drop policy if exists "site settings admin write" on public.site_settings;
 create policy "site settings admin write" on public.site_settings for all to authenticated using (public.is_app_admin()) with check (public.is_app_admin());
 
 insert into public.site_settings(key,value) values ('hero_text',E'MOVE. SWEAT.\nFEEL GOOD.') on conflict (key) do nothing;
+insert into public.site_settings(key,value) values ('hero_subtitle','Енергична тренировка с музика, движение и настроение във Fit Body Center.') on conflict (key) do nothing;
 
 drop policy if exists "registrations admin read" on public.registrations;
 create policy "registrations admin read" on public.registrations for select to authenticated using (public.is_app_admin());

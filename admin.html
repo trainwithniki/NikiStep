@@ -1015,7 +1015,8 @@ html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!imp
   <div class="settingsHead"><div><h2>⚙ Настройки</h2><p>Промени текста върху главната снимка или управлявай шаблоните за тренировки.</p></div><button class="btn" onclick="closeSettings()">✕</button></div>
   <div class="tplBox" style="margin-bottom:13px">
     <h3>Текст върху главната снимка</h3>
-    <div class="field" style="margin:0"><label>ТЕКСТ</label><textarea id="heroTextSetting" maxlength="90" rows="3" placeholder="Напиши текст върху снимката"></textarea><div class="help">Може да използваш нов ред. Снимката и дизайнът няма да се променят.</div></div>
+    <div class="field" style="margin:0"><label>ГОЛЯМ ТЕКСТ</label><textarea id="heroTextSetting" maxlength="90" rows="3" placeholder="Напиши големия текст върху снимката"></textarea><div class="help">Може да използваш нов ред.</div></div>
+    <div class="field" style="margin-top:10px"><label>МАЛЪК ТЕКСТ</label><textarea id="heroSubtitleSetting" maxlength="180" rows="3" placeholder="Напиши малкия текст под заглавието"></textarea><div class="help">Снимката и дизайнът няма да се променят.</div></div>
     <div class="tplEditorActions" style="margin-top:10px"><button class="btn primary" onclick="saveHeroTextSetting()">Запази текста</button></div>
   </div>
   <div class="settingsGrid">
@@ -1132,12 +1133,12 @@ function applySelectedTemplate(){const t=tplById(fTemplate.value);if(!t){showToa
 function openNewFromTemplate(id){const t=tplById(id);if(!t)return;openNew();fTemplate.value=id;applyTemplate(t)}
 function useTemplateFromSettings(id){closeSettings();openNewFromTemplate(id)}
 async function saveHeroTextSetting(){
-  data=loadData();const value=heroTextSetting.value.trim();
-  if(!value){showToast('Напиши текст за снимката.');return}
-  data.siteSettings={...(data.siteSettings||{}),heroText:value};
-  if(await saveData(data)){showToast('Текстът върху снимката е запазен.');renderAll()}
+  data=loadData();const value=heroTextSetting.value.trim(),subtitle=heroSubtitleSetting.value.trim();
+  if(!value||!subtitle){showToast('Попълни големия и малкия текст.');return}
+  data.siteSettings={...(data.siteSettings||{}),heroText:value,heroSubtitle:subtitle};
+  if(await saveData(data)){showToast('Текстовете върху снимката са запазени.');renderAll()}
 }
-function openSettings(){templates=loadTemplates();renderTemplatesAll();if(!selectedTplId)resetTemplateEditor();data=loadData();heroTextSetting.value=data.siteSettings?.heroText||'MOVE. SWEAT.\nFEEL GOOD.';settingsOv.classList.add('open')}
+function openSettings(){templates=loadTemplates();renderTemplatesAll();if(!selectedTplId)resetTemplateEditor();data=loadData();heroTextSetting.value=data.siteSettings?.heroText||'MOVE. SWEAT.\nFEEL GOOD.';heroSubtitleSetting.value=data.siteSettings?.heroSubtitle||'Енергична тренировка с музика, движение и настроение във Fit Body Center.';settingsOv.classList.add('open')}
 function closeSettings(){settingsOv.classList.remove('open')}
 
 let data=loadData(),editId=null,deleteId=null,mode='new';function stateText(s){return{open:'Отворено',upcoming:'Предстояща',closed:'Затворено',completed:'Проведена'}[s]}function renderStats(){}
@@ -1510,7 +1511,7 @@ function confirmRemoveReg(){
 function askDelete(id){const s=data.sessions.find(x=>x.id===id);if(!s)return;deleteId=id;deleteText.textContent=`Сигурни ли сте, че искате да изтриете тренировката на ${fmtDDMM(s.date)} в ${s.time}? Действието не може да бъде отменено.`;deleteConfirm.classList.add('open')}function closeDelete(){deleteId=null;deleteConfirm.classList.remove('open')}function confirmDelete(){if(!deleteId)return;data=loadData();data.sessions=data.sessions.filter(s=>s.id!==deleteId);saveData(data);closeDelete();renderAll();showToast('Тренировката е изтрита.')}function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}function renderAll(){data=loadData();renderActiveTraining();renderList()}window.addEventListener('storage',renderAll);buildTimePicker();setTimePicker('18:30');buildTplTime();renderTemplatesAll();renderAll();</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="supabase-sync.js?v=20260814-4"></script>
+<script src="supabase-sync.js?v=20260814-5"></script>
 <script id="supabase-auth-js">
 (function(){
   const gate=document.getElementById('adminAuthGate');

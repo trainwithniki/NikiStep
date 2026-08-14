@@ -20,6 +20,10 @@ insert into public.site_settings(key,value)
 values ('hero_text',E'MOVE. SWEAT.\nFEEL GOOD.')
 on conflict (key) do nothing;
 
+insert into public.site_settings(key,value)
+values ('hero_subtitle','Енергична тренировка с музика, движение и настроение във Fit Body Center.')
+on conflict (key) do nothing;
+
 do $$ begin
   alter publication supabase_realtime add table public.site_settings;
 exception when duplicate_object then null; end $$;

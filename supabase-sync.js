@@ -13,7 +13,7 @@
     auth: { persistSession: true, storage: authStorage }
   });
   const isAdminPage = /admin(?:\.html)?$/.test(location.pathname);
-  const defaultSiteSettings = { heroText: 'MOVE. SWEAT.\nFEEL GOOD.' };
+  const defaultSiteSettings = { heroText: 'MOVE. SWEAT.\nFEEL GOOD.', heroSubtitle: 'Енергична тренировка с музика, движение и настроение във Fit Body Center.' };
   let cache = { sessions: [], siteSettings: { ...defaultSiteSettings } };
   let ready = false;
   const cancelTokens = new Map();
@@ -60,8 +60,11 @@
       });
     }
     let siteSettings = { ...defaultSiteSettings };
-    const settingsResult = await client.from('site_settings').select('key,value').eq('key', 'hero_text').maybeSingle();
-    if (!settingsResult.error && settingsResult.data?.value) siteSettings.heroText = String(settingsResult.data.value);
+    const settingsResult = await client.from('site_settings').select('key,value').in('key', ['hero_text', 'hero_subtitle']);
+    if (!settingsResult.error) (settingsResult.data || []).forEach(setting => {
+      if (setting.key === 'hero_text' && setting.value) siteSettings.heroText = String(setting.value);
+      if (setting.key === 'hero_subtitle' && setting.value) siteSettings.heroSubtitle = String(setting.value);
+    });
     cache = { sessions, siteSettings };
     ready = true;
     document.documentElement.classList.remove('appLoading');
@@ -110,6 +113,10 @@
       if ((after.siteSettings?.heroText || defaultSiteSettings.heroText) !== (before.siteSettings?.heroText || defaultSiteSettings.heroText)) {
         const settingSaved = await client.from('site_settings').upsert({ key: 'hero_text', value: after.siteSettings?.heroText || defaultSiteSettings.heroText, updated_at: new Date().toISOString() });
         if (settingSaved.error) throw settingSaved.error;
+      }
+      if ((after.siteSettings?.heroSubtitle || defaultSiteSettings.heroSubtitle) !== (before.siteSettings?.heroSubtitle || defaultSiteSettings.heroSubtitle)) {
+        const subtitleSaved = await client.from('site_settings').upsert({ key: 'hero_subtitle', value: after.siteSettings?.heroSubtitle || defaultSiteSettings.heroSubtitle, updated_at: new Date().toISOString() });
+        if (subtitleSaved.error) throw subtitleSaved.error;
       }
     } else {
       for (const session of after.sessions) {
