@@ -1169,7 +1169,7 @@ function renderActiveTraining(){
         </div>`).join('')
       : '<div class="activeEmpty">Все още няма записани участници.</div>';
     const cancelledPeople=cancelled.length
-      ? cancelled.map(p=>`<div class="activePerson cancelledPerson"><span class="n">—</span><span class="activePersonIdentity"><span class="personName">${esc(p.name)}</span><span class="cancelledStamp">ОТПИСАН</span></span><span></span></div>`).join('')
+      ? cancelled.map(p=>`<div class="activePerson cancelledPerson"><span class="n">—</span><span class="activePersonIdentity"><span class="personName">${esc(p.name)}</span><span class="cancelledStamp">ОТПИСАН</span></span><button class="activeRemove" title="Изтрий от историята" aria-label="Изтрий ${esc(p.name)} от историята" onclick="askRemoveReg(${allRegistrations.indexOf(p)},'${active.id}')">×</button></div>`).join('')
       : '';
 
     return `
@@ -1440,7 +1440,7 @@ function renderRegs(s){
       <td><span class="personWithCard">${esc(x.name)}${x.hasMultisport?'<span class="multiSportStamp" title="Има карта MultiSport">MultiSport</span>':''}${x.cancelledAt?'<span class="cancelledStamp">ОТПИСАН</span>':''}</span></td>
       <td>${esc(x.phone)}</td>
       <td style="white-space:nowrap;font-weight:800;color:#686d75">${fmtRegistrationAt(x.createdAt)}</td>
-      <td>${x.cancelledAt?'—':`<button class="remove" onclick="askRemoveReg(${i},'${s.id}')">Премахни</button>`}</td>`;
+      <td><button class="remove" onclick="askRemoveReg(${i},'${s.id}')">${x.cancelledAt?'Изтрий':'Премахни'}</button></td>`;
     regTable.appendChild(tr);
   });
 }
