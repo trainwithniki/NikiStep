@@ -2205,18 +2205,29 @@ img{max-width:100%;height:auto}
 }
 .top .brandSignatureLine .brandNiki{margin:0!important}
 .top .brandTwoLine small{
-  color:#208cff!important;
+  display:inline-block!important;
+  color:transparent!important;
+  font-size:11px!important;
   font-weight:950!important;
   letter-spacing:.16em!important;
-  text-shadow:0 0 4px rgba(32,140,255,.82),0 0 11px rgba(32,140,255,.52),0 0 22px rgba(32,140,255,.3)!important;
+  background:linear-gradient(90deg,#208cff 0%,#8b5cf6 18%,#ff3f91 36%,#ffd43b 54%,#3ee68b 72%,#208cff 90%,#8b5cf6 100%);
+  background-size:300% 100%;
+  background-clip:text;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  text-shadow:none!important;
+  filter:drop-shadow(0 0 3px rgba(32,140,255,.52)) drop-shadow(0 0 7px rgba(255,63,145,.28));
+  animation:addressableLedText 3.2s linear infinite;
 }
+@keyframes addressableLedText{from{background-position:-100% 50%}to{background-position:200% 50%}}
 @media(max-width:430px){
   .top{min-height:128px!important}
   .top .brandSignatureLine{margin-top:16px}
   .top .brandStep{text-shadow:0 0 3px rgba(114,92,255,.68),0 0 8px rgba(114,92,255,.42),0 0 16px rgba(114,92,255,.25)!important}
   .top .brandWith{text-shadow:0 0 3px rgba(255,63,145,.76),0 0 9px rgba(255,63,145,.44),0 0 17px rgba(255,63,145,.23)!important}
-  .top .brandTwoLine small{text-shadow:0 0 3px rgba(32,140,255,.8),0 0 8px rgba(32,140,255,.48),0 0 16px rgba(32,140,255,.26)!important}
+  .top .brandTwoLine small{filter:drop-shadow(0 0 2px rgba(32,140,255,.5)) drop-shadow(0 0 5px rgba(255,212,59,.25))}
 }
+@media(prefers-reduced-motion:reduce){.top .brandTwoLine small{animation:none;background-position:50% 50%}}
 </style>
 
 <style id="self-cancellation-ui">
