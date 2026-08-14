@@ -121,7 +121,7 @@ button,a{min-height:44px}.calBtn{min-height:36px}.app{width:100%}
   box-shadow:none!important;
 }
 .day.today{
-  outline:1px solid rgba(98,103,112,.45)!important;
+  outline:2px solid #111318!important;
   outline-offset:2px!important;
 }
 
@@ -2929,6 +2929,7 @@ function renderAll(){
 window.addEventListener('storage',renderAll);
 document.getElementById('personPhone')?.addEventListener('input',()=>setPhoneError(''));
 renderAll();
+setInterval(renderCalendar,60000);
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
