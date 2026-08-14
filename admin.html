@@ -1012,7 +1012,12 @@ html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!imp
 </div><div class="regs" id="regsBlock" style="display:none"><div class="regsHead"><h3>Записани участници</h3><span id="regCount" style="font-size:9px;color:var(--muted)"></span></div><div style="overflow:auto"><table><thead><tr><th>#</th><th>Име</th><th>Телефон</th><th>Записан на</th><th></th></tr></thead><tbody id="regTable"></tbody></table></div></div></div></div>
 
 <div class="settingsOv" id="settingsOv"><div class="settingsPanel">
-  <div class="settingsHead"><div><h2>⚙ Настройки · Шаблони</h2><p>Създай готови настройки за често използваните тренировки. Датата не се записва в шаблона.</p></div><button class="btn" onclick="closeSettings()">✕</button></div>
+  <div class="settingsHead"><div><h2>⚙ Настройки</h2><p>Промени текста върху главната снимка или управлявай шаблоните за тренировки.</p></div><button class="btn" onclick="closeSettings()">✕</button></div>
+  <div class="tplBox" style="margin-bottom:13px">
+    <h3>Текст върху главната снимка</h3>
+    <div class="field" style="margin:0"><label>ТЕКСТ</label><textarea id="heroTextSetting" maxlength="90" rows="3" placeholder="Напиши текст върху снимката"></textarea><div class="help">Може да използваш нов ред. Снимката и дизайнът няма да се променят.</div></div>
+    <div class="tplEditorActions" style="margin-top:10px"><button class="btn primary" onclick="saveHeroTextSetting()">Запази текста</button></div>
+  </div>
   <div class="settingsGrid">
     <div class="tplBox">
       <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:10px"><h3 style="margin:0">Моите шаблони</h3><button class="btn primary" onclick="newTemplate()">+ Нов</button></div>
@@ -1126,7 +1131,13 @@ function applyTemplate(t){
 function applySelectedTemplate(){const t=tplById(fTemplate.value);if(!t){showToast('Избери шаблон.');return}applyTemplate(t);showToast('Шаблонът е зареден.')}
 function openNewFromTemplate(id){const t=tplById(id);if(!t)return;openNew();fTemplate.value=id;applyTemplate(t)}
 function useTemplateFromSettings(id){closeSettings();openNewFromTemplate(id)}
-function openSettings(){templates=loadTemplates();renderTemplatesAll();if(!selectedTplId)resetTemplateEditor();settingsOv.classList.add('open')}
+async function saveHeroTextSetting(){
+  data=loadData();const value=heroTextSetting.value.trim();
+  if(!value){showToast('Напиши текст за снимката.');return}
+  data.siteSettings={...(data.siteSettings||{}),heroText:value};
+  if(await saveData(data)){showToast('Текстът върху снимката е запазен.');renderAll()}
+}
+function openSettings(){templates=loadTemplates();renderTemplatesAll();if(!selectedTplId)resetTemplateEditor();data=loadData();heroTextSetting.value=data.siteSettings?.heroText||'MOVE. SWEAT.\nFEEL GOOD.';settingsOv.classList.add('open')}
 function closeSettings(){settingsOv.classList.remove('open')}
 
 let data=loadData(),editId=null,deleteId=null,mode='new';function stateText(s){return{open:'Отворено',upcoming:'Предстояща',closed:'Затворено',completed:'Проведена'}[s]}function renderStats(){}
@@ -1499,7 +1510,7 @@ function confirmRemoveReg(){
 function askDelete(id){const s=data.sessions.find(x=>x.id===id);if(!s)return;deleteId=id;deleteText.textContent=`Сигурни ли сте, че искате да изтриете тренировката на ${fmtDDMM(s.date)} в ${s.time}? Действието не може да бъде отменено.`;deleteConfirm.classList.add('open')}function closeDelete(){deleteId=null;deleteConfirm.classList.remove('open')}function confirmDelete(){if(!deleteId)return;data=loadData();data.sessions=data.sessions.filter(s=>s.id!==deleteId);saveData(data);closeDelete();renderAll();showToast('Тренировката е изтрита.')}function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}function renderAll(){data=loadData();renderActiveTraining();renderList()}window.addEventListener('storage',renderAll);buildTimePicker();setTimePicker('18:30');buildTplTime();renderTemplatesAll();renderAll();</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="supabase-sync.js?v=20260813-3"></script>
+<script src="supabase-sync.js?v=20260814-4"></script>
 <script id="supabase-auth-js">
 (function(){
   const gate=document.getElementById('adminAuthGate');

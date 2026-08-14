@@ -37,9 +37,16 @@ create table if not exists public.app_admins (
   user_id uuid primary key references auth.users(id) on delete cascade
 );
 
+create table if not exists public.site_settings (
+  key text primary key,
+  value text not null,
+  updated_at timestamptz not null default now()
+);
+
 alter table public.sessions enable row level security;
 alter table public.registrations enable row level security;
 alter table public.app_admins enable row level security;
+alter table public.site_settings enable row level security;
 
 -- Safe migration for projects created with an earlier version of this file.
 alter table public.registrations add column if not exists has_multisport boolean not null default false;
@@ -66,6 +73,13 @@ drop policy if exists "sessions public read" on public.sessions;
 create policy "sessions public read" on public.sessions for select to anon, authenticated using (true);
 drop policy if exists "sessions admin write" on public.sessions;
 create policy "sessions admin write" on public.sessions for all to authenticated using (public.is_app_admin()) with check (public.is_app_admin());
+
+drop policy if exists "site settings public read" on public.site_settings;
+create policy "site settings public read" on public.site_settings for select to anon, authenticated using (true);
+drop policy if exists "site settings admin write" on public.site_settings;
+create policy "site settings admin write" on public.site_settings for all to authenticated using (public.is_app_admin()) with check (public.is_app_admin());
+
+insert into public.site_settings(key,value) values ('hero_text',E'MOVE. SWEAT.\nFEEL GOOD.') on conflict (key) do nothing;
 
 drop policy if exists "registrations admin read" on public.registrations;
 create policy "registrations admin read" on public.registrations for select to authenticated using (public.is_app_admin());
@@ -114,6 +128,9 @@ do $$ begin
 exception when duplicate_object then null; end $$;
 do $$ begin
   alter publication supabase_realtime add table public.registrations;
+exception when duplicate_object then null; end $$;
+do $$ begin
+  alter publication supabase_realtime add table public.site_settings;
 exception when duplicate_object then null; end $$;
 
 -- After creating your Auth user, run this separately with your real email:

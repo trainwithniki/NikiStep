@@ -13,7 +13,8 @@
     auth: { persistSession: true, storage: authStorage }
   });
   const isAdminPage = /admin(?:\.html)?$/.test(location.pathname);
-  let cache = { sessions: [] };
+  const defaultSiteSettings = { heroText: 'MOVE. SWEAT.\nFEEL GOOD.' };
+  let cache = { sessions: [], siteSettings: { ...defaultSiteSettings } };
   let ready = false;
   const cancelTokens = new Map();
   const isTrue = value => value === true || value === 'true' || value === 1 || value === '1';
@@ -58,7 +59,10 @@
         return session;
       });
     }
-    cache = { sessions };
+    let siteSettings = { ...defaultSiteSettings };
+    const settingsResult = await client.from('site_settings').select('key,value').eq('key', 'hero_text').maybeSingle();
+    if (!settingsResult.error && settingsResult.data?.value) siteSettings.heroText = String(settingsResult.data.value);
+    cache = { sessions, siteSettings };
     ready = true;
     document.documentElement.classList.remove('appLoading');
     if (typeof window.renderAll === 'function') window.renderAll();
@@ -102,6 +106,10 @@
           const deletedRegs = await client.from('registrations').delete().in('id', removedRegs);
           if (deletedRegs.error) throw deletedRegs.error;
         }
+      }
+      if ((after.siteSettings?.heroText || defaultSiteSettings.heroText) !== (before.siteSettings?.heroText || defaultSiteSettings.heroText)) {
+        const settingSaved = await client.from('site_settings').upsert({ key: 'hero_text', value: after.siteSettings?.heroText || defaultSiteSettings.heroText, updated_at: new Date().toISOString() });
+        if (settingSaved.error) throw settingSaved.error;
       }
     } else {
       for (const session of after.sessions) {
@@ -189,6 +197,7 @@
   client.channel('niki-live')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'sessions' }, refresh)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'registrations' }, refresh)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'site_settings' }, refresh)
     .subscribe();
 
   document.addEventListener('DOMContentLoaded', () => {
