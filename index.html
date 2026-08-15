@@ -2235,6 +2235,13 @@ img{max-width:100%;height:auto}
 
 <style id="self-cancellation-ui">
 .mainBtn.cancelBookingBtn,.sessionBookBtn.cancelBookingBtn,.sticky .cancelBookingBtn{background:#fff1f3!important;color:#b4233d!important;border:1px solid #f2a8b5!important;box-shadow:none!important}
+.ownBookingSummary{margin-top:14px;padding:11px 12px;border:1px solid #a8dfbe;border-radius:14px;background:#effbf4;color:#145c39;display:flex;flex-direction:column;gap:4px}
+.ownBookingSummary strong{font-size:12px;line-height:1.35}.ownBookingSummary span{font-size:10px;line-height:1.4;font-weight:800;color:#3e6351}
+.ownBookingSummary+.mainBtn{margin-top:8px}
+.sticky.hasOwnBooking{display:flex;flex-direction:column;gap:7px}.stickyOwnInfo{padding:2px 3px;text-align:center;display:flex;flex-direction:column;gap:2px;color:#174f35}
+.stickyOwnInfo strong{font-size:11px;line-height:1.25}.stickyOwnInfo span{font-size:9px;line-height:1.3;font-weight:850;color:#52635a}
+.sticky.hasOwnBooking button{padding:10px!important;min-height:42px}.sticky.hasOwnBooking .stickyAction{font-size:12px}
+@media(max-width:759px){body:has(.sticky.hasOwnBooking){padding-bottom:calc(132px + env(safe-area-inset-bottom))}}
 .cancelConfirmText{color:#656a72;font-size:13px;line-height:1.5;margin:8px 0 18px}
 .cancelConfirmActions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .cancelConfirmActions button{min-height:48px;border-radius:13px;font-weight:900;border:1px solid var(--line)}
@@ -2352,6 +2359,7 @@ function bookingState(s,now=new Date()){
 function daysUntilBooking(s, now=new Date()){const ms=bookingOpenAt(s).getTime()-now.getTime();if(ms<=0)return 0;return Math.max(1,Math.ceil(ms/86400000))}function fmtDDMM(iso){const[y,m,d]=iso.split('-');return `${d}.${m}`}
 function fmtOpenAt(s){const d=bookingOpenAt(s);return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')} в ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`}
 function dayName(iso){return new Intl.DateTimeFormat('bg-BG',{weekday:'long'}).format(new Date(iso+'T12:00:00'))}
+function dayNameTitle(iso){const value=dayName(iso);return value.charAt(0).toUpperCase()+value.slice(1)}
 function monthName(m,y){return new Intl.DateTimeFormat('bg-BG',{month:'long',year:'numeric'}).format(new Date(y,m,1))}
 function esc(v=''){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 
@@ -2462,15 +2470,16 @@ function trainingBrandMarkup(s){
 
 function renderFeatured(){
   const s=nextSession(),box=document.getElementById('featured'),sticky=document.getElementById('sticky');
-  if(!s){box.innerHTML='<p>Няма обявени тренировки.</p>';sticky.innerHTML='';return}
+  if(!s){box.innerHTML='<p>Няма обявени тренировки.</p>';sticky.innerHTML='';sticky.classList.remove('hasOwnBooking');return}
   const st=bookingState(s),reg=(s.registrations||[]).length,free=Math.max(0,s.capacity-reg);
   const cap=Math.max(1,Number(s.capacity)||1),pct=Math.min(100,reg/cap*100);
   const [yy,mm,dd]=s.date.split('-');
   const announcement=String(s.announcement||'').trim();
   const featuredClass=st==='open'?'featured-open':st==='completed'?'featured-completed':st==='closed'?'featured-closed':'featured-upcoming';
   const ownBooking=!!window.nikiBookings?.has(s.id);
+  const bookingInfo=`<div class="ownBookingSummary"><strong>✓ Записали сте се за ${esc(s.title)} with ${esc(s.trainer)}</strong><span>📍 ${esc(s.location)} · ${fmtDDMM(s.date)} – ${dayNameTitle(s.date)} · ${esc(s.time)}</span></div>`;
   const button = ownBooking
-    ? `<button class="mainBtn cancelBookingBtn" onclick="openCancelBooking('${s.id}')">ОТПИШИ СЕ</button>`
+    ? `${bookingInfo}<button class="mainBtn cancelBookingBtn" onclick="openCancelBooking('${s.id}')">ОТПИШИ СЕ</button>`
     : st==='open'
     ? `<button class="mainBtn" ${free>0?`onclick="openBook('${s.id}')"`:'disabled'}>${free>0?'ЗАПИШИ СЕ':'НЯМА СВОБОДНИ МЕСТА'}</button>`
     : st==='upcoming'
@@ -2518,8 +2527,9 @@ function renderFeatured(){
   </div>${button}`;
 
   const stickyDate=`${fmtDDMM(s.date)} · ${esc(s.time)}`;
+  sticky.classList.toggle('hasOwnBooking',ownBooking);
   sticky.innerHTML = ownBooking
-    ? `<button class="cancelBookingBtn" onclick="openCancelBooking('${s.id}')"><span class="stickyDate">ТРЕНИРОВКА НА ${stickyDate}</span><span class="stickyAction">ОТПИШИ СЕ</span></button>`
+    ? `<div class="stickyOwnInfo"><strong>✓ Записали сте се за ${esc(s.title)} with ${esc(s.trainer)}</strong><span>📍 ${esc(s.location)} · ${fmtDDMM(s.date)} – ${dayNameTitle(s.date)} · ${esc(s.time)}</span></div><button class="cancelBookingBtn" onclick="openCancelBooking('${s.id}')"><span class="stickyAction">ОТПИШИ СЕ</span></button>`
     : st==='open'
     ? `<button ${free>0?`onclick="openBook('${s.id}')"`:'disabled'}><span class="stickyDate">ТРЕНИРОВКА НА ${stickyDate}</span><span class="stickyAction">${free>0?'ЗАПИШИ СЕ · '+free+' СВОБОДНИ МЕСТА':'НЯМА СВОБОДНИ МЕСТА'}</span></button>`
     : st==='upcoming'
