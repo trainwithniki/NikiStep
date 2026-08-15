@@ -2237,10 +2237,12 @@ img{max-width:100%;height:auto}
 .mainBtn.cancelBookingBtn,.sessionBookBtn.cancelBookingBtn,.sticky .cancelBookingBtn{background:#fff1f3!important;color:#b4233d!important;border:1px solid #f2a8b5!important;box-shadow:none!important}
 .ownBookingSummary{margin-top:14px;padding:11px 12px;border:1px solid #a8dfbe;border-radius:14px;background:#effbf4;color:#145c39;display:flex;flex-direction:column;gap:4px}
 .ownBookingSummary strong{font-size:12px;line-height:1.35}.ownBookingSummary span{font-size:10px;line-height:1.4;font-weight:800;color:#3e6351}
-.ownBookingSummary+.mainBtn{margin-top:8px}
+.ownBookingActions,.stickyOwnActions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.ownBookingActions .mainBtn{margin-top:0}
+.mainBtn.friendBookingBtn,.sessionBookBtn.friendBookingBtn,.sticky .friendBookingBtn{background:linear-gradient(135deg,#147d52,#20a563)!important;color:#fff!important;border:1px solid #147d52!important;box-shadow:0 7px 18px rgba(20,125,82,.2)!important}
 .sticky.hasOwnBooking{display:flex;flex-direction:column;gap:7px}.stickyOwnInfo{padding:2px 3px;text-align:center;display:flex;flex-direction:column;gap:2px;color:#174f35}
 .stickyOwnInfo strong{font-size:11px;line-height:1.25}.stickyOwnInfo span{font-size:9px;line-height:1.3;font-weight:850;color:#52635a}
-.sticky.hasOwnBooking button{padding:10px!important;min-height:42px}.sticky.hasOwnBooking .stickyAction{font-size:12px}
+.sticky.hasOwnBooking button{padding:10px 5px!important;min-height:42px}.sticky.hasOwnBooking .stickyAction{font-size:11px}.stickyOwnActions{margin-top:0;width:100%}
 @media(max-width:759px){body:has(.sticky.hasOwnBooking){padding-bottom:calc(132px + env(safe-area-inset-bottom))}}
 .cancelConfirmText{color:#656a72;font-size:13px;line-height:1.5;margin:8px 0 18px}
 .cancelConfirmActions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
@@ -2439,7 +2441,7 @@ function setPhoneError(msg=''){
   e.classList.toggle('show',!!msg);
 }
 
-let data=loadData(),selectedId=null,currentView=new Date(new Date().getFullYear(),new Date().getMonth(),1);function stateLabel(st,s){if(st==='upcoming')return `Отваря ${bookingDaysFor(s)} ${bookingDaysFor(s)===1?'ден':'дни'} преди`;return{open:'Записването е отворено',closed:'Записването е затворено',completed:'Проведена'}[st]}function nextSession(){
+let data=loadData(),selectedId=null,bookingMode='self',currentView=new Date(new Date().getFullYear(),new Date().getMonth(),1);function stateLabel(st,s){if(st==='upcoming')return `Отваря ${bookingDaysFor(s)} ${bookingDaysFor(s)===1?'ден':'дни'} преди`;return{open:'Записването е отворено',closed:'Записването е затворено',completed:'Проведена'}[st]}function nextSession(){
   const today=todayISO();
 
   const open=data.sessions
@@ -2479,7 +2481,7 @@ function renderFeatured(){
   const ownBooking=!!window.nikiBookings?.has(s.id);
   const bookingInfo=`<div class="ownBookingSummary"><strong>✓ Записали сте се за ${esc(s.title)} with ${esc(s.trainer)}</strong><span>📍 ${esc(s.location)} · ${fmtDDMM(s.date)} – ${dayNameTitle(s.date)} · ${esc(s.time)}</span></div>`;
   const button = ownBooking
-    ? `${bookingInfo}<button class="mainBtn cancelBookingBtn" onclick="openCancelBooking('${s.id}')">ОТПИШИ СЕ</button>`
+    ? `${bookingInfo}<div class="ownBookingActions"><button class="mainBtn cancelBookingBtn" onclick="openCancelBooking('${s.id}')">ОТПИШИ СЕ</button><button class="mainBtn friendBookingBtn" onclick="openFriendBook('${s.id}')">ЗАПИШИ ПРИЯТЕЛ</button></div>`
     : st==='open'
     ? `<button class="mainBtn" ${free>0?`onclick="openBook('${s.id}')"`:'disabled'}>${free>0?'ЗАПИШИ СЕ':'НЯМА СВОБОДНИ МЕСТА'}</button>`
     : st==='upcoming'
@@ -2529,7 +2531,7 @@ function renderFeatured(){
   const stickyDate=`${fmtDDMM(s.date)} · ${esc(s.time)}`;
   sticky.classList.toggle('hasOwnBooking',ownBooking);
   sticky.innerHTML = ownBooking
-    ? `<div class="stickyOwnInfo"><strong>✓ Записали сте се за ${esc(s.title)} with ${esc(s.trainer)}</strong><span>📍 ${esc(s.location)} · ${fmtDDMM(s.date)} – ${dayNameTitle(s.date)} · ${esc(s.time)}</span></div><button class="cancelBookingBtn" onclick="openCancelBooking('${s.id}')"><span class="stickyAction">ОТПИШИ СЕ</span></button>`
+    ? `<div class="stickyOwnInfo"><strong>✓ Записали сте се за ${esc(s.title)} with ${esc(s.trainer)}</strong><span>📍 ${esc(s.location)} · ${fmtDDMM(s.date)} – ${dayNameTitle(s.date)} · ${esc(s.time)}</span></div><div class="stickyOwnActions"><button class="cancelBookingBtn" onclick="openCancelBooking('${s.id}')"><span class="stickyAction">ОТПИШИ СЕ</span></button><button class="friendBookingBtn" onclick="openFriendBook('${s.id}')"><span class="stickyAction">ЗАПИШИ ПРИЯТЕЛ</span></button></div>`
     : st==='open'
     ? `<button ${free>0?`onclick="openBook('${s.id}')"`:'disabled'}><span class="stickyDate">ТРЕНИРОВКА НА ${stickyDate}</span><span class="stickyAction">${free>0?'ЗАПИШИ СЕ · '+free+' СВОБОДНИ МЕСТА':'НЯМА СВОБОДНИ МЕСТА'}</span></button>`
     : st==='upcoming'
@@ -2658,7 +2660,7 @@ function sessionCard(s){
 
   const ownBooking=!!window.nikiBookings?.has(s.id);
   const bookingAction = ownBooking
-    ? `<div class="sessionBookAction"><button class="sessionBookBtn cancelBookingBtn" onclick="event.stopPropagation();openCancelBooking('${s.id}')">ОТПИШИ СЕ</button></div>`
+    ? `<div class="sessionBookAction ownBookingActions"><button class="sessionBookBtn cancelBookingBtn" onclick="event.stopPropagation();openCancelBooking('${s.id}')">ОТПИШИ СЕ</button><button class="sessionBookBtn friendBookingBtn" onclick="event.stopPropagation();openFriendBook('${s.id}')">ЗАПИШИ ПРИЯТЕЛ</button></div>`
     : st==='open'
     ? `<div class="sessionBookAction"><button class="sessionBookBtn" ${free>0?`onclick="event.stopPropagation();openBook('${s.id}')"`:'disabled'}>${free>0?'ЗАПИШИ СЕ':'НЯМА МЕСТА'}</button></div>`
     : '';
@@ -2794,7 +2796,11 @@ async function confirmSelfCancellation(){
   showToast(result.ok?'Успешно се отписахте. Мястото е освободено.':result.message);
   renderAll();
 }
-function moveMonth(n){currentView=new Date(currentView.getFullYear(),currentView.getMonth()+n,1);renderCalendar()}function openBook(id){data=loadData();const s=data.sessions.find(x=>x.id===id);if(!s)return;if(bookingState(s)!=='open'){showInactive(id);return}if((s.registrations||[]).length>=s.capacity){showToast('Няма свободни места.');return}selectedId=id;setPhoneError('');document.getElementById('personMultisport').checked=false;document.getElementById('bookSummary').innerHTML=`<span class="bookHeroDate">${fmtDDMM(s.date)}</span><span class="bookHeroTime">${esc(s.time)}</span><span class="bookHeroPlace">${esc(s.location)}</span>`;document.getElementById('bookModal').classList.add('open')}function closeBook(){document.getElementById('bookModal').classList.remove('open');selectedId=null}var pendingBooking=null,countTimer=null,countLeft=5;
+function moveMonth(n){currentView=new Date(currentView.getFullYear(),currentView.getMonth()+n,1);renderCalendar()}
+function prepareBook(id,mode='self'){data=loadData();const s=data.sessions.find(x=>x.id===id);if(!s)return;if(bookingState(s)!=='open'){showInactive(id);return}if((s.registrations||[]).length>=s.capacity){showToast('Няма свободни места.');return}selectedId=id;bookingMode=mode;setPhoneError('');document.getElementById('personMultisport').checked=false;document.querySelector('#bookModal h3').textContent=mode==='friend'?'Запиши приятел':'Запиши своето място';document.getElementById('bookSummary').innerHTML=`<span class="bookHeroDate">${fmtDDMM(s.date)}</span><span class="bookHeroTime">${esc(s.time)}</span><span class="bookHeroPlace">${esc(s.location)}</span>`;document.getElementById('bookModal').classList.add('open')}
+function openBook(id){prepareBook(id,'self')}
+function openFriendBook(id){if(!window.nikiBookings?.has(id)){showToast('Първо трябва да имате собствено записване.');return}prepareBook(id,'friend')}
+function closeBook(){document.getElementById('bookModal').classList.remove('open');selectedId=null;bookingMode='self'}var pendingBooking=null,countTimer=null,countLeft=5;
 async function submitBooking(){
   const name=document.getElementById('personName').value.trim();
   const phoneRaw=document.getElementById('personPhone').value.trim();
@@ -2808,8 +2814,11 @@ async function submitBooking(){
   if(!s||bookingState(s)!=='open'){closeBook();showToast('Записването вече не е активно.');return}
   if((s.registrations||[]).length>=s.capacity){closeBook();showToast('Няма свободни места.');return}
   const regId='r-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);
+  const friendBooking=bookingMode==='friend';
+  const bookedBy=friendBooking?(window.nikiBookings?.get(s.id)?.name||''):'';
+  if(friendBooking&&!bookedBy){closeBook();showToast('Не открихме вашето собствено записване.');return}
   s.registrations=s.registrations||[];
-  s.registrations.push({id:regId,name,phone:formatPhone(check.normalized),hasMultisport,createdAt:new Date().toISOString(),pending:true});
+  s.registrations.push({id:regId,name,phone:formatPhone(check.normalized),hasMultisport,bookedBy,friendBooking,createdAt:new Date().toISOString(),pending:true});
   if(!(await saveData(data)))return;
   pendingBooking={sessionId:s.id,regId};
   document.getElementById('personName').value='';
@@ -2943,5 +2952,5 @@ setInterval(renderCalendar,60000);
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="supabase-sync.js?v=20260814-5"></script>
+<script src="supabase-sync.js?v=20260815-6"></script>
 </body></html>

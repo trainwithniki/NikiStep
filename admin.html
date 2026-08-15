@@ -919,8 +919,10 @@ html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!imp
 .activePanel .activePerson{display:grid!important;grid-template-columns:18px minmax(0,1fr) 24px;align-items:center!important;gap:6px!important;min-height:30px;padding:3px 0;border-bottom:1px solid rgba(30,165,99,.08);font-size:10px!important}
 .activePanel .activePerson:last-child{border-bottom:0}
 .activePanel .activePerson .n{min-width:0!important}
-.activePersonIdentity{display:flex;align-items:center;min-width:0}
+.activePersonIdentity{display:flex;flex-direction:column;align-items:stretch;min-width:0}
 .activePersonMainLine{display:flex;align-items:center;gap:6px;min-width:0;width:100%;max-width:100%}
+.activePersonBookedBy{display:block;margin-top:2px;color:#7b8289;font-size:7px;line-height:1.15;font-weight:800;letter-spacing:.01em}
+.registrationBookedBy{display:block;margin-top:2px;color:#7b8289;font-size:7px;line-height:1.15;font-weight:800}
 .activePersonPhone{flex:0 0 auto;color:#646b73;font-size:9px;font-weight:750;letter-spacing:.015em;white-space:nowrap}
 .activePersonJoinedAt{flex:0 0 auto;margin-left:auto;color:#92979d;font-size:7px;font-weight:800;letter-spacing:.01em;white-space:nowrap;text-align:right}
 .cancelledStamp{display:inline-flex;align-items:center;padding:2px 6px;border:2px solid #b4233d;border-radius:4px;color:#b4233d;background:#fff5f6;font-size:8px;font-weight:950;letter-spacing:.08em;line-height:1;transform:rotate(-2deg);white-space:nowrap}
@@ -1171,12 +1173,12 @@ function renderActiveTraining(){
     const people=list.length
       ? list.map((p,i)=>`<div class="activePerson">
           <span class="n">${i+1}.</span>
-          <span class="activePersonIdentity"><span class="activePersonMainLine"><span class="personName">${esc(p.name)}</span>${p.hasMultisport?'<span class="multiSportStamp" title="Има карта MultiSport">MultiSport</span>':''}<span class="activePersonPhone">${esc(p.phone||'Без телефон')}</span><span class="activePersonJoinedAt" title="Записан на ${fmtRegistrationAt(p.createdAt)}">${fmtRegistrationCompact(p.createdAt)}</span></span></span>
+          <span class="activePersonIdentity"><span class="activePersonMainLine"><span class="personName">${esc(p.name)}</span>${p.hasMultisport?'<span class="multiSportStamp" title="Има карта MultiSport">MultiSport</span>':''}<span class="activePersonPhone">${esc(p.phone||'Без телефон')}</span><span class="activePersonJoinedAt" title="Записан на ${fmtRegistrationAt(p.createdAt)}">${fmtRegistrationCompact(p.createdAt)}</span></span>${p.bookedBy?`<span class="activePersonBookedBy">Записан от: ${esc(p.bookedBy)}</span>`:''}</span>
           <button class="activeRemove" title="Премахни" aria-label="Премахни записването на ${esc(p.name)}" onclick="askRemoveReg(${allRegistrations.indexOf(p)},'${active.id}')">×</button>
         </div>`).join('')
       : '<div class="activeEmpty">Все още няма записани участници.</div>';
     const cancelledPeople=cancelled.length
-      ? cancelled.map(p=>`<div class="activePerson cancelledPerson"><span class="n">—</span><span class="activePersonIdentity"><span class="activePersonMainLine"><span class="personName">${esc(p.name)}</span><span class="cancelledStamp">ОТПИСАН</span><span class="activePersonPhone">${esc(p.phone||'Без телефон')}</span><span class="activePersonJoinedAt" title="Записан на ${fmtRegistrationAt(p.createdAt)}">${fmtRegistrationCompact(p.createdAt)}</span></span></span><button class="activeRemove" title="Изтрий от историята" aria-label="Изтрий ${esc(p.name)} от историята" onclick="askRemoveReg(${allRegistrations.indexOf(p)},'${active.id}')">×</button></div>`).join('')
+      ? cancelled.map(p=>`<div class="activePerson cancelledPerson"><span class="n">—</span><span class="activePersonIdentity"><span class="activePersonMainLine"><span class="personName">${esc(p.name)}</span><span class="cancelledStamp">ОТПИСАН</span><span class="activePersonPhone">${esc(p.phone||'Без телефон')}</span><span class="activePersonJoinedAt" title="Записан на ${fmtRegistrationAt(p.createdAt)}">${fmtRegistrationCompact(p.createdAt)}</span></span>${p.bookedBy?`<span class="activePersonBookedBy">Записан от: ${esc(p.bookedBy)}</span>`:''}</span><button class="activeRemove" title="Изтрий от историята" aria-label="Изтрий ${esc(p.name)} от историята" onclick="askRemoveReg(${allRegistrations.indexOf(p)},'${active.id}')">×</button></div>`).join('')
       : '';
 
     return `
@@ -1444,7 +1446,7 @@ function renderRegs(s){
     const tr=document.createElement('tr');
     tr.innerHTML=`
       <td>${i+1}</td>
-      <td><span class="personWithCard">${esc(x.name)}${x.hasMultisport?'<span class="multiSportStamp" title="Има карта MultiSport">MultiSport</span>':''}${x.cancelledAt?'<span class="cancelledStamp">ОТПИСАН</span>':''}</span></td>
+      <td><span class="personWithCard">${esc(x.name)}${x.hasMultisport?'<span class="multiSportStamp" title="Има карта MultiSport">MultiSport</span>':''}${x.cancelledAt?'<span class="cancelledStamp">ОТПИСАН</span>':''}</span>${x.bookedBy?`<span class="registrationBookedBy">Записан от: ${esc(x.bookedBy)}</span>`:''}</td>
       <td>${esc(x.phone)}</td>
       <td style="white-space:nowrap;font-weight:800;color:#686d75">${fmtRegistrationAt(x.createdAt)}</td>
       <td><button class="remove" onclick="askRemoveReg(${i},'${s.id}')">${x.cancelledAt?'Изтрий':'Премахни'}</button></td>`;
@@ -1518,7 +1520,7 @@ function confirmRemoveReg(){
 function askDelete(id){const s=data.sessions.find(x=>x.id===id);if(!s)return;deleteId=id;deleteText.textContent=`Сигурни ли сте, че искате да изтриете тренировката на ${fmtDDMM(s.date)} в ${s.time}? Действието не може да бъде отменено.`;deleteConfirm.classList.add('open')}function closeDelete(){deleteId=null;deleteConfirm.classList.remove('open')}function confirmDelete(){if(!deleteId)return;data=loadData();data.sessions=data.sessions.filter(s=>s.id!==deleteId);saveData(data);closeDelete();renderAll();showToast('Тренировката е изтрита.')}function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}function renderAll(){data=loadData();renderActiveTraining();renderList()}window.addEventListener('storage',renderAll);buildTimePicker();setTimePicker('18:30');buildTplTime();renderTemplatesAll();renderAll();</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="supabase-sync.js?v=20260814-5"></script>
+<script src="supabase-sync.js?v=20260815-6"></script>
 <script id="supabase-auth-js">
 (function(){
   const gate=document.getElementById('adminAuthGate');

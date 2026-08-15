@@ -27,6 +27,7 @@ create table if not exists public.registrations (
   name text not null check (char_length(trim(name)) between 2 and 80),
   phone text not null check (char_length(phone) between 7 and 24),
   has_multisport boolean not null default false,
+  booked_by text,
   pending boolean not null default false,
   cancel_token uuid not null default gen_random_uuid(),
   cancelled_at timestamptz,

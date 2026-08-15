@@ -48,7 +48,7 @@
       if (regs.error) throw regs.error;
       regs.data.forEach(row => {
         const session = sessions.find(item => item.id === row.session_id);
-        if (session) session.registrations.push({ id: row.id, name: row.name, phone: row.phone, hasMultisport: isTrue(row.has_multisport), pending: row.pending, createdAt: row.created_at, cancelledAt: row.cancelled_at || null });
+        if (session) session.registrations.push({ id: row.id, name: row.name, phone: row.phone, hasMultisport: isTrue(row.has_multisport), pending: row.pending, createdAt: row.created_at, cancelledAt: row.cancelled_at || null, bookedBy: row.booked_by || '' });
       });
     } else {
       const result = await client.rpc('public_sessions');
@@ -81,9 +81,11 @@
     } catch (error) {
       console.error(error); cache = before;
       if (typeof window.showToast === 'function') {
-        const multiSportColumnMissing = /has_multisport/i.test(String(error?.message || error?.details || ''));
+        const errorText = String(error?.message || error?.details || '');
+        const multiSportColumnMissing = /has_multisport/i.test(errorText);
+        const friendColumnMissing = /booked_by/i.test(errorText);
         const duplicateBooking = error?.code === '23505' || /one_active_phone|duplicate key/i.test(String(error?.message || error?.details || ''));
-        window.showToast(multiSportColumnMissing ? 'MultiSport настройката още не е активирана в базата.' : duplicateBooking ? 'Този телефон вече е записан за тренировката.' : 'Промяната не беше записана.');
+        window.showToast(friendColumnMissing ? 'Настройката „Запиши приятел“ още не е активирана в базата.' : multiSportColumnMissing ? 'MultiSport настройката още не е активирана в базата.' : duplicateBooking ? 'Този телефон вече е записан за тренировката.' : 'Промяната не беше записана.');
       }
       await refresh().catch(console.error);
       return false;
@@ -128,13 +130,15 @@
           const inserted = await client.from('registrations').insert({
             id: registration.id, session_id: session.id, name: registration.name,
             phone: registration.phone, has_multisport: !!registration.hasMultisport,
-            pending: false, cancel_token: cancelToken
+            pending: false, cancel_token: cancelToken, booked_by: registration.bookedBy || null
           });
           if (inserted.error) throw inserted.error;
           cancelTokens.set(registration.id, cancelToken);
-          const receipts = readReceipts();
-          receipts[session.id] = { registrationId: registration.id, token: cancelToken, sessionId: session.id, name: registration.name, createdAt: new Date().toISOString() };
-          writeReceipts(receipts);
+          if (!registration.friendBooking) {
+            const receipts = readReceipts();
+            receipts[session.id] = { registrationId: registration.id, token: cancelToken, sessionId: session.id, name: registration.name, createdAt: new Date().toISOString() };
+            writeReceipts(receipts);
+          }
         }
       }
     }
