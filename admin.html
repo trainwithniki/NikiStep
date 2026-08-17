@@ -961,6 +961,7 @@ html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!imp
 .paymentCard[open]{border-color:#cfd9d5}.paymentCardHead{display:grid;grid-template-columns:minmax(0,1fr) auto 18px;align-items:center;gap:10px;cursor:pointer;list-style:none}.paymentCardHead::-webkit-details-marker{display:none}.paymentCardHead:after{content:'⌄';font-size:18px;font-weight:950;color:#697078;transition:transform .18s}.paymentCard[open]>.paymentCardHead:after{transform:rotate(180deg)}.paymentCardBody{margin-top:11px;padding-top:11px;border-top:1px solid #edf0f2}.paymentCardDate{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}.paymentCardDate strong{font-size:22px;letter-spacing:-.04em}.paymentCardDate span{font-size:12px;font-weight:900;color:#173f66}.paymentCardHead p{margin:4px 0 0;color:#6b7178;font-size:9px;font-weight:750}.paymentCardAmount{text-align:right;white-space:nowrap}.paymentCardAmount span{display:block;color:#838991;font-size:8px;font-weight:850;text-transform:uppercase}.paymentCardAmount strong{display:block;margin-top:2px;font-size:22px;color:#176f50}
 .paymentBreakdown{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:11px}.paymentBreakdownItem{border-radius:12px;padding:9px 10px;background:#f5f7f8;display:flex;align-items:center;justify-content:space-between;gap:7px}.paymentBreakdownItem span{font-size:8px;font-weight:850;color:#6b7178}.paymentBreakdownItem strong{font-size:12px;white-space:nowrap}
 .paymentPeopleTitle{display:flex;justify-content:space-between;gap:8px;margin:13px 0 6px;font-size:9px;font-weight:900;color:#555b63}.paymentPeople{border-top:1px solid #eef0f2}.paymentPerson{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;min-height:31px;padding:5px 1px;border-bottom:1px solid #f0f2f3}.paymentPersonName{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px;font-weight:850}.paymentPersonMeta{display:flex;align-items:center;gap:7px}.paymentTypeBadge{display:inline-flex;padding:3px 6px;border-radius:5px;font-size:7px;font-weight:950;white-space:nowrap}.paymentTypeBadge.multi{background:#e9f8f0;color:#14734e}.paymentTypeBadge.individual{background:#edf3fb;color:#244f83}.paymentPersonValue{font-size:9px;font-weight:950;min-width:42px;text-align:right}.paymentManual{margin-top:12px;padding-top:11px;border-top:1px solid #e9ecee}.paymentManual>strong{display:block;font-size:9px;margin-bottom:7px}.paymentManualButtons{display:grid;grid-template-columns:1fr 1fr;gap:7px}.paymentAddBtn{border:1px solid #dce2e6;border-radius:11px;background:#fff;min-height:42px;padding:7px;font-size:9px;font-weight:900;cursor:pointer}.paymentAddBtn.multi{color:#14734e;background:#f2fbf6}.paymentAddBtn.individual{color:#244f83;background:#f3f7fc}.manualPaymentRow .paymentPersonName{color:#626871}.paymentAdjustBtn{width:24px;height:24px;border:1px solid #d9dfe3;border-radius:7px;background:#f7f8f9;color:#26323e;font-size:14px;font-weight:950;cursor:pointer}.paymentAdjustBtn.minus{border-color:#f0c8cf;background:#fff5f6;color:#b4233d}.paymentsEmpty{background:#fff;border:1px dashed #ccd1d6;border-radius:17px;padding:28px 15px;text-align:center;color:#777d85;font-size:10px;font-weight:800}.paymentsPreviewNote{display:none;margin:0 0 10px;padding:9px 11px;border-radius:11px;background:#fff8df;border:1px solid #f2dda0;color:#785c0c;font-size:8px;font-weight:800}.paymentsPreviewMode .paymentsPreviewNote{display:block}
+.paymentAddBtn small{display:block;margin-top:2px;font-size:7px;font-weight:800;opacity:.7}
 @media(max-width:560px){.adminSectionTabs{width:100%}.adminSectionTab{flex:1}.paymentsHero{padding:15px}.paymentsTotal strong{font-size:34px}.paymentsRateLegend,.paymentBreakdown,.paymentManualButtons{grid-template-columns:1fr 1fr}.paymentCard{padding:12px}.paymentCardDate strong{font-size:20px}.paymentCardAmount strong{font-size:20px}}
 </style>
 
@@ -1375,14 +1376,21 @@ async function savePaymentRates(){
   if(preview){renderPayments();showToast('Локален преглед — таксите още не са запазени.');return}
   if(await saveData(data)){renderAll();showToast('Таксите са запазени.')}
 }
-async function changePaymentExtra(sessionId,type,delta){
-  const preview=data.paymentsConfigured===false;if(!preview)data=loadData();
+let paymentSaveTimer=null;
+function changePaymentExtra(sessionId,type,delta){
+  const preview=data.paymentsConfigured===false;
   data.paymentAdjustments=data.paymentAdjustments||{};
   const current=paymentAdjustment(sessionId);
   current[type]=Math.max(0,current[type]+delta);
   data.paymentAdjustments[sessionId]=current;
-  if(preview){renderPayments();showToast('Локален преглед — добавянето още не е запазено.');return}
-  if(await saveData(data)){renderAll();showToast(delta>0?'Добавено е към плащанията.':'Ръчният брой е намален.')}
+  renderPayments();
+  if(preview){showToast('Локален преглед — добавянето още не е запазено.');return}
+  if(paymentSaveTimer)clearTimeout(paymentSaveTimer);
+  paymentSaveTimer=setTimeout(async()=>{
+    paymentSaveTimer=null;
+    const snapshot=JSON.parse(JSON.stringify(data));
+    if(await saveData(snapshot)){data=loadData();renderPayments();showToast('Броят е запазен.')}
+  },300);
 }
 function renderPayments(){
   const cards=document.getElementById('paymentCards');
@@ -1417,7 +1425,7 @@ function renderPayments(){
       <summary class="paymentCardHead"><div><div class="paymentCardDate"><strong>${fmtDDMM(session.date)}</strong><span>${fmtWeekday(session.date)} · ${esc(session.time)}</span></div><p>${esc(session.title)} with ${esc(session.trainer)} · ${esc(session.location)}</p></div><div class="paymentCardAmount"><span>За тренировката</span><strong>${moneyEUR(summary.total)} €</strong></div></summary><div class="paymentCardBody">
       <div class="paymentBreakdown"><div class="paymentBreakdownItem"><span>MultiSport · ${summary.multisport}</span><strong>${moneyEUR(summary.multisport*rates.multisport)} €</strong></div><div class="paymentBreakdownItem"><span>Индивидуални · ${summary.individual}</span><strong>${moneyEUR(summary.individual*rates.individual)} €</strong></div></div>
       <div class="paymentPeopleTitle"><span>Присъствали от записванията</span><span>${summary.people.length} души</span></div><div class="paymentPeople">${registeredRows}${manualIndividual}${manualMulti}</div>
-      <div class="paymentManual"><strong>Добави човек, който е дошъл без записване — натисни отново за всеки следващ</strong><div class="paymentManualButtons"><button class="paymentAddBtn individual" type="button" onclick="changePaymentExtra('${session.id}','individual',1)">+1 Индивидуален</button><button class="paymentAddBtn multi" type="button" onclick="changePaymentExtra('${session.id}','multisport',1)">+1 MultiSport</button></div></div>
+      <div class="paymentManual"><strong>Добави човек, който е дошъл без записване</strong><div class="paymentManualButtons"><button class="paymentAddBtn individual" type="button" onclick="changePaymentExtra('${session.id}','individual',1)">Добави индивидуален<small>+1 при всяко натискане</small></button><button class="paymentAddBtn multi" type="button" onclick="changePaymentExtra('${session.id}','multisport',1)">Добави MultiSport<small>+1 при всяко натискане</small></button></div></div>
     </div></details>`;
   }).join('');
 }
