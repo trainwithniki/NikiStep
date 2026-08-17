@@ -956,7 +956,7 @@ html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!imp
 .paymentsTotal{position:relative;z-index:1;display:flex;align-items:baseline;gap:7px;margin-top:2px}.paymentsTotal strong{font-size:38px;line-height:1;font-weight:950;letter-spacing:-.05em}.paymentsTotal span{font-size:14px;font-weight:900;color:#cce9df}
 .paymentsMonthMeta{position:relative;z-index:1;margin-top:9px;color:#c5dbd4;font-size:9px;font-weight:750}
 .paymentsRateLegend{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.paymentRate{background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px}.paymentRate span{font-size:9px;color:var(--muted);font-weight:850}.paymentRateEdit{display:flex;align-items:center;gap:4px;font-size:13px;font-weight:950}.paymentRateEdit input{width:66px;border:1px solid #dfe3e7;border-radius:8px;background:#f8f9fa;padding:6px 7px;text-align:right;font-size:13px;font-weight:950;outline:none}.paymentRate.multi .paymentRateEdit{color:#167653}.paymentRate.individual .paymentRateEdit{color:#244d85}.paymentRatesSave{grid-column:1/-1;border:0;border-radius:11px;min-height:40px;background:#202c3b;color:#fff;font-size:10px;font-weight:900;cursor:pointer}
+.paymentRate{background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px}.paymentRate span{font-size:9px;color:var(--muted);font-weight:850}.paymentRateEdit{display:flex;align-items:center;gap:4px;font-size:13px;font-weight:950}.paymentRateEdit input{width:66px;border:1px solid #dfe3e7;border-radius:8px;background:#f8f9fa;padding:6px 7px;text-align:right;font-size:13px;font-weight:950;outline:none}.paymentRateEdit input[readonly]{border-color:transparent;background:#eef1f3;color:#5d646c;cursor:not-allowed}.paymentRate.multi .paymentRateEdit{color:#167653}.paymentRate.individual .paymentRateEdit{color:#244d85}.paymentRatesSave{grid-column:1/-1;border:0;border-radius:11px;min-height:40px;background:#202c3b;color:#fff;font-size:10px;font-weight:900;cursor:pointer}.paymentRatesSave.editing{background:#167653}
 .paymentCards{display:flex;flex-direction:column;gap:11px}.paymentCard{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:var(--shadow)}
 .paymentCard[open]{border-color:#cfd9d5}.paymentCardHead{display:grid;grid-template-columns:minmax(0,1fr) auto 18px;align-items:center;gap:10px;cursor:pointer;list-style:none}.paymentCardHead::-webkit-details-marker{display:none}.paymentCardHead:after{content:'⌄';font-size:18px;font-weight:950;color:#697078;transition:transform .18s}.paymentCard[open]>.paymentCardHead:after{transform:rotate(180deg)}.paymentCardBody{margin-top:11px;padding-top:11px;border-top:1px solid #edf0f2}.paymentCardDate{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}.paymentCardDate strong{font-size:22px;letter-spacing:-.04em}.paymentCardDate span{font-size:12px;font-weight:900;color:#173f66}.paymentCardHead p{margin:4px 0 0;color:#6b7178;font-size:9px;font-weight:750}.paymentCardAmount{text-align:right;white-space:nowrap}.paymentCardAmount span{display:block;color:#838991;font-size:8px;font-weight:850;text-transform:uppercase}.paymentCardAmount strong{display:block;margin-top:2px;font-size:22px;color:#176f50}
 .paymentBreakdown{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:11px}.paymentBreakdownItem{border-radius:12px;padding:9px 10px;background:#f5f7f8;display:flex;align-items:center;justify-content:space-between;gap:7px}.paymentBreakdownItem span{font-size:8px;font-weight:850;color:#6b7178}.paymentBreakdownItem strong{font-size:12px;white-space:nowrap}
@@ -1008,7 +1008,7 @@ html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!imp
     <div class="paymentsTotal"><strong id="paymentsMonthTotal">0,00</strong><span>EUR</span></div>
     <div class="paymentsMonthMeta" id="paymentsMonthMeta"></div>
   </div>
-  <div class="paymentsRateLegend"><div class="paymentRate multi"><span>MultiSport · на човек</span><label class="paymentRateEdit"><input id="multisportRateInput" type="number" min="0" step="0.05" inputmode="decimal" aria-label="Такса MultiSport"> €</label></div><div class="paymentRate individual"><span>Индивидуално · на човек</span><label class="paymentRateEdit"><input id="individualRateInput" type="number" min="0" step="0.05" inputmode="decimal" aria-label="Индивидуална такса"> €</label></div><button class="paymentRatesSave" type="button" onclick="savePaymentRates()">Запази таксите</button></div>
+  <div class="paymentsRateLegend"><div class="paymentRate multi"><span>MultiSport · на човек</span><label class="paymentRateEdit"><input id="multisportRateInput" type="number" min="0" step="0.05" inputmode="decimal" aria-label="Такса MultiSport" readonly> €</label></div><div class="paymentRate individual"><span>Индивидуално · на човек</span><label class="paymentRateEdit"><input id="individualRateInput" type="number" min="0" step="0.05" inputmode="decimal" aria-label="Индивидуална такса" readonly> €</label></div><button class="paymentRatesSave" id="paymentRatesButton" type="button" onclick="togglePaymentRatesEdit()">Редактирай таксите</button></div>
   <div class="paymentsPreviewNote">Това е локален преглед. Ръчните добавяния ще се запазват след активиране на защитената таблица в Supabase.</div>
   <div class="paymentCards" id="paymentCards"></div>
 </section></div>
@@ -1368,13 +1368,22 @@ function paymentNumbers(session){
   const individual=registeredIndividual+extra.individual;
   return {people,extra,multisport,individual,total:multisport*rates.multisport+individual*rates.individual};
 }
+let paymentRatesUnlocked=false;
+function setPaymentRatesLocked(locked){paymentRatesUnlocked=!locked;multisportRateInput.readOnly=locked;individualRateInput.readOnly=locked;paymentRatesButton.textContent=locked?'Редактирай таксите':'Запази и заключи';paymentRatesButton.classList.toggle('editing',!locked)}
+async function togglePaymentRatesEdit(){
+  if(!paymentRatesUnlocked){setPaymentRatesLocked(false);multisportRateInput.focus();multisportRateInput.select();return}
+  if(await savePaymentRates())setPaymentRatesLocked(true);
+}
 async function savePaymentRates(){
   const multisport=Number(String(multisportRateInput.value).replace(',','.'));
   const individual=Number(String(individualRateInput.value).replace(',','.'));
-  if(!Number.isFinite(multisport)||multisport<0||!Number.isFinite(individual)||individual<0){showToast('Въведи валидни положителни такси.');return}
+  if(!Number.isFinite(multisport)||multisport<0||!Number.isFinite(individual)||individual<0){showToast('Въведи валидни положителни такси.');return false}
   const preview=data.paymentsConfigured===false;if(!preview)data=loadData();data.paymentRates={multisport,individual};
-  if(preview){renderPayments();showToast('Локален преглед — таксите още не са запазени.');return}
-  if(await saveData(data)){renderAll();showToast('Таксите са запазени.')}
+  renderPayments();
+  if(preview){showToast('Локален преглед — таксите още не са запазени.');return true}
+  const result=await window.nikiAdmin.savePaymentRates(data.paymentRates);
+  if(result.error){showToast('Таксите не бяха запазени.');return false}
+  showToast('Таксите са запазени и заключени.');return true
 }
 let paymentSaveTimer=null;
 function changePaymentExtra(sessionId,type,delta){
@@ -1388,9 +1397,10 @@ function changePaymentExtra(sessionId,type,delta){
   if(paymentSaveTimer)clearTimeout(paymentSaveTimer);
   paymentSaveTimer=setTimeout(async()=>{
     paymentSaveTimer=null;
-    const snapshot=JSON.parse(JSON.stringify(data));
-    if(await saveData(snapshot)){data=loadData();renderPayments();showToast('Броят е запазен.')}
-  },300);
+    const snapshot=JSON.parse(JSON.stringify(data.paymentAdjustments||{}));
+    const result=await window.nikiAdmin.savePaymentAdjustments(snapshot);
+    if(result.error)showToast('Броят не беше запазен. Опитай отново.');
+  },1200);
 }
 function renderPayments(){
   const cards=document.getElementById('paymentCards');
@@ -1644,7 +1654,7 @@ function confirmRemoveReg(){
 function askDelete(id){const s=data.sessions.find(x=>x.id===id);if(!s)return;deleteId=id;deleteText.textContent=`Сигурни ли сте, че искате да изтриете тренировката на ${fmtDDMM(s.date)} в ${s.time}? Действието не може да бъде отменено.`;deleteConfirm.classList.add('open')}function closeDelete(){deleteId=null;deleteConfirm.classList.remove('open')}function confirmDelete(){if(!deleteId)return;data=loadData();data.sessions=data.sessions.filter(s=>s.id!==deleteId);saveData(data);closeDelete();renderAll();showToast('Тренировката е изтрита.')}function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}function renderAll(){data=loadData();renderActiveTraining();renderList();renderPayments()}window.addEventListener('storage',renderAll);buildTimePicker();setTimePicker('18:30');buildTplTime();renderTemplatesAll();renderAll();</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="supabase-sync.js?v=20260817-7"></script>
+<script src="supabase-sync.js?v=20260818-8"></script>
 <script id="supabase-auth-js">
 (function(){
   const gate=document.getElementById('adminAuthGate');

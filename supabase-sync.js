@@ -214,6 +214,30 @@
       if (access.authorized) await refresh();
       return access;
     },
+    async savePaymentAdjustments(adjustments) {
+      const rows = Object.entries(adjustments || {}).map(([sessionId, values]) => ({
+        session_id: sessionId,
+        extra_individual: Math.max(0, Number(values?.individual) || 0),
+        extra_multisport: Math.max(0, Number(values?.multisport) || 0),
+        updated_at: new Date().toISOString()
+      }));
+      if (!rows.length) return { error: null };
+      const result = await client.from('payment_adjustments').upsert(rows, { onConflict: 'session_id' });
+      if (!result.error) cache.paymentAdjustments = JSON.parse(JSON.stringify(adjustments || {}));
+      return result;
+    },
+    async savePaymentRates(rates) {
+      const values = {
+        multisport: Math.max(0, Number(rates?.multisport) || 0),
+        individual: Math.max(0, Number(rates?.individual) || 0)
+      };
+      const result = await client.from('payment_config').upsert({
+        id: 'default', multisport_rate: values.multisport,
+        individual_rate: values.individual, updated_at: new Date().toISOString()
+      });
+      if (!result.error) cache.paymentRates = values;
+      return result;
+    },
     refresh
   };
 
