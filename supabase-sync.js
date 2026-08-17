@@ -14,7 +14,8 @@
   });
   const isAdminPage = /admin(?:\.html)?$/.test(location.pathname);
   const defaultSiteSettings = { heroText: 'MOVE. SWEAT.\nFEEL GOOD.', heroSubtitle: 'Енергична тренировка с музика, движение и настроение във Fit Body Center.' };
-  let cache = { sessions: [], siteSettings: { ...defaultSiteSettings } };
+  const defaultPaymentRates = { multisport: 1.70, individual: 3.75 };
+  let cache = { sessions: [], siteSettings: { ...defaultSiteSettings }, paymentAdjustments: {}, paymentRates: { ...defaultPaymentRates }, paymentsConfigured: false };
   let ready = false;
   const cancelTokens = new Map();
   const isTrue = value => value === true || value === 'true' || value === 1 || value === '1';
@@ -40,6 +41,9 @@
 
   async function refresh() {
     let sessions;
+    let paymentAdjustments = {};
+    let paymentRates = { ...defaultPaymentRates };
+    let paymentsConfigured = !isAdminPage;
     if (isAdminPage) {
       const result = await client.from('sessions').select('*').order('date');
       if (result.error) throw result.error;
@@ -50,6 +54,25 @@
         const session = sessions.find(item => item.id === row.session_id);
         if (session) session.registrations.push({ id: row.id, name: row.name, phone: row.phone, hasMultisport: isTrue(row.has_multisport), pending: row.pending, createdAt: row.created_at, cancelledAt: row.cancelled_at || null, bookedBy: row.booked_by || '' });
       });
+      const payments = await client.from('payment_adjustments').select('session_id,extra_individual,extra_multisport');
+      if (payments.error) {
+        const missing = payments.error.code === '42P01' || payments.error.code === 'PGRST205' || /payment_adjustments/i.test(String(payments.error.message || ''));
+        if (!missing) throw payments.error;
+        paymentsConfigured = false;
+      } else {
+        paymentsConfigured = true;
+        (payments.data || []).forEach(row => {
+          paymentAdjustments[row.session_id] = { individual: Number(row.extra_individual) || 0, multisport: Number(row.extra_multisport) || 0 };
+        });
+      }
+      const rates = await client.from('payment_config').select('multisport_rate,individual_rate').eq('id', 'default').maybeSingle();
+      if (rates.error) {
+        const missing = rates.error.code === '42P01' || rates.error.code === 'PGRST205' || /payment_config/i.test(String(rates.error.message || ''));
+        if (!missing) throw rates.error;
+        paymentsConfigured = false;
+      } else if (rates.data) {
+        paymentRates = { multisport: Number(rates.data.multisport_rate), individual: Number(rates.data.individual_rate) };
+      }
     } else {
       const result = await client.rpc('public_sessions');
       if (result.error) throw result.error;
@@ -65,7 +88,7 @@
       if (setting.key === 'hero_text' && setting.value) siteSettings.heroText = String(setting.value);
       if (setting.key === 'hero_subtitle' && setting.value) siteSettings.heroSubtitle = String(setting.value);
     });
-    cache = { sessions, siteSettings };
+    cache = { sessions, siteSettings, paymentAdjustments, paymentRates, paymentsConfigured };
     ready = true;
     document.documentElement.classList.remove('appLoading');
     if (typeof window.renderAll === 'function') window.renderAll();
@@ -119,6 +142,27 @@
       if ((after.siteSettings?.heroSubtitle || defaultSiteSettings.heroSubtitle) !== (before.siteSettings?.heroSubtitle || defaultSiteSettings.heroSubtitle)) {
         const subtitleSaved = await client.from('site_settings').upsert({ key: 'hero_subtitle', value: after.siteSettings?.heroSubtitle || defaultSiteSettings.heroSubtitle, updated_at: new Date().toISOString() });
         if (subtitleSaved.error) throw subtitleSaved.error;
+      }
+      if (after.paymentsConfigured !== false && JSON.stringify(after.paymentAdjustments || {}) !== JSON.stringify(before.paymentAdjustments || {})) {
+        const rows = Object.entries(after.paymentAdjustments || {}).map(([sessionId, values]) => ({
+          session_id: sessionId,
+          extra_individual: Math.max(0, Number(values?.individual) || 0),
+          extra_multisport: Math.max(0, Number(values?.multisport) || 0),
+          updated_at: new Date().toISOString()
+        }));
+        if (rows.length) {
+          const paymentsSaved = await client.from('payment_adjustments').upsert(rows, { onConflict: 'session_id' });
+          if (paymentsSaved.error) throw paymentsSaved.error;
+        }
+      }
+      if (after.paymentsConfigured !== false && JSON.stringify(after.paymentRates || defaultPaymentRates) !== JSON.stringify(before.paymentRates || defaultPaymentRates)) {
+        const ratesSaved = await client.from('payment_config').upsert({
+          id: 'default',
+          multisport_rate: Math.max(0, Number(after.paymentRates?.multisport) || 0),
+          individual_rate: Math.max(0, Number(after.paymentRates?.individual) || 0),
+          updated_at: new Date().toISOString()
+        });
+        if (ratesSaved.error) throw ratesSaved.error;
       }
     } else {
       for (const session of after.sessions) {
@@ -205,11 +249,13 @@
     window.showToast?.('Записването е отказано.');
   };
 
-  client.channel('niki-live')
+  const liveChannel = client.channel('niki-live')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'sessions' }, refresh)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'registrations' }, refresh)
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'site_settings' }, refresh)
-    .subscribe();
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'site_settings' }, refresh);
+  if (isAdminPage) liveChannel.on('postgres_changes', { event: '*', schema: 'public', table: 'payment_adjustments' }, refresh);
+  if (isAdminPage) liveChannel.on('postgres_changes', { event: '*', schema: 'public', table: 'payment_config' }, refresh);
+  liveChannel.subscribe();
 
   document.addEventListener('DOMContentLoaded', () => {
     const footer = document.createElement('footer');
