@@ -1443,7 +1443,7 @@ function renderPayments(){
   const totals=completed.map(paymentNumbers);
   const monthTotal=totals.reduce((sum,item)=>sum+item.total,0);
   const peopleTotal=totals.reduce((sum,item)=>sum+item.multisport+item.individual,0);
-  paymentsMonthTitle.textContent=paymentMonth.toLocaleDateString('bg-BG',{month:'long',year:'numeric'});
+  paymentsMonthTitle.textContent=paymentMonth.toLocaleDateString('bg-BG',{month:'long',year:'numeric'}).replace(/\s*г\.$/i,'');
   paymentsMonthTotal.textContent=moneyEUR(monthTotal);
   paymentsMonthMeta.textContent=`${completed.length} ${completed.length===1?'проведена тренировка':'проведени тренировки'} · ${peopleTotal} ${peopleTotal===1?'човек':'души'}`;
   if(document.activeElement!==multisportRateInput)multisportRateInput.value=rates.multisport.toFixed(2);
