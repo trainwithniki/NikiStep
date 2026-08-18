@@ -962,6 +962,7 @@ html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!imp
 .paymentBreakdown{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:11px}.paymentBreakdownItem{border-radius:12px;padding:9px 10px;background:#f5f7f8;display:flex;align-items:center;justify-content:space-between;gap:7px}.paymentBreakdownItem span{font-size:8px;font-weight:850;color:#6b7178}.paymentBreakdownItem strong{font-size:12px;white-space:nowrap}
 .paymentPeopleTitle{display:flex;justify-content:space-between;gap:8px;margin:13px 0 6px;font-size:9px;font-weight:900;color:#555b63}.paymentPeople{border-top:1px solid #eef0f2}.paymentPerson{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;min-height:31px;padding:5px 1px;border-bottom:1px solid #f0f2f3}.paymentPersonName{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px;font-weight:850}.paymentPersonMeta{display:flex;align-items:center;gap:7px}.paymentTypeBadge{display:inline-flex;padding:3px 6px;border-radius:5px;font-size:7px;font-weight:950;white-space:nowrap}.paymentTypeBadge.multi{background:#e9f8f0;color:#14734e}.paymentTypeBadge.individual{background:#edf3fb;color:#244f83}.paymentPersonValue{font-size:9px;font-weight:950;min-width:42px;text-align:right}.paymentManual{margin-top:12px;padding-top:11px;border-top:1px solid #e9ecee}.paymentManual>strong{display:block;font-size:9px;margin-bottom:7px}.paymentManualButtons{display:grid;grid-template-columns:1fr 1fr;gap:7px}.paymentAddBtn{border:1px solid #dce2e6;border-radius:11px;background:#fff;min-height:42px;padding:7px;font-size:9px;font-weight:900;cursor:pointer}.paymentAddBtn.multi{color:#14734e;background:#f2fbf6}.paymentAddBtn.individual{color:#244f83;background:#f3f7fc}.manualPaymentRow .paymentPersonName{color:#626871}.paymentAdjustBtn{width:24px;height:24px;border:1px solid #d9dfe3;border-radius:7px;background:#f7f8f9;color:#26323e;font-size:14px;font-weight:950;cursor:pointer}.paymentAdjustBtn.minus{border-color:#f0c8cf;background:#fff5f6;color:#b4233d}.paymentsEmpty{background:#fff;border:1px dashed #ccd1d6;border-radius:17px;padding:28px 15px;text-align:center;color:#777d85;font-size:10px;font-weight:800}.paymentsPreviewNote{display:none;margin:0 0 10px;padding:9px 11px;border-radius:11px;background:#fff8df;border:1px solid #f2dda0;color:#785c0c;font-size:8px;font-weight:800}.paymentsPreviewMode .paymentsPreviewNote{display:block}
 .paymentAddBtn small{display:block;margin-top:2px;font-size:7px;font-weight:800;opacity:.7}
+.paymentSaveBar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 11px;padding:10px 11px;border:1px solid #dfe4e7;border-radius:13px;background:#fff}.paymentSaveStatus{font-size:8px;font-weight:850;color:#737981}.paymentSaveStatus.dirty{color:#9b650d}.paymentSaveStatus.saving{color:#245b91}.paymentSaveStatus.saved{color:#14734e}.paymentSaveNow{border:0;border-radius:9px;min-width:92px;min-height:38px;padding:7px 12px;background:#176f50;color:#fff;font-size:10px;font-weight:950;cursor:pointer}.paymentSaveNow:disabled{background:#c9ced2;color:#737980;cursor:default}
 @media(max-width:560px){.adminSectionTabs{width:100%}.adminSectionTab{flex:1}.paymentsHero{padding:15px}.paymentsTotal strong{font-size:34px}.paymentsRateLegend,.paymentBreakdown,.paymentManualButtons{grid-template-columns:1fr 1fr}.paymentCard{padding:12px}.paymentCardDate strong{font-size:20px}.paymentCardAmount strong{font-size:20px}}
 </style>
 
@@ -1010,6 +1011,7 @@ html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!imp
   </div>
   <div class="paymentsRateLegend"><div class="paymentRate multi"><span>MultiSport · на човек</span><label class="paymentRateEdit"><input id="multisportRateInput" type="number" min="0" step="0.05" inputmode="decimal" aria-label="Такса MultiSport" readonly> €</label></div><div class="paymentRate individual"><span>Индивидуално · на човек</span><label class="paymentRateEdit"><input id="individualRateInput" type="number" min="0" step="0.05" inputmode="decimal" aria-label="Индивидуална такса" readonly> €</label></div><button class="paymentRatesSave" id="paymentRatesButton" type="button" onclick="togglePaymentRatesEdit()">Редактирай таксите</button></div>
   <div class="paymentsPreviewNote">Това е локален преглед. Ръчните добавяния ще се запазват след активиране на защитената таблица в Supabase.</div>
+  <div class="paymentSaveBar"><span class="paymentSaveStatus saved" id="paymentSaveStatus">Всички промени са запазени.</span><button class="paymentSaveNow" id="paymentSaveNow" type="button" onclick="flushPaymentChanges()" disabled>Запази</button></div>
   <div class="paymentCards" id="paymentCards"></div>
 </section></div>
 <div class="overlay" id="editorOverlay"><div class="editor"><div class="handle"></div><div class="edHead"><div><h2 id="editorTitle">Нова тренировка</h2><p>Избери дата от календара и кога автоматично да започне записването.</p></div><button class="btn" onclick="closeEditor()">✕</button></div><div class="form"><div class="templateQuick"><div class="templateQuickTitle"><strong>Шаблон за тренировка</strong><span>попълва настройките автоматично</span></div><div class="templateQuickRow"><select id="fTemplate"><option value="">Без шаблон</option></select><button type="button" class="btn" onclick="applySelectedTemplate()">Зареди</button></div></div><div class="field"><label>ДАТА</label><div class="dateControl"><button type="button" class="dateButton" id="fDateButton" onclick="toggleDatePicker()"><span id="fDateText">Избери дата</span><span class="calIcon">▦</span></button><input id="fDate" type="hidden"><div class="datePicker" id="datePicker"><div class="dpHead"><button type="button" class="dpNav" onclick="moveDatePicker(-1)">‹</button><strong id="dpTitle"></strong><button type="button" class="dpNav" onclick="moveDatePicker(1)">›</button></div><div class="dpWeek"><span>ПН</span><span>ВТ</span><span>СР</span><span>ЧТ</span><span>ПТ</span><span>СБ</span><span>НД</span></div><div class="dpDays" id="dpDays"></div></div></div></div><div class="field"><label>ЧАС (24 ЧАСА)</label><div class="timePickerWrap"><select id="fHour" class="timeSelect" onchange="syncTimePreview()"></select><select id="fMinute" class="timeSelect" onchange="syncTimePreview()"></select><div class="timePreview" id="fTimePreview">18:30</div></div><input id="fTime" type="hidden"></div><div class="field"><label>ПРОДЪЛЖИТЕЛНОСТ</label><input id="fDuration" type="number" min="10" step="5"><div class="help">По подразбиране: 60 минути.</div></div><div class="field"><label>ЗАГЛАВИЕ</label><input id="fTitle"></div><div class="field"><label>ТРЕНЬОР</label><input id="fTrainer"></div><div class="field"><label>МЯСТО</label>
@@ -1385,7 +1387,38 @@ async function savePaymentRates(){
   if(result.error){showToast('Таксите не бяха запазени.');return false}
   showToast('Таксите са запазени и заключени.');return true
 }
-let paymentSaveTimer=null;
+let paymentSaveTimer=null,paymentSaveCountdown=null,paymentDirty=false,paymentChangeVersion=0;
+function setPaymentSaveState(state,text){
+  if(!document.getElementById('paymentSaveStatus'))return;
+  paymentSaveStatus.className='paymentSaveStatus '+state;
+  paymentSaveStatus.textContent=text;
+  paymentSaveNow.disabled=!paymentDirty||state==='saving';
+}
+function schedulePaymentSave(){
+  paymentDirty=true;
+  paymentChangeVersion++;
+  if(paymentSaveTimer)clearTimeout(paymentSaveTimer);
+  if(paymentSaveCountdown)clearInterval(paymentSaveCountdown);
+  let seconds=10;
+  setPaymentSaveState('dirty',`Незапазени промени · автоматично след ${seconds} сек.`);
+  paymentSaveCountdown=setInterval(()=>{
+    seconds--;
+    if(seconds>0)setPaymentSaveState('dirty',`Незапазени промени · автоматично след ${seconds} сек.`);
+  },1000);
+  paymentSaveTimer=setTimeout(()=>flushPaymentChanges(true),10000);
+}
+async function flushPaymentChanges(automatic=false){
+  if(!paymentDirty)return;
+  if(paymentSaveTimer){clearTimeout(paymentSaveTimer);paymentSaveTimer=null}
+  if(paymentSaveCountdown){clearInterval(paymentSaveCountdown);paymentSaveCountdown=null}
+  setPaymentSaveState('saving',automatic?'Автоматично запазване…':'Запазване…');
+  const savingVersion=paymentChangeVersion;
+  const snapshot=JSON.parse(JSON.stringify(data.paymentAdjustments||{}));
+  const result=await window.nikiAdmin.savePaymentAdjustments(snapshot);
+  if(savingVersion!==paymentChangeVersion)return;
+  if(result.error){paymentDirty=true;setPaymentSaveState('dirty','Не беше запазено. Натисни „Запази“.');return}
+  paymentDirty=false;setPaymentSaveState('saved',automatic?'Запазено автоматично.':'Промените са запазени.');
+}
 function changePaymentExtra(sessionId,type,delta){
   const preview=data.paymentsConfigured===false;
   data.paymentAdjustments=data.paymentAdjustments||{};
@@ -1394,13 +1427,7 @@ function changePaymentExtra(sessionId,type,delta){
   data.paymentAdjustments[sessionId]=current;
   renderPayments();
   if(preview){showToast('Локален преглед — добавянето още не е запазено.');return}
-  if(paymentSaveTimer)clearTimeout(paymentSaveTimer);
-  paymentSaveTimer=setTimeout(async()=>{
-    paymentSaveTimer=null;
-    const snapshot=JSON.parse(JSON.stringify(data.paymentAdjustments||{}));
-    const result=await window.nikiAdmin.savePaymentAdjustments(snapshot);
-    if(result.error)showToast('Броят не беше запазен. Опитай отново.');
-  },1200);
+  schedulePaymentSave();
 }
 function renderPayments(){
   const cards=document.getElementById('paymentCards');
