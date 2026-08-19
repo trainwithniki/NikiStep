@@ -2530,7 +2530,7 @@ function bookingOpenCountdownText(s,now=new Date()){
   parts.push(`${minutes} ${minutes===1?'минута':'минути'}`);
   return parts.join(', ');
 }
-let data=loadData(),selectedId=null,bookingMode='self',currentView=new Date(new Date().getFullYear(),new Date().getMonth(),1);function stateLabel(st,s){if(st==='upcoming')return `Ще бъде отворено за записване след: ${bookingOpenCountdownText(s)}`;return{open:'Записването е отворено',closed:'Записването е затворено',completed:'Проведена'}[st]}function nextSession(){
+let data=loadData(),selectedId=null,bookingMode='self',currentView=new Date(new Date().getFullYear(),new Date().getMonth(),1);function stateLabel(st,s){if(st==='upcoming')return `Ще бъде отворено за записване след: ${bookingOpenCountdownText(s)} (${fmtOpenAt(s)} ч.)`;return{open:'Записването е отворено',closed:'Записването е затворено',completed:'Проведена'}[st]}function nextSession(){
   const today=todayISO();
 
   const open=data.sessions
@@ -2730,7 +2730,7 @@ function renderCalendar(){
   const note=document.getElementById('calendarCountdown');
   if(note){
     if(nextInactive){
-      note.innerHTML=`<div class="calendarCountdown">Ще бъде отворено за записване след: <strong>${bookingOpenCountdownText(nextInactive)}</strong><br>За тренировката на ${fmtDDMM(nextInactive.date)} · ${nextInactive.time}</div>`;
+      note.innerHTML=`<div class="calendarCountdown">Ще бъде отворено за записване след: <strong>${bookingOpenCountdownText(nextInactive)}</strong><br>(${fmtOpenAt(nextInactive)} ч.)<br>За тренировката на ${fmtDDMM(nextInactive.date)} · ${nextInactive.time}</div>`;
     }else{
       note.innerHTML='';
     }
