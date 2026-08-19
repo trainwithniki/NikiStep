@@ -2299,6 +2299,17 @@ img{max-width:100%;height:auto}
 }
 </style>
 
+<style id="booking-open-countdown-label">
+.pill.upcoming,.status.upcoming{
+  max-width:100%;
+  border-radius:12px;
+  line-height:1.35;
+  white-space:normal;
+}
+.pill.upcoming{display:inline-block}
+.sessionStatusRow .status.upcoming{display:block}
+</style>
+
 <style id="self-cancellation-ui">
 .mainBtn.cancelBookingBtn,.sessionBookBtn.cancelBookingBtn,.sticky .cancelBookingBtn{background:#fff1f3!important;color:#b4233d!important;border:1px solid #f2a8b5!important;box-shadow:none!important}
 .ownBookingSummary{margin-top:14px;padding:11px 12px;border:1px solid #a8dfbe;border-radius:14px;background:#effbf4;color:#145c39;display:flex;flex-direction:column;gap:4px}
@@ -2507,7 +2518,19 @@ function setPhoneError(msg=''){
   e.classList.toggle('show',!!msg);
 }
 
-let data=loadData(),selectedId=null,bookingMode='self',currentView=new Date(new Date().getFullYear(),new Date().getMonth(),1);function stateLabel(st,s){if(st==='upcoming')return `Отваря ${bookingDaysFor(s)} ${bookingDaysFor(s)===1?'ден':'дни'} преди`;return{open:'Записването е отворено',closed:'Записването е затворено',completed:'Проведена'}[st]}function nextSession(){
+function bookingOpenCountdownText(s,now=new Date()){
+  const remaining=Math.max(0,bookingOpenAt(s).getTime()-now.getTime());
+  const totalMinutes=Math.max(0,Math.ceil(remaining/60000));
+  const days=Math.floor(totalMinutes/1440);
+  const hours=Math.floor((totalMinutes%1440)/60);
+  const minutes=totalMinutes%60;
+  const parts=[];
+  if(days)parts.push(`${days} ${days===1?'ден':'дни'}`);
+  if(hours||days)parts.push(`${hours} ${hours===1?'час':'часа'}`);
+  parts.push(`${minutes} ${minutes===1?'минута':'минути'}`);
+  return parts.join(', ');
+}
+let data=loadData(),selectedId=null,bookingMode='self',currentView=new Date(new Date().getFullYear(),new Date().getMonth(),1);function stateLabel(st,s){if(st==='upcoming')return `Ще бъде отворено за записване след: ${bookingOpenCountdownText(s)}`;return{open:'Записването е отворено',closed:'Записването е затворено',completed:'Проведена'}[st]}function nextSession(){
   const today=todayISO();
 
   const open=data.sessions
@@ -2707,8 +2730,7 @@ function renderCalendar(){
   const note=document.getElementById('calendarCountdown');
   if(note){
     if(nextInactive){
-      const days=daysUntilBooking(nextInactive);
-      note.innerHTML=`<div class="calendarCountdown"><strong>${days} ${days===1?'ден':'дни'}</strong> до начало на записването за ${fmtDDMM(nextInactive.date)} · ${nextInactive.time}</div>`;
+      note.innerHTML=`<div class="calendarCountdown">Ще бъде отворено за записване след: <strong>${bookingOpenCountdownText(nextInactive)}</strong><br>За тренировката на ${fmtDDMM(nextInactive.date)} · ${nextInactive.time}</div>`;
     }else{
       note.innerHTML='';
     }
@@ -3015,6 +3037,13 @@ window.addEventListener('storage',renderAll);
 document.getElementById('personPhone')?.addEventListener('input',()=>setPhoneError(''));
 renderAll();
 setInterval(renderCalendar,60000);
+setInterval(()=>{
+  if(document.querySelector('.pill.upcoming,.status.upcoming')){
+    renderFeatured();
+    renderSessions();
+    startBookingCloseCountdowns();
+  }
+},30000);
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
