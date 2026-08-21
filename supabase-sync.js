@@ -15,7 +15,7 @@
   const isAdminPage = /admin(?:\.html)?$/.test(location.pathname);
   const defaultSiteSettings = { heroText: 'MOVE. SWEAT.\nFEEL GOOD.', heroSubtitle: 'Енергична тренировка с музика, движение и настроение във Fit Body Center.' };
   const defaultPaymentRates = { multisport: 1.70, individual: 3.75 };
-  let cache = { sessions: [], siteSettings: { ...defaultSiteSettings }, paymentAdjustments: {}, paymentRates: { ...defaultPaymentRates }, paymentsConfigured: false };
+  let cache = { sessions: [], siteSettings: { ...defaultSiteSettings }, paymentAdjustments: {}, paymentRates: { ...defaultPaymentRates }, manualPaymentSessions: [], paymentsConfigured: false, manualPaymentsConfigured: false };
   let ready = false;
   const cancelTokens = new Map();
   const isTrue = value => value === true || value === 'true' || value === 1 || value === '1';
@@ -38,12 +38,31 @@
     booking_close_hours: Number(session.bookingCloseHours || 0),
     announcement: session.announcement || '', description: session.description || ''
   });
+  const fromManualPaymentRow = row => ({
+    id: String(row.id), date: String(row.date), time: String(row.time).slice(0, 5),
+    title: row.title, location: row.location,
+    multisportCount: Number(row.multisport_count) || 0,
+    individualCount: Number(row.individual_count) || 0,
+    multisportRate: Number(row.multisport_rate) || 0,
+    individualRate: Number(row.individual_rate) || 0
+  });
+  const toManualPaymentRow = item => ({
+    id: item.id, date: item.date, time: item.time || '18:30',
+    title: item.title || 'Step Aerobics with Niki', location: item.location || 'Fitness Line',
+    multisport_count: Math.max(0, Number(item.multisportCount) || 0),
+    individual_count: Math.max(0, Number(item.individualCount) || 0),
+    multisport_rate: Math.max(0, Number(item.multisportRate) || 0),
+    individual_rate: Math.max(0, Number(item.individualRate) || 0),
+    updated_at: new Date().toISOString()
+  });
 
   async function refresh() {
     let sessions;
     let paymentAdjustments = {};
     let paymentRates = { ...defaultPaymentRates };
+    let manualPaymentSessions = [];
     let paymentsConfigured = !isAdminPage;
+    let manualPaymentsConfigured = !isAdminPage;
     if (isAdminPage) {
       const result = await client.from('sessions').select('*').order('date');
       if (result.error) throw result.error;
@@ -73,6 +92,15 @@
       } else if (rates.data) {
         paymentRates = { multisport: Number(rates.data.multisport_rate), individual: Number(rates.data.individual_rate) };
       }
+      const manualPayments = await client.from('manual_payment_sessions').select('id,date,time,title,location,multisport_count,individual_count,multisport_rate,individual_rate').order('date');
+      if (manualPayments.error) {
+        const missing = manualPayments.error.code === '42P01' || manualPayments.error.code === 'PGRST205' || /manual_payment_sessions/i.test(String(manualPayments.error.message || ''));
+        if (!missing) throw manualPayments.error;
+        manualPaymentsConfigured = false;
+      } else {
+        manualPaymentsConfigured = true;
+        manualPaymentSessions = (manualPayments.data || []).map(fromManualPaymentRow);
+      }
     } else {
       const result = await client.rpc('public_sessions');
       if (result.error) throw result.error;
@@ -88,7 +116,7 @@
       if (setting.key === 'hero_text' && setting.value) siteSettings.heroText = String(setting.value);
       if (setting.key === 'hero_subtitle' && setting.value) siteSettings.heroSubtitle = String(setting.value);
     });
-    cache = { sessions, siteSettings, paymentAdjustments, paymentRates, paymentsConfigured };
+    cache = { sessions, siteSettings, paymentAdjustments, paymentRates, manualPaymentSessions, paymentsConfigured, manualPaymentsConfigured };
     ready = true;
     document.documentElement.classList.remove('appLoading');
     if (typeof window.renderAll === 'function') window.renderAll();
@@ -237,6 +265,29 @@
       });
       if (!result.error) cache.paymentRates = values;
       return result;
+    },
+    async saveManualPaymentSessions(items) {
+      const values = (items || []).map(item => ({
+        id: String(item.id), date: String(item.date), time: String(item.time || '18:30').slice(0, 5),
+        title: String(item.title || 'Step Aerobics with Niki').trim(),
+        location: String(item.location || 'Fitness Line').trim(),
+        multisportCount: Math.min(1000, Math.max(0, Math.floor(Number(item.multisportCount) || 0))),
+        individualCount: Math.min(1000, Math.max(0, Math.floor(Number(item.individualCount) || 0))),
+        multisportRate: Math.min(999999.99, Math.max(0, Number(item.multisportRate) || 0)),
+        individualRate: Math.min(999999.99, Math.max(0, Number(item.individualRate) || 0))
+      }));
+      const nextIds = new Set(values.map(item => item.id));
+      const removedIds = (cache.manualPaymentSessions || []).filter(item => !nextIds.has(String(item.id))).map(item => item.id);
+      if (values.length) {
+        const saved = await client.from('manual_payment_sessions').upsert(values.map(toManualPaymentRow), { onConflict: 'id' });
+        if (saved.error) return saved;
+      }
+      if (removedIds.length) {
+        const removed = await client.from('manual_payment_sessions').delete().in('id', removedIds);
+        if (removed.error) return removed;
+      }
+      cache.manualPaymentSessions = JSON.parse(JSON.stringify(values));
+      return { error: null };
     },
     refresh
   };

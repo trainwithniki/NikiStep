@@ -28,6 +28,14 @@ Both pages use the same Supabase database. Changes and new registrations arrive 
 
 Never put a Supabase secret key or `service_role` key in this repository. The publishable key in `config.js` is designed for browser use; database access is protected by Row Level Security.
 
+### Updating an existing Supabase project
+
+Run new files from `supabase/migrations/` in date order through **Supabase → SQL Editor**. For the admin-only external-training payment records, run:
+
+`supabase/migrations/20260821_add_manual_payment_sessions.sql`
+
+The table is protected by Row Level Security and is not readable from the public booking page.
+
 ## Local preview
 
 Do not open the files directly with `file://`. Start any local static server, for example:
