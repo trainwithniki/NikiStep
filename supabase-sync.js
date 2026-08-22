@@ -16,8 +16,8 @@
   const defaultSiteSettings = { heroText: 'MOVE. SWEAT.\nFEEL GOOD.', heroSubtitle: 'Енергична тренировка с музика, движение и настроение във Fit Body Center.' };
   const defaultPaymentRates = { multisport: 1.70, individual: 3.75 };
   const defaultManualPaymentTemplates = [
-    { id: 'pilates-mon', name: 'Пилатес Пон', title: 'Пилатес Пон', location: 'Fitness Line', time: '07:45', multisportRate: 1.70, individualRate: 3.75, card8Rate: 3.06, card12Rate: 2.54, sortOrder: 1 },
-    { id: 'pilates-fri', name: 'Пилатес Пт', title: 'Пилатес Пт', location: 'Fitness Line', time: '07:45', multisportRate: 1.70, individualRate: 3.75, card8Rate: 3.06, card12Rate: 2.54, sortOrder: 2 },
+    { id: 'pilates-mon', name: 'Пилатес Понеделник', title: 'Пилатес Понеделник', location: 'Fitness Line', time: '07:45', multisportRate: 1.70, individualRate: 3.75, card8Rate: 3.06, card12Rate: 2.54, sortOrder: 1 },
+    { id: 'pilates-fri', name: 'Пилатес Петък', title: 'Пилатес Петък', location: 'Fitness Line', time: '07:45', multisportRate: 1.70, individualRate: 3.75, card8Rate: 3.06, card12Rate: 2.54, sortOrder: 2 },
     { id: 'step-fl-mon', name: 'STEP FL Пон', title: 'STEP FL Пон', location: 'Fitness Line', time: '18:30', multisportRate: 1.33, individualRate: 2.73, card8Rate: null, card12Rate: null, sortOrder: 3 },
     { id: 'step-fl-fri', name: 'STEP FL Пт', title: 'STEP FL Пт', location: 'Fitness Line', time: '18:30', multisportRate: 1.33, individualRate: 2.73, card8Rate: null, card12Rate: null, sortOrder: 4 }
   ];

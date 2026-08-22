@@ -177,8 +177,8 @@ for all to authenticated using (public.is_app_admin()) with check (public.is_app
 insert into public.manual_payment_templates
   (id,name,title,location,"time",multisport_rate,individual_rate,card8_rate,card12_rate,sort_order)
 values
-  ('pilates-mon','Пилатес Пон','Пилатес Пон','Fitness Line','07:45',1.70,3.75,3.06,2.54,1),
-  ('pilates-fri','Пилатес Пт','Пилатес Пт','Fitness Line','07:45',1.70,3.75,3.06,2.54,2),
+  ('pilates-mon','Пилатес Понеделник','Пилатес Понеделник','Fitness Line','07:45',1.70,3.75,3.06,2.54,1),
+  ('pilates-fri','Пилатес Петък','Пилатес Петък','Fitness Line','07:45',1.70,3.75,3.06,2.54,2),
   ('step-fl-mon','STEP FL Пон','STEP FL Пон','Fitness Line','18:30',1.33,2.73,null,null,3),
   ('step-fl-fri','STEP FL Пт','STEP FL Пт','Fitness Line','18:30',1.33,2.73,null,null,4)
 on conflict (id) do nothing;
