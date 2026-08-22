@@ -100,6 +100,15 @@ create table if not exists public.site_settings (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.app_installations (
+  installation_id uuid primary key,
+  platform text not null default 'android' check (platform = 'android'),
+  installed_at timestamptz not null default now()
+);
+
+create index if not exists app_installations_installed_at_idx
+  on public.app_installations (installed_at desc);
+
 alter table public.sessions enable row level security;
 alter table public.registrations enable row level security;
 alter table public.payment_adjustments enable row level security;
@@ -108,6 +117,7 @@ alter table public.manual_payment_sessions enable row level security;
 alter table public.manual_payment_templates enable row level security;
 alter table public.app_admins enable row level security;
 alter table public.site_settings enable row level security;
+alter table public.app_installations enable row level security;
 
 -- Safe migration for projects created with an earlier version of this file.
 alter table public.registrations add column if not exists has_multisport boolean not null default false;
@@ -139,6 +149,14 @@ drop policy if exists "site settings public read" on public.site_settings;
 create policy "site settings public read" on public.site_settings for select to anon, authenticated using (true);
 drop policy if exists "site settings admin write" on public.site_settings;
 create policy "site settings admin write" on public.site_settings for all to authenticated using (public.is_app_admin()) with check (public.is_app_admin());
+
+revoke all on table public.app_installations from anon, authenticated, public;
+grant insert on table public.app_installations to anon, authenticated;
+grant select on table public.app_installations to authenticated;
+drop policy if exists "app installations public create" on public.app_installations;
+create policy "app installations public create" on public.app_installations for insert to anon, authenticated with check (platform = 'android');
+drop policy if exists "app installations admin read" on public.app_installations;
+create policy "app installations admin read" on public.app_installations for select to authenticated using (public.is_app_admin());
 
 insert into public.site_settings(key,value) values ('hero_text',E'MOVE. SWEAT.\nFEEL GOOD.') on conflict (key) do nothing;
 insert into public.site_settings(key,value) values ('hero_subtitle','Енергична тренировка с музика, движение и настроение във Fit Body Center.') on conflict (key) do nothing;
@@ -239,6 +257,9 @@ do $$ begin
 exception when duplicate_object then null; end $$;
 do $$ begin
   alter publication supabase_realtime add table public.manual_payment_templates;
+exception when duplicate_object then null; end $$;
+do $$ begin
+  alter publication supabase_realtime add table public.app_installations;
 exception when duplicate_object then null; end $$;
 
 -- After creating your Auth user, run this separately with your real email:

@@ -5,11 +5,55 @@
 
   let installPrompt=null;
   let helpOverlay=null;
+  const installedKey='niki-public-app-installed-v1';
+  const installationIdKey='niki-public-app-installation-id-v1';
+  const installationRecordedKey='niki-public-app-installation-recorded-v1';
   const section=document.getElementById('publicAppInstallSection');
   const action=document.getElementById('publicAppInstallAction');
 
+  function readLocal(key){
+    try{return localStorage.getItem(key)}catch{return null}
+  }
+
+  function writeLocal(key,value){
+    try{localStorage.setItem(key,value)}catch{}
+  }
+
   function isInstalled(){
     return window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+  }
+
+  function wasInstalled(){
+    return readLocal(installedKey)==='1';
+  }
+
+  function installationId(){
+    let id=readLocal(installationIdKey);
+    if(id)return id;
+    if(crypto.randomUUID)id=crypto.randomUUID();
+    else{
+      const bytes=crypto.getRandomValues(new Uint8Array(16));
+      bytes[6]=(bytes[6]&15)|64;
+      bytes[8]=(bytes[8]&63)|128;
+      const hex=Array.from(bytes,byte=>byte.toString(16).padStart(2,'0')).join('');
+      id=`${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
+    }
+    writeLocal(installationIdKey,id);
+    return id;
+  }
+
+  function hideSection(){
+    if(!section)return;
+    section.classList.remove('visible');
+    section.hidden=true;
+  }
+
+  async function rememberInstallation(){
+    writeLocal(installedKey,'1');
+    hideSection();
+    if(readLocal(installationRecordedKey)==='1')return;
+    const recorded=await window.nikiAppInstallations?.record(installationId(),'android');
+    if(recorded)writeLocal(installationRecordedKey,'1');
   }
 
   function isAndroid(){
@@ -25,7 +69,7 @@
   }
 
   function revealSection(){
-    if(!section||!isAndroid()||isInstalled())return;
+    if(!section||!isAndroid()||isInstalled()||wasInstalled())return;
     section.hidden=false;
     requestAnimationFrame(()=>section.classList.add('visible'));
     updateAction();
@@ -57,7 +101,7 @@
   }
 
   function watchTrainingDate(){
-    if(!section||!isAndroid()||isInstalled())return;
+    if(!section||!isAndroid()||isInstalled()||wasInstalled())return;
     const target=document.querySelector('.featuredDateTime')||document.getElementById('featured');
     if(!target){revealSection();return}
     if(!('IntersectionObserver' in window)){revealSection();return}
@@ -74,7 +118,7 @@
     if(!installPrompt){showHelp();return}
     installPrompt.prompt();
     const choice=await installPrompt.userChoice;
-    if(choice.outcome==='accepted')section.hidden=true;
+    if(choice.outcome==='accepted')await rememberInstallation();
     installPrompt=null;
     updateAction();
   });
@@ -87,7 +131,10 @@
   window.addEventListener('appinstalled',()=>{
     installPrompt=null;
     closeHelp();
-    if(section)section.hidden=true;
+    rememberInstallation();
   });
-  window.addEventListener('load',()=>setTimeout(watchTrainingDate,350));
+  window.addEventListener('load',()=>{
+    if(isInstalled()||wasInstalled())rememberInstallation();
+    else setTimeout(watchTrainingDate,350);
+  });
 })();

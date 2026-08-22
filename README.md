@@ -20,7 +20,7 @@ The protected administration page is an installable Progressive Web App. On an A
 
 The installed app starts directly at the protected administration login. The public booking page never shows the **Niki Admin** installation banner.
 
-The public booking page also has its own **Step с Niki** application. Its inline installation card appears below the featured training and before the MultiSport information when the training date scrolls into view.
+The public booking page also has its own **Step с Niki** application. Its inline installation card appears below the featured training and before the MultiSport information when the training date scrolls into view. After a successful installation, the card stays hidden on that device.
 
 ## First-time Supabase setup
 
@@ -54,7 +54,11 @@ For the 8-visit and 12-visit card counters on platform trainings, also run:
 
 `supabase/migrations/20260822_add_visit_card_payment_adjustments.sql`
 
-The table is protected by Row Level Security and is not readable from the public booking page.
+To show the anonymous public-app installation counter in the admin panel, run:
+
+`supabase/migrations/20260822_add_app_installations.sql`
+
+The tables are protected by Row Level Security and are not readable from the public booking page. The installation counter stores only a random installation identifier, platform, and installation time—no name, phone number, IP address, or browser details.
 
 ## Local preview
 

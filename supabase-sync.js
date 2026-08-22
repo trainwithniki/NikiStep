@@ -21,7 +21,7 @@
     { id: 'step-fl-mon', name: 'STEP FL Пон', title: 'STEP FL Пон', location: 'Fitness Line', time: '18:30', multisportRate: 1.33, individualRate: 2.73, card8Rate: null, card12Rate: null, sortOrder: 3 },
     { id: 'step-fl-fri', name: 'STEP FL Пт', title: 'STEP FL Пт', location: 'Fitness Line', time: '18:30', multisportRate: 1.33, individualRate: 2.73, card8Rate: null, card12Rate: null, sortOrder: 4 }
   ];
-  let cache = { sessions: [], siteSettings: { ...defaultSiteSettings }, paymentAdjustments: {}, paymentRates: { ...defaultPaymentRates }, manualPaymentSessions: [], manualPaymentTemplates: JSON.parse(JSON.stringify(defaultManualPaymentTemplates)), paymentsConfigured: false, manualPaymentsConfigured: false, manualPaymentTemplatesConfigured: false };
+  let cache = { sessions: [], siteSettings: { ...defaultSiteSettings }, paymentAdjustments: {}, paymentRates: { ...defaultPaymentRates }, manualPaymentSessions: [], manualPaymentTemplates: JSON.parse(JSON.stringify(defaultManualPaymentTemplates)), installStats: { configured: false, count: 0, lastInstalledAt: null }, paymentsConfigured: false, manualPaymentsConfigured: false, manualPaymentTemplatesConfigured: false };
   let ready = false;
   const cancelTokens = new Map();
   const isTrue = value => value === true || value === 'true' || value === 1 || value === '1';
@@ -88,6 +88,7 @@
     let paymentRates = { ...defaultPaymentRates };
     let manualPaymentSessions = [];
     let manualPaymentTemplates = JSON.parse(JSON.stringify(defaultManualPaymentTemplates));
+    let installStats = { configured: !isAdminPage, count: 0, lastInstalledAt: null };
     let paymentsConfigured = !isAdminPage;
     let manualPaymentsConfigured = !isAdminPage;
     let manualPaymentTemplatesConfigured = !isAdminPage;
@@ -151,6 +152,16 @@
         manualPaymentTemplatesConfigured = true;
         if ((manualTemplates.data || []).length) manualPaymentTemplates = manualTemplates.data.map(fromManualPaymentTemplateRow);
       }
+      const installCount = await client.from('app_installations').select('installation_id', { count: 'exact', head: true });
+      if (installCount.error) {
+        const missing = installCount.error.code === '42P01' || installCount.error.code === 'PGRST205' || /app_installations/i.test(String(installCount.error.message || ''));
+        if (!missing) throw installCount.error;
+        installStats = { configured: false, count: 0, lastInstalledAt: null };
+      } else {
+        const latestInstall = await client.from('app_installations').select('installed_at').order('installed_at', { ascending: false }).limit(1).maybeSingle();
+        if (latestInstall.error) throw latestInstall.error;
+        installStats = { configured: true, count: Number(installCount.count) || 0, lastInstalledAt: latestInstall.data?.installed_at || null };
+      }
     } else {
       const result = await client.rpc('public_sessions');
       if (result.error) throw result.error;
@@ -166,7 +177,7 @@
       if (setting.key === 'hero_text' && setting.value) siteSettings.heroText = String(setting.value);
       if (setting.key === 'hero_subtitle' && setting.value) siteSettings.heroSubtitle = String(setting.value);
     });
-    cache = { sessions, siteSettings, paymentAdjustments, paymentRates, manualPaymentSessions, manualPaymentTemplates, paymentsConfigured, manualPaymentsConfigured, manualPaymentTemplatesConfigured };
+    cache = { sessions, siteSettings, paymentAdjustments, paymentRates, manualPaymentSessions, manualPaymentTemplates, installStats, paymentsConfigured, manualPaymentsConfigured, manualPaymentTemplatesConfigured };
     ready = true;
     document.documentElement.classList.remove('appLoading');
     if (typeof window.renderAll === 'function') window.renderAll();
@@ -361,6 +372,18 @@
     refresh
   };
 
+  window.nikiAppInstallations = {
+    async record(installationId, platform = 'android') {
+      const id = String(installationId || '').trim();
+      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) return false;
+      const result = await client.from('app_installations').insert({ installation_id: id, platform: String(platform || 'android').slice(0, 24) });
+      if (!result.error || result.error.code === '23505') return true;
+      const missing = result.error.code === '42P01' || result.error.code === 'PGRST205' || /app_installations/i.test(String(result.error.message || ''));
+      if (!missing) console.error(result.error);
+      return false;
+    }
+  };
+
   window.nikiBookings = {
     has(sessionId) { return !!readReceipts()[sessionId]; },
     get(sessionId) { return readReceipts()[sessionId] || null; },
@@ -399,6 +422,7 @@
     .on('postgres_changes', { event: '*', schema: 'public', table: 'site_settings' }, refresh);
   if (isAdminPage) liveChannel.on('postgres_changes', { event: '*', schema: 'public', table: 'payment_adjustments' }, refresh);
   if (isAdminPage) liveChannel.on('postgres_changes', { event: '*', schema: 'public', table: 'payment_config' }, refresh);
+  if (isAdminPage) liveChannel.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'app_installations' }, refresh);
   liveChannel.subscribe();
 
   document.addEventListener('DOMContentLoaded', () => {
