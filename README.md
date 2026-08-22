@@ -10,6 +10,16 @@ Step Aerobics / With Niki booking site with a protected administration page and 
 
 Both pages use the same Supabase database. Changes and new registrations arrive through Supabase Realtime without refreshing the browser.
 
+## Android application
+
+The public page is an installable Progressive Web App. On an Android phone:
+
+1. Open the published site in Google Chrome.
+2. Tap **Инсталирай** in the site banner. If the banner is not visible, open the Chrome menu and choose **Install app** or **Add to Home screen**.
+3. Confirm the installation. **Step с Niki** then appears on the Home screen and in the app launcher.
+
+The installed app opens in its own full-screen window. The administration page is not cached as part of the public app.
+
 ## First-time Supabase setup
 
 1. Open the Supabase project.
