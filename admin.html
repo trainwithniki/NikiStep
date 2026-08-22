@@ -1959,6 +1959,7 @@ function confirmRemoveReg(){
 }
 
 function askDelete(id){const s=data.sessions.find(x=>x.id===id);if(!s)return;deleteId=id;deleteText.textContent=`Сигурни ли сте, че искате да изтриете тренировката на ${fmtDDMM(s.date)} в ${s.time}? Действието не може да бъде отменено.`;deleteConfirm.classList.add('open')}function closeDelete(){deleteId=null;deleteConfirm.classList.remove('open')}function confirmDelete(){if(!deleteId)return;data=loadData();data.sessions=data.sessions.filter(s=>s.id!==deleteId);saveData(data);closeDelete();renderAll();showToast('Тренировката е изтрита.')}function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}function renderAll(){data=loadData();renderActiveTraining();renderList();renderPayments()}window.addEventListener('storage',renderAll);buildTimePicker();setTimePicker('18:30');buildTplTime();renderTemplatesAll();renderAll();</script>
+<script src="modal-scroll-lock.js?v=20260822-1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script src="supabase-sync.js?v=20260822-2"></script>
