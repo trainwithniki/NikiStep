@@ -1,8 +1,8 @@
 <!doctype html><html class="authLocked" lang="bg"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Admin • Step Aerobics with Niki</title><style>
-:root{--bg:#f4f5f7;--text:#17181c;--muted:#71757d;--line:#e5e7eb;--pink:#ff4778;--coral:#ff7558;--red:#bc3151;--shadow:0 12px 28px rgba(20,22,28,.07)}*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,textarea,select{font:inherit}.shell{max-width:1040px;margin:auto;padding:17px}.head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.head h1{font-size:25px;letter-spacing:-.04em;margin:2px 0 0}.eye{font-size:11px;color:var(--muted);font-weight:900;letter-spacing:.08em}.btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 10px;font-size:13px;font-weight:850;cursor:pointer}.primary{border:0!important;color:#fff;background:linear-gradient(135deg,var(--pink),var(--coral))!important}.danger{border-color:#ffd3dd!important;background:#fff3f6!important;color:var(--red)!important}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:13px}.stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}.stat span{display:block;color:var(--muted);font-size:11px;font-weight:800}.stat strong{display:block;font-size:24px;margin-top:4px}.card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:14px;box-shadow:var(--shadow)}.card h2{font-size:18px;margin:0 0 10px}.list{display:flex;flex-direction:column;gap:8px}.session{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:11px;border:1px solid var(--line);border-radius:13px;background:#fcfcfd}.main strong{font-size:14px}.main p{font-size:12px;color:var(--muted);margin:4px 0 0}.acts{display:flex;gap:5px}.state{display:inline-flex;margin-top:6px;padding:4px 6px;border-radius:999px;font-size:10px;font-weight:950}.state.open{background:#fff0f4;color:#c52d58}.state.upcoming{background:#f0f2f5;color:#676c75}.state.closed{background:#fff3e5;color:#9e6109}.state.completed{background:#eaf7f0;color:#15764f}.session.live{border-color:#78d5a6;background:linear-gradient(135deg,#f6fff9,#ffffff);box-shadow:0 0 0 1px rgba(30,165,99,.10),0 0 20px rgba(30,165,99,.14)}
-.activePanel{margin:0 0 13px;border:1px solid rgba(38,190,112,.48);border-radius:18px;padding:16px;background:radial-gradient(circle at 92% 10%,rgba(54,211,131,.18),transparent 34%),linear-gradient(145deg,#f7fff9,#ffffff);box-shadow:0 0 0 1px rgba(34,197,94,.08),0 0 30px rgba(34,197,94,.24),0 12px 30px rgba(20,22,28,.07);position:relative;overflow:hidden}.activePanel:before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(110deg,transparent 25%,rgba(255,255,255,.75) 48%,transparent 70%);transform:translateX(-120%);animation:liveShine 4s ease-in-out infinite}.activeTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;position:relative;z-index:1}.liveLabel{display:inline-flex;align-items:center;gap:6px;padding:5px 8px;border-radius:999px;background:#dff8e9;color:#127046;font-size:11px;font-weight:950;letter-spacing:.05em}.liveDot{width:7px;height:7px;border-radius:50%;background:#20b968;box-shadow:0 0 0 4px rgba(32,185,104,.12),0 0 12px rgba(32,185,104,.55)}.activeDate{font-size:14px;font-weight:900;color:#3c4540}.activeName{position:relative;z-index:1;font-size:18px;font-weight:950;letter-spacing:-.03em;margin:10px 0 2px}.activeMeta{position:relative;z-index:1;font-size:12px;color:var(--muted)}.activeNumbers{position:relative;z-index:1;display:flex;align-items:flex-end;gap:12px;margin:14px 0 10px}.bigCount{font-size:54px;line-height:.82;font-weight:950;color:#159055;letter-spacing:-.06em;text-shadow:0 0 20px rgba(21,144,85,.14)}.bigCount small{font-size:19px;color:#7d8a82;letter-spacing:-.02em}.freeCount{padding-bottom:3px}.freeCount strong{display:block;font-size:23px;color:#26302a}.freeCount span{display:block;font-size:10px;font-weight:900;color:#7b827e;text-transform:uppercase}.liveBarLabel{position:relative;z-index:1;display:flex;justify-content:space-between;font-size:11px;font-weight:900;color:#607068;margin-bottom:6px}.liveBar{position:relative;z-index:1;height:13px;border-radius:999px;background:#e6f0e9;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,.06)}.liveBar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#159055,#35ca7b);box-shadow:0 0 15px rgba(38,190,112,.42);transition:width .35s ease}.noActive{margin:0 0 13px;padding:13px 14px;border:1px dashed #cbd0d5;border-radius:15px;background:#fafbfc;color:#737982;font-size:12px}@keyframes liveShine{0%,65%{transform:translateX(-120%)}85%,100%{transform:translateX(120%)}}
-.overlay{display:none;position:fixed;inset:0;z-index:50;background:rgba(18,19,23,.55);align-items:flex-end;justify-content:center}.overlay.open{display:flex}.editor{width:min(720px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:22px 22px 0 0;padding:14px 15px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -20px 60px rgba(0,0,0,.2)}.handle{width:42px;height:5px;border-radius:99px;background:#d9dce2;margin:0 auto 12px}.edHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:12px}.edHead h2{font-size:20px;margin:0}.edHead p{font-size:11px;color:var(--muted);margin:3px 0 0}.form{display:grid;grid-template-columns:1fr 1fr;gap:9px}.field.full{grid-column:1/-1}.field label{display:block;font-size:11px;font-weight:900;color:#484c54;margin-bottom:5px}.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);border-radius:10px;background:#fafbfc;padding:9px 10px;font-size:14px;outline:none}.field textarea{min-height:72px;resize:vertical}.help{font-size:10px;color:var(--muted);margin-top:4px}.edActs{display:flex;gap:6px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap}.regs{margin-top:15px;border-top:1px solid var(--line);padding-top:12px}.regsHead{display:flex;justify-content:space-between;margin-bottom:7px}.regs h3{font-size:15px;margin:0}table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;padding:7px 5px;border-bottom:1px solid #eef0f2}th{font-size:10px;color:var(--muted);text-transform:uppercase}.remove{border:0;background:#fff1f4;color:var(--red);border-radius:7px;padding:5px 6px;font-size:10px;font-weight:900}
-.confirmOv{display:none;position:fixed;inset:0;z-index:80;background:rgba(18,19,23,.62);align-items:center;justify-content:center;padding:18px}.confirmOv.open{display:flex}.confirmBox{width:min(360px,100%);background:#fff;border-radius:18px;padding:18px;box-shadow:0 24px 70px rgba(0,0,0,.23)}.confirmBox h3{font-size:19px;margin:0 0 6px}.confirmBox p{font-size:12px;color:var(--muted);line-height:1.45;margin:0 0 13px}.cActs{display:flex;gap:7px;justify-content:flex-end}.toast{display:none;position:fixed;right:14px;bottom:14px;z-index:100;background:#202126;color:#fff;border-radius:11px;padding:10px 12px;font-size:12px;font-weight:800}.toast.show{display:block}@media(max-width:650px){.shell{padding:12px}.stats{grid-template-columns:1fr 1fr}.session{grid-template-columns:1fr}.acts{justify-content:flex-start}.form{grid-template-columns:1fr}.field.full{grid-column:auto}}@media(min-width:720px){.overlay{align-items:center;padding:20px}.editor{border-radius:22px}}
+:root{--bg:#f4f5f7;--text:#17181c;--muted:#71757d;--line:#e5e7eb;--pink:#ff4778;--coral:#ff7558;--red:#bc3151;--shadow:0 12px 28px rgba(20,22,28,.07)}*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,textarea,select{font:inherit}.shell{max-width:1040px;margin:auto;padding:17px}.head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.head h1{font-size:24px;letter-spacing:-.04em;margin:2px 0 0}.eye{font-size:10px;color:var(--muted);font-weight:900;letter-spacing:.08em}.btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 10px;font-size:12px;font-weight:850;cursor:pointer}.primary{border:0!important;color:#fff;background:linear-gradient(135deg,var(--pink),var(--coral))!important}.danger{border-color:#ffd3dd!important;background:#fff3f6!important;color:var(--red)!important}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:13px}.stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}.stat span{display:block;color:var(--muted);font-size:10px;font-weight:800}.stat strong{display:block;font-size:23px;margin-top:4px}.card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:14px;box-shadow:var(--shadow)}.card h2{font-size:17px;margin:0 0 10px}.list{display:flex;flex-direction:column;gap:8px}.session{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:11px;border:1px solid var(--line);border-radius:13px;background:#fcfcfd}.main strong{font-size:13px}.main p{font-size:11px;color:var(--muted);margin:4px 0 0}.acts{display:flex;gap:5px}.state{display:inline-flex;margin-top:6px;padding:4px 6px;border-radius:999px;font-size:9px;font-weight:950}.state.open{background:#fff0f4;color:#c52d58}.state.upcoming{background:#f0f2f5;color:#676c75}.state.closed{background:#fff3e5;color:#9e6109}.state.completed{background:#eaf7f0;color:#15764f}.session.live{border-color:#78d5a6;background:linear-gradient(135deg,#f6fff9,#ffffff);box-shadow:0 0 0 1px rgba(30,165,99,.10),0 0 20px rgba(30,165,99,.14)}
+.activePanel{margin:0 0 13px;border:1px solid rgba(38,190,112,.48);border-radius:18px;padding:16px;background:radial-gradient(circle at 92% 10%,rgba(54,211,131,.18),transparent 34%),linear-gradient(145deg,#f7fff9,#ffffff);box-shadow:0 0 0 1px rgba(34,197,94,.08),0 0 30px rgba(34,197,94,.24),0 12px 30px rgba(20,22,28,.07);position:relative;overflow:hidden}.activePanel:before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(110deg,transparent 25%,rgba(255,255,255,.75) 48%,transparent 70%);transform:translateX(-120%);animation:liveShine 4s ease-in-out infinite}.activeTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;position:relative;z-index:1}.liveLabel{display:inline-flex;align-items:center;gap:6px;padding:5px 8px;border-radius:999px;background:#dff8e9;color:#127046;font-size:10px;font-weight:950;letter-spacing:.05em}.liveDot{width:7px;height:7px;border-radius:50%;background:#20b968;box-shadow:0 0 0 4px rgba(32,185,104,.12),0 0 12px rgba(32,185,104,.55)}.activeDate{font-size:13px;font-weight:900;color:#3c4540}.activeName{position:relative;z-index:1;font-size:17px;font-weight:950;letter-spacing:-.03em;margin:10px 0 2px}.activeMeta{position:relative;z-index:1;font-size:11px;color:var(--muted)}.activeNumbers{position:relative;z-index:1;display:flex;align-items:flex-end;gap:12px;margin:14px 0 10px}.bigCount{font-size:53px;line-height:.82;font-weight:950;color:#159055;letter-spacing:-.06em;text-shadow:0 0 20px rgba(21,144,85,.14)}.bigCount small{font-size:18px;color:#7d8a82;letter-spacing:-.02em}.freeCount{padding-bottom:3px}.freeCount strong{display:block;font-size:22px;color:#26302a}.freeCount span{display:block;font-size:9px;font-weight:900;color:#7b827e;text-transform:uppercase}.liveBarLabel{position:relative;z-index:1;display:flex;justify-content:space-between;font-size:10px;font-weight:900;color:#607068;margin-bottom:6px}.liveBar{position:relative;z-index:1;height:13px;border-radius:999px;background:#e6f0e9;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,.06)}.liveBar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#159055,#35ca7b);box-shadow:0 0 15px rgba(38,190,112,.42);transition:width .35s ease}.noActive{margin:0 0 13px;padding:13px 14px;border:1px dashed #cbd0d5;border-radius:15px;background:#fafbfc;color:#737982;font-size:11px}@keyframes liveShine{0%,65%{transform:translateX(-120%)}85%,100%{transform:translateX(120%)}}
+.overlay{display:none;position:fixed;inset:0;z-index:50;background:rgba(18,19,23,.55);align-items:flex-end;justify-content:center}.overlay.open{display:flex}.editor{width:min(720px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:22px 22px 0 0;padding:14px 15px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -20px 60px rgba(0,0,0,.2)}.handle{width:42px;height:5px;border-radius:99px;background:#d9dce2;margin:0 auto 12px}.edHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:12px}.edHead h2{font-size:19px;margin:0}.edHead p{font-size:10px;color:var(--muted);margin:3px 0 0}.form{display:grid;grid-template-columns:1fr 1fr;gap:9px}.field.full{grid-column:1/-1}.field label{display:block;font-size:10px;font-weight:900;color:#484c54;margin-bottom:5px}.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);border-radius:10px;background:#fafbfc;padding:9px 10px;font-size:13px;outline:none}.field textarea{min-height:72px;resize:vertical}.help{font-size:9px;color:var(--muted);margin-top:4px}.edActs{display:flex;gap:6px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap}.regs{margin-top:15px;border-top:1px solid var(--line);padding-top:12px}.regsHead{display:flex;justify-content:space-between;margin-bottom:7px}.regs h3{font-size:14px;margin:0}table{width:100%;border-collapse:collapse;font-size:11px}th,td{text-align:left;padding:7px 5px;border-bottom:1px solid #eef0f2}th{font-size:9px;color:var(--muted);text-transform:uppercase}.remove{border:0;background:#fff1f4;color:var(--red);border-radius:7px;padding:5px 6px;font-size:9px;font-weight:900}
+.confirmOv{display:none;position:fixed;inset:0;z-index:80;background:rgba(18,19,23,.62);align-items:center;justify-content:center;padding:18px}.confirmOv.open{display:flex}.confirmBox{width:min(360px,100%);background:#fff;border-radius:18px;padding:18px;box-shadow:0 24px 70px rgba(0,0,0,.23)}.confirmBox h3{font-size:18px;margin:0 0 6px}.confirmBox p{font-size:11px;color:var(--muted);line-height:1.45;margin:0 0 13px}.cActs{display:flex;gap:7px;justify-content:flex-end}.toast{display:none;position:fixed;right:14px;bottom:14px;z-index:100;background:#202126;color:#fff;border-radius:11px;padding:10px 12px;font-size:11px;font-weight:800}.toast.show{display:block}@media(max-width:650px){.shell{padding:12px}.stats{grid-template-columns:1fr 1fr}.session{grid-template-columns:1fr}.acts{justify-content:flex-start}.form{grid-template-columns:1fr}.field.full{grid-column:auto}}@media(min-width:720px){.overlay{align-items:center;padding:20px}.editor{border-radius:22px}}
 </style>
 <style id="v6-active-participants">
 .activeParticipants{
@@ -18,7 +18,7 @@
   align-items:center;
   gap:8px;
   margin-bottom:6px;
-  font-size:10px;
+  font-size:9px;
   font-weight:950;
   color:#557066;
   text-transform:uppercase;
@@ -40,13 +40,13 @@
   align-items:baseline;
   padding:2px 0;
   color:#476257;
-  font-size:10px;
+  font-size:9px;
   line-height:1.25;
 }
 .activeParticipant .num{
   flex:0 0 auto;
   color:#159055;
-  font-size:10px;
+  font-size:9px;
   font-weight:950;
 }
 .activeParticipant .name{
@@ -58,7 +58,7 @@
 }
 .activeParticipantsEmpty{
   color:#73847b;
-  font-size:10px;
+  font-size:9px;
   font-style:italic;
 }
 @media(max-width:560px){
@@ -94,7 +94,7 @@
   gap:8px;
   margin-bottom:8px;
   color:#426356;
-  font-size:11px;
+  font-size:10px;
   font-weight:950;
   text-transform:uppercase;
   letter-spacing:.07em;
@@ -114,7 +114,7 @@
   align-items:baseline;
   gap:5px;
   min-width:0;
-  font-size:11px;
+  font-size:10px;
   line-height:1.3;
   color:#496157;
 }
@@ -131,11 +131,11 @@
 }
 .activeEmpty{
   color:#77857e;
-  font-size:11px;
+  font-size:10px;
   font-style:italic;
 }
 .activePanel .activeName{
-  font-size:21px;
+  font-size:20px;
 }
 
 /* Calendar picker for creating/editing a training */
@@ -153,12 +153,12 @@
   border-radius:10px;
   background:#fafbfc;
   padding:9px 10px;
-  font-size:14px;
+  font-size:13px;
   font-weight:850;
   color:#282b31;
   cursor:pointer;
 }
-.dateButton .calIcon{font-size:17px}
+.dateButton .calIcon{font-size:16px}
 .datePicker{
   display:none;
   margin-top:7px;
@@ -176,7 +176,7 @@
   margin-bottom:6px;
 }
 .dpHead strong{
-  font-size:13px;
+  font-size:12px;
   text-transform:capitalize;
 }
 .dpNav{
@@ -195,7 +195,7 @@
 }
 .dpWeek span{
   text-align:center;
-  font-size:9px;
+  font-size:8px;
   font-weight:950;
   color:#8a8f97;
   padding:3px 0;
@@ -206,7 +206,7 @@
   border-radius:8px;
   background:#f8f9fb;
   color:#43474f;
-  font-size:11px;
+  font-size:10px;
   font-weight:900;
   cursor:pointer;
 }
@@ -225,19 +225,19 @@
 
 /* Cleaner date emphasis in admin list */
 .main strong{
-  font-size:15px!important;
+  font-size:14px!important;
 }
 .adminDate{
   display:inline-block;
   min-width:46px;
-  font-size:17px;
+  font-size:16px;
   font-weight:950;
   color:#25282e;
   letter-spacing:-.03em;
 }
 .adminWeekday{
   color:#12345b;
-  font-size:16px;
+  font-size:15px;
   font-weight:950;
 }
 
@@ -265,7 +265,7 @@
   border-radius:10px;
   background:#fafbfc;
   padding:9px 10px;
-  font-size:14px;
+  font-size:13px;
   font-weight:850;
   color:#25282e;
 }
@@ -276,7 +276,7 @@
   border-radius:9px;
   background:#f2f4f6;
   text-align:center;
-  font-size:18px;
+  font-size:17px;
   font-weight:950;
   letter-spacing:.05em;
   color:#202328;
@@ -325,7 +325,7 @@
 }
 .activeWhenDate{
   display:block;
-  font-size:40px;
+  font-size:39px;
   line-height:.9;
   font-weight:950;
   letter-spacing:-.065em;
@@ -335,7 +335,7 @@
 .activeWhenTime{
   display:block;
   margin-top:7px;
-  font-size:29px;
+  font-size:28px;
   line-height:1;
   font-weight:950;
   letter-spacing:-.045em;
@@ -343,7 +343,7 @@
 }
 .activePanel .activeName{
   margin:8px 0 3px!important;
-  font-size:20px!important;
+  font-size:19px!important;
 }
 .activeMeta{
   line-height:1.45;
@@ -352,7 +352,7 @@
   margin:12px 0 0!important;
 }
 .bigCount{
-  font-size:50px!important;
+  font-size:49px!important;
 }
 
 /* Names start earlier and use as much right-side room as possible */
@@ -370,7 +370,7 @@
   padding:1px 2px 5px 0!important;
 }
 .activePerson{
-  font-size:10.5px!important;
+  font-size:9.5px!important;
 }
 .activePerson .n{
   min-width:14px;
@@ -416,14 +416,14 @@
   background:linear-gradient(145deg,#fff8f0,#fff);
   border:1px solid #ffd7ad;
   color:#df720d;
-  font-size:18px;
+  font-size:17px;
   font-weight:950;
   letter-spacing:-.02em;
 }
 .completedSummary::-webkit-details-marker{display:none}
 .completedSummary:after{
   content:"⌄";
-  font-size:22px;
+  font-size:21px;
   line-height:1;
   font-weight:950;
   color:#df720d;
@@ -439,7 +439,7 @@
   border-radius:999px;
   background:#fff0df;
   color:#d76705;
-  font-size:11px;
+  font-size:10px;
   font-weight:950;
 }
 .completedList{
@@ -475,8 +475,8 @@
   .activePeopleSide{
     padding-left:8px!important;
   }
-  .activeWhenDate{font-size:34px}
-  .activeWhenTime{font-size:26px}
+  .activeWhenDate{font-size:33px}
+  .activeWhenTime{font-size:25px}
 }
 </style>
 
@@ -510,12 +510,12 @@
 }
 .personConfirmBox h3{
   margin:0 0 6px;
-  font-size:19px;
+  font-size:18px;
 }
 .personConfirmBox p{
   margin:0 0 14px;
   color:#70757e;
-  font-size:13px;
+  font-size:12px;
   line-height:1.45;
 }
 .personConfirmActions{
@@ -540,7 +540,7 @@
   min-height:40px;
 }
 .edActs .btn.primary{
-  font-size:14px;
+  font-size:13px;
 }
 
 /* Registration controls are a separate operational panel */
@@ -561,7 +561,7 @@
 }
 .bookingManagementHead strong{
   display:block;
-  font-size:15px;
+  font-size:14px;
   color:#25292c;
 }
 .bookingManagementHead span{
@@ -569,7 +569,7 @@
   margin-top:3px;
   max-width:440px;
   color:#777c84;
-  font-size:10px;
+  font-size:9px;
   line-height:1.4;
 }
 .bookingManagementBadge{
@@ -578,7 +578,7 @@
   border-radius:999px;
   background:#edf1ef;
   color:#65726b;
-  font-size:10px;
+  font-size:9px;
   font-weight:950;
   letter-spacing:.05em;
 }
@@ -590,7 +590,7 @@
 .bookingManagementButtons .btn{
   min-height:44px;
   border-radius:11px!important;
-  font-size:13px!important;
+  font-size:12px!important;
   font-weight:950!important;
 }
 .bookingManagementButtons .activateNow{
@@ -610,7 +610,7 @@
   background:#fff8eb;
   border:1px solid #ffe0a9;
   color:#8a611b;
-  font-size:10px;
+  font-size:9px;
   line-height:1.4;
 }
 
@@ -629,7 +629,7 @@
   }
   .bookingManagementButtons .btn{
     min-height:48px!important;
-    font-size:14px!important;
+    font-size:13px!important;
   }
 }
 </style>
@@ -639,27 +639,27 @@
 .headActions{display:flex;gap:7px;align-items:center}.settingsBtn{display:flex;align-items:center;gap:6px}
 .quickTemplates{margin:0 0 13px;padding:12px 13px;border:1px solid #e2e6e3;border-radius:15px;background:linear-gradient(145deg,#fff,#f8faf9)}
 .quickTemplatesTop{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px}
-.quickTemplatesTop strong{font-size:14px}.quickTemplatesTop span{font-size:10px;color:#7e838b}
+.quickTemplatesTop strong{font-size:13px}.quickTemplatesTop span{font-size:9px;color:#7e838b}
 .quickTemplateChips{display:flex;flex-wrap:wrap;gap:6px}
-.quickTemplateChip{border:1px solid #dce1de;background:#fff;border-radius:999px;padding:7px 10px;font-size:11px;font-weight:900;cursor:pointer}
+.quickTemplateChip{border:1px solid #dce1de;background:#fff;border-radius:999px;padding:7px 10px;font-size:10px;font-weight:900;cursor:pointer}
 .quickTemplateChip b{color:#149458}
 .templateQuick{grid-column:1/-1;padding:10px;border:1px solid #e1e4e8;border-radius:12px;background:#f8f9fb}
-.templateQuickTitle{display:flex;justify-content:space-between;gap:8px;margin-bottom:7px;font-size:12px;font-weight:900}
-.templateQuickTitle span{font-size:10px;color:#7e838b;font-weight:700}
-.templateQuickRow{display:grid;grid-template-columns:1fr auto;gap:7px}.templateQuick select{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px;background:#fff;font-size:13px;font-weight:850}
+.templateQuickTitle{display:flex;justify-content:space-between;gap:8px;margin-bottom:7px;font-size:11px;font-weight:900}
+.templateQuickTitle span{font-size:9px;color:#7e838b;font-weight:700}
+.templateQuickRow{display:grid;grid-template-columns:1fr auto;gap:7px}.templateQuick select{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px;background:#fff;font-size:12px;font-weight:850}
 
 .settingsOv{display:none;position:fixed;inset:0;z-index:160;background:rgba(16,17,21,.66);align-items:center;justify-content:center;padding:18px}.settingsOv.open{display:flex}
 .settingsPanel{width:min(850px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:22px;padding:17px;box-shadow:0 28px 90px rgba(0,0,0,.3)}
-.settingsHead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:13px}.settingsHead h2{margin:0;font-size:22px}.settingsHead p{margin:4px 0 0;color:#767b84;font-size:11px;line-height:1.4}
-.settingsGrid{display:grid;grid-template-columns:.85fr 1.15fr;gap:13px}.tplBox{border:1px solid var(--line);border-radius:16px;padding:13px;background:#fcfcfd}.tplBox h3{margin:0 0 10px;font-size:16px}
+.settingsHead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:13px}.settingsHead h2{margin:0;font-size:21px}.settingsHead p{margin:4px 0 0;color:#767b84;font-size:10px;line-height:1.4}
+.settingsGrid{display:grid;grid-template-columns:.85fr 1.15fr;gap:13px}.tplBox{border:1px solid var(--line);border-radius:16px;padding:13px;background:#fcfcfd}.tplBox h3{margin:0 0 10px;font-size:15px}
 .tplList{display:flex;flex-direction:column;gap:7px}.tplItem{padding:10px;border:1px solid #e2e5e9;border-radius:11px;background:#fff;cursor:pointer}.tplItem.sel{border-color:#ff95b2;box-shadow:0 0 0 3px #fff0f5}
-.tplItem strong{display:block;font-size:13px}.tplItem p{margin:4px 0 0;color:#7b8089;font-size:10px;line-height:1.4}.tplActions{display:flex;gap:5px;margin-top:8px}.tplActions .btn{padding:5px 7px!important;font-size:10px!important}
-.tplEmpty{padding:14px;border:1px dashed #d6d9de;border-radius:11px;text-align:center;color:#858a93;font-size:11px}
-.tplForm{display:grid;grid-template-columns:1fr 1fr;gap:8px}.tplForm .full{grid-column:1/-1}.tplForm label{display:block;margin-bottom:4px;font-size:10px;font-weight:950}
-.tplForm input,.tplForm select,.tplForm textarea{width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 9px;background:#fff;font-size:13px}.tplForm textarea{min-height:64px;resize:vertical}
+.tplItem strong{display:block;font-size:12px}.tplItem p{margin:4px 0 0;color:#7b8089;font-size:9px;line-height:1.4}.tplActions{display:flex;gap:5px;margin-top:8px}.tplActions .btn{padding:5px 7px!important;font-size:9px!important}
+.tplEmpty{padding:14px;border:1px dashed #d6d9de;border-radius:11px;text-align:center;color:#858a93;font-size:10px}
+.tplForm{display:grid;grid-template-columns:1fr 1fr;gap:8px}.tplForm .full{grid-column:1/-1}.tplForm label{display:block;margin-bottom:4px;font-size:9px;font-weight:950}
+.tplForm input,.tplForm select,.tplForm textarea{width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 9px;background:#fff;font-size:12px}.tplForm textarea{min-height:64px;resize:vertical}
 .tplTime{display:grid;grid-template-columns:1fr 1fr;gap:5px}.tplEditorActions{display:flex;justify-content:flex-end;gap:6px;margin-top:10px}.tplDanger{border:1px solid #ffd0da!important;background:#fff1f4!important;color:#bf2948!important}
 .tplConfirm{display:none;position:fixed;inset:0;z-index:180;background:rgba(16,17,21,.62);align-items:center;justify-content:center;padding:18px}.tplConfirm.open{display:flex}
-.tplConfirmBox{width:min(360px,100%);background:#fff;border-radius:17px;padding:17px;box-shadow:0 24px 70px rgba(0,0,0,.28)}.tplConfirmBox h3{margin:0 0 6px;font-size:18px}.tplConfirmBox p{margin:0 0 13px;color:#747982;font-size:11px;line-height:1.4}.tplConfirmActions{display:flex;justify-content:flex-end;gap:6px}
+.tplConfirmBox{width:min(360px,100%);background:#fff;border-radius:17px;padding:17px;box-shadow:0 24px 70px rgba(0,0,0,.28)}.tplConfirmBox h3{margin:0 0 6px;font-size:17px}.tplConfirmBox p{margin:0 0 13px;color:#747982;font-size:10px;line-height:1.4}.tplConfirmActions{display:flex;justify-content:flex-end;gap:6px}
 @media(max-width:700px){.settingsOv{align-items:flex-end;padding:0}.settingsPanel{width:100%;max-height:94vh;border-radius:22px 22px 0 0;padding:15px 13px calc(17px + env(safe-area-inset-bottom))}.settingsGrid{grid-template-columns:1fr}.tplForm{grid-template-columns:1fr}.tplForm .full{grid-column:auto}.headActions{width:100%}.headActions .btn{flex:1}}
 </style>
 
@@ -676,7 +676,7 @@
 .activePerson{
   width:100%!important;
   min-width:0!important;
-  font-size:11px!important;
+  font-size:10px!important;
   line-height:1.35!important;
 }
 .activePerson .personName{
@@ -734,7 +734,7 @@
   border-radius:999px;
   background:#10a85b;
   color:#fff;
-  font-size:9px;
+  font-size:8px;
   line-height:1;
   font-weight:950;
   letter-spacing:.09em;
@@ -755,7 +755,7 @@
   min-height:32px!important;
   padding:6px 9px!important;
   border-radius:9px!important;
-  font-size:11px!important;
+  font-size:10px!important;
   font-weight:950!important;
   white-space:nowrap!important;
 }
@@ -825,7 +825,7 @@
   border-radius:7px;
   background:#fff1f4;
   color:#c32645;
-  font-size:15px;
+  font-size:14px;
   line-height:22px;
   font-weight:950;
   cursor:pointer;
@@ -843,26 +843,26 @@ html{-webkit-text-size-adjust:100%}html,body{max-width:100%;overflow-x:hidden}bu
 @media(max-width:650px){
   .shell{padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) calc(18px + env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}
   .head{align-items:flex-start;flex-direction:column;margin-bottom:10px}
-  .head h1{font-size:27px}.eye{line-height:1.4}
+  .head h1{font-size:26px}.eye{line-height:1.4}
   .adminNavActions{display:grid;grid-template-columns:1fr 44px 74px;width:100%;gap:7px}
   .adminNavBtn,.adminLogoutBtn,.adminSettingsIcon{width:100%;min-height:44px}
-  .newTrainingRow{margin:0 0 12px}.newTrainingRow .btn{width:100%;min-height:48px;font-size:15px}
+  .newTrainingRow{margin:0 0 12px}.newTrainingRow .btn{width:100%;min-height:48px;font-size:14px}
   .session{padding:12px}.acts{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px!important}
   .acts{display:flex!important;flex-wrap:wrap;gap:5px!important}
-  .acts .btn{width:auto!important;min-width:0!important;min-height:36px!important;padding:6px 9px!important;font-size:11px!important;flex:1 1 calc(50% - 5px)}
+  .acts .btn{width:auto!important;min-width:0!important;min-height:36px!important;padding:6px 9px!important;font-size:10px!important;flex:1 1 calc(50% - 5px)}
   .editor{height:auto;max-height:96dvh;padding:12px 12px calc(16px + env(safe-area-inset-bottom))}
-  .field input,.field select,.field textarea,.tplForm input,.tplForm select,.tplForm textarea{font-size:18px!important;min-height:46px}
+  .field input,.field select,.field textarea,.tplForm input,.tplForm select,.tplForm textarea{font-size:17px!important;min-height:46px}
   .edActs{display:grid;grid-template-columns:1fr 1fr}.edActs .btn{min-height:46px}
   .regs{overflow:hidden}.regs>div{overflow-x:auto;-webkit-overflow-scrolling:touch}
   .regs table{min-width:620px}
-  .toast{left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));text-align:center;font-size:14px}
+  .toast{left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));text-align:center;font-size:13px}
   .settingsPanel{max-height:96dvh}.tplEditorActions,.tplConfirmActions,.cActs{flex-wrap:wrap}.tplEditorActions .btn{min-height:44px}
 }
 @media(max-width:360px){
-  .adminNavActions{grid-template-columns:1fr 44px 66px}.adminNavBtn{font-size:11px;padding:7px}.head h1{font-size:25px}
-  .edActs{grid-template-columns:1fr}.activeNumbers{flex-wrap:wrap}.bigCount{font-size:46px}
+  .adminNavActions{grid-template-columns:1fr 44px 66px}.adminNavBtn{font-size:10px;padding:7px}.head h1{font-size:24px}
+  .edActs{grid-template-columns:1fr}.activeNumbers{flex-wrap:wrap}.bigCount{font-size:45px}
 }
-@media(min-width:651px){.acts .btn{min-height:34px!important;padding:6px 8px!important;font-size:11px!important}}
+@media(min-width:651px){.acts .btn{min-height:34px!important;padding:6px 8px!important;font-size:10px!important}}
 @media(min-width:651px){
   .head{position:sticky;top:0;z-index:40;padding:12px 0;background:rgba(244,245,247,.94);backdrop-filter:blur(14px)}
   .newTrainingRow{margin-top:-4px}
@@ -873,32 +873,32 @@ html.authLocked,html.authLocked body,html.authChecking,html.authChecking body{ov
 html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!important}
 #adminAuthGate{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;background:linear-gradient(145deg,#f4f7f5,#fff)}
 #adminAuthGate.hidden{display:none!important}
-.adminBackToSite{position:absolute;top:max(14px,env(safe-area-inset-top));left:max(14px,env(safe-area-inset-left));display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:9px 13px;border:1px solid #dce4df;border-radius:11px;background:rgba(255,255,255,.92);box-shadow:0 7px 20px rgba(22,55,38,.08);color:#343a3f;font-size:13px;font-weight:900;text-decoration:none}
+.adminBackToSite{position:absolute;top:max(14px,env(safe-area-inset-top));left:max(14px,env(safe-area-inset-left));display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:9px 13px;border:1px solid #dce4df;border-radius:11px;background:rgba(255,255,255,.92);box-shadow:0 7px 20px rgba(22,55,38,.08);color:#343a3f;font-size:12px;font-weight:900;text-decoration:none}
 .adminLoginCard{width:min(100%,390px);padding:24px 20px;border-radius:22px;background:#fff;border:1px solid #e1e7e3;box-shadow:0 20px 55px rgba(22,55,38,.14)}
 .adminLoginBrand{text-align:center;margin-bottom:18px}
-.loginMark{width:56px;height:56px;margin:0 auto 12px;display:grid;place-items:center;border-radius:17px;background:linear-gradient(145deg,#13a45b,#29d17a);color:#fff;font-size:32px;font-weight:950}
-.adminLoginBrand h1{margin:0;font-size:25px;color:#202328}
-.adminLoginBrand p{margin:7px 0 0;color:#7a8087;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.loginMark{width:56px;height:56px;margin:0 auto 12px;display:grid;place-items:center;border-radius:17px;background:linear-gradient(145deg,#13a45b,#29d17a);color:#fff;font-size:31px;font-weight:950}
+.adminLoginBrand h1{margin:0;font-size:24px;color:#202328}
+.adminLoginBrand p{margin:7px 0 0;color:#7a8087;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
 .adminLoginField{margin-top:12px}
-.adminLoginField label{display:block;margin-bottom:6px;font-size:11px;font-weight:950;color:#60656d;letter-spacing:.07em;text-transform:uppercase}
-.adminLoginField input{width:100%;min-height:48px;padding:11px 13px;border:1px solid #d9dee1;border-radius:12px;background:#fbfcfb;color:#202328;font-size:18px;outline:none}
+.adminLoginField label{display:block;margin-bottom:6px;font-size:10px;font-weight:950;color:#60656d;letter-spacing:.07em;text-transform:uppercase}
+.adminLoginField input{width:100%;min-height:48px;padding:11px 13px;border:1px solid #d9dee1;border-radius:12px;background:#fbfcfb;color:#202328;font-size:17px;outline:none}
 .adminLoginField input:focus{border-color:#18a65d;box-shadow:0 0 0 3px rgba(24,166,93,.10);background:#fff}
 .adminPasswordWrap{position:relative}
 .adminPasswordWrap input{padding-right:48px}
 .adminPasswordToggle{position:absolute;top:50%;right:7px;transform:translateY(-50%);width:36px;height:36px;border:0;border-radius:9px;background:#eef3f0;cursor:pointer}
-.adminLoginBtn{width:100%;min-height:48px;margin-top:16px;border:0;border-radius:12px;background:linear-gradient(135deg,#109d55,#24c86f);color:#fff;font-size:15px;font-weight:950;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+.adminLoginBtn{width:100%;min-height:48px;margin-top:16px;border:0;border-radius:12px;background:linear-gradient(135deg,#109d55,#24c86f);color:#fff;font-size:14px;font-weight:950;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
 .adminLoginBtn:disabled{opacity:.55;cursor:not-allowed}
-.adminLoginError{display:none;margin-top:11px;padding:9px 10px;border-radius:10px;background:#fff0f3;color:#b62a45;font-size:13px;font-weight:850;text-align:center}
+.adminLoginError{display:none;margin-top:11px;padding:9px 10px;border-radius:10px;background:#fff0f3;color:#b62a45;font-size:12px;font-weight:850;text-align:center}
 .adminLoginError.show{display:block}
-.adminRemember{display:flex;align-items:center;gap:9px;margin-top:13px;color:#626970;font-size:13px;font-weight:800;cursor:pointer}
+.adminRemember{display:flex;align-items:center;gap:9px;margin-top:13px;color:#626970;font-size:12px;font-weight:800;cursor:pointer}
 .adminRemember input{width:18px;height:18px;accent-color:#18a65d}
-.adminLogoutBtn{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:7px 11px;border:1px solid #ffd4dc;border-radius:9px;background:#fff3f5;color:#bd2946;font-size:11px;font-weight:950;cursor:pointer}
+.adminLogoutBtn{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:7px 11px;border:1px solid #ffd4dc;border-radius:9px;background:#fff3f5;color:#bd2946;font-size:10px;font-weight:950;cursor:pointer}
 .adminNavActions{display:flex;gap:7px;align-items:center;justify-content:flex-end}
-.adminNavBtn{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:8px 12px;border:1px solid #dce4df;border-radius:10px;background:#fff;color:#343a3f;font-size:12px;font-weight:950;text-decoration:none;cursor:pointer}
-.adminSettingsIcon{width:38px;padding:8px!important;font-size:19px!important;line-height:1}
+.adminNavBtn{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:8px 12px;border:1px solid #dce4df;border-radius:10px;background:#fff;color:#343a3f;font-size:11px;font-weight:950;text-decoration:none;cursor:pointer}
+.adminSettingsIcon{width:38px;padding:8px!important;font-size:18px!important;line-height:1}
 .newTrainingRow{display:flex;justify-content:flex-end;margin:-3px 0 13px}
 .newTrainingRow .btn{min-height:42px;padding:10px 16px}
-.multiSportStamp{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;padding:3px 6px;border:1.5px solid #738079;border-radius:4px;background:#f8faf9;color:#455049;font-size:8.5px;line-height:1;font-weight:950;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;transform:rotate(-1deg)}
+.multiSportStamp{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;padding:3px 6px;border:1.5px solid #738079;border-radius:4px;background:#f8faf9;color:#455049;font-size:7.5px;line-height:1;font-weight:950;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;transform:rotate(-1deg)}
 .personWithCard{display:inline-flex;align-items:center;gap:6px;min-width:0}
 @media(max-width:430px){#adminAuthGate{padding:12px}.adminLoginCard{padding:22px 16px 18px;border-radius:18px}}
 </style>
@@ -907,38 +907,38 @@ html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!imp
 #activeTraining{display:flex;flex-direction:column;gap:12px;margin-bottom:13px}
 #activeTraining .activePanel{margin:0!important;padding:14px!important}
 .activeScheduleRow{position:relative;z-index:1;display:flex;align-items:baseline;gap:12px;margin-top:13px}
-.activeScheduleDate{color:#149458;font-size:32px;line-height:1;font-weight:950;letter-spacing:-.055em}
-.activeScheduleWeekday{color:#12345b;font-size:24px;line-height:1;font-weight:950}
-.activeScheduleSep{color:#7a8288;font-size:20px;font-weight:800}
-.activeScheduleTime{color:#20262a;font-size:26px;line-height:1;font-weight:950;letter-spacing:-.04em}
-.activeSessionLine{position:relative;z-index:1;margin-top:8px;color:#4f5b55;font-size:13px;line-height:1.4;font-weight:850}
+.activeScheduleDate{color:#149458;font-size:31px;line-height:1;font-weight:950;letter-spacing:-.055em}
+.activeScheduleWeekday{color:#12345b;font-size:23px;line-height:1;font-weight:950}
+.activeScheduleSep{color:#7a8288;font-size:19px;font-weight:800}
+.activeScheduleTime{color:#20262a;font-size:25px;line-height:1;font-weight:950;letter-spacing:-.04em}
+.activeSessionLine{position:relative;z-index:1;margin-top:8px;color:#4f5b55;font-size:12px;line-height:1.4;font-weight:850}
 .activePanel .activeProgressFull{margin-top:13px!important;padding-top:11px!important;border-top:1px solid rgba(30,165,99,.16)!important}
 .activePanel .activePeopleSide{position:relative;z-index:1;margin-top:14px;padding:12px 0 0!important;border-top:1px solid rgba(30,165,99,.18)!important;border-left:0!important}
 .activePanel .activePeopleHeading{margin-bottom:8px!important}
 .activePanel .activePeopleGrid{display:flex!important;flex-direction:column!important;gap:5px!important;padding:0!important;overflow:visible!important}
-.activePanel .activePerson{display:grid!important;grid-template-columns:18px minmax(0,1fr) 24px;align-items:center!important;gap:6px!important;min-height:30px;padding:3px 0;border-bottom:1px solid rgba(30,165,99,.08);font-size:12px!important}
+.activePanel .activePerson{display:grid!important;grid-template-columns:18px minmax(0,1fr) 24px;align-items:center!important;gap:6px!important;min-height:30px;padding:3px 0;border-bottom:1px solid rgba(30,165,99,.08);font-size:11px!important}
 .activePanel .activePerson:last-child{border-bottom:0}
 .activePanel .activePerson .n{min-width:0!important}
 .activePersonIdentity{display:flex;flex-direction:column;align-items:stretch;min-width:0}
 .activePersonMainLine{display:flex;align-items:center;gap:6px;min-width:0;width:100%;max-width:100%}
-.activePersonBookedBy{display:block;margin-top:2px;color:#7b8289;font-size:9px;line-height:1.15;font-weight:800;letter-spacing:.01em}
-.registrationBookedBy{display:block;margin-top:2px;color:#7b8289;font-size:9px;line-height:1.15;font-weight:800}
-.activePersonPhone{flex:0 0 auto;color:#646b73;font-size:11px;font-weight:750;letter-spacing:.015em;white-space:nowrap}
-.activePersonJoinedAt{flex:0 0 auto;margin-left:auto;color:#92979d;font-size:9px;font-weight:800;letter-spacing:.01em;white-space:nowrap;text-align:right}
-.cancelledStamp{display:inline-flex;align-items:center;padding:2px 6px;border:2px solid #b4233d;border-radius:4px;color:#b4233d;background:#fff5f6;font-size:10px;font-weight:950;letter-spacing:.08em;line-height:1;transform:rotate(-2deg);white-space:nowrap}
+.activePersonBookedBy{display:block;margin-top:2px;color:#7b8289;font-size:8px;line-height:1.15;font-weight:800;letter-spacing:.01em}
+.registrationBookedBy{display:block;margin-top:2px;color:#7b8289;font-size:8px;line-height:1.15;font-weight:800}
+.activePersonPhone{flex:0 0 auto;color:#646b73;font-size:10px;font-weight:750;letter-spacing:.015em;white-space:nowrap}
+.activePersonJoinedAt{flex:0 0 auto;margin-left:auto;color:#92979d;font-size:8px;font-weight:800;letter-spacing:.01em;white-space:nowrap;text-align:right}
+.cancelledStamp{display:inline-flex;align-items:center;padding:2px 6px;border:2px solid #b4233d;border-radius:4px;color:#b4233d;background:#fff5f6;font-size:9px;font-weight:950;letter-spacing:.08em;line-height:1;transform:rotate(-2deg);white-space:nowrap}
 .activePerson.cancelledPerson{opacity:.78;background:#fff8f8}.activePerson.cancelledPerson .personName{text-decoration:line-through;text-decoration-color:#b4233d}
 .activePanel .activePerson .personName{flex:0 1 auto!important;min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;font-weight:850}
 .activePanel .activeRemove{margin-left:0}
 @media(max-width:430px){
   .activePanel{padding:13px 12px!important}
   .activeScheduleRow{gap:10px;margin-top:12px}
-  .activeScheduleDate{font-size:29px}
-  .activeScheduleWeekday{font-size:22px}
-  .activeScheduleSep{font-size:18px}
-  .activeScheduleTime{font-size:24px}
-  .activeSessionLine{font-size:12px}
+  .activeScheduleDate{font-size:28px}
+  .activeScheduleWeekday{font-size:21px}
+  .activeScheduleSep{font-size:17px}
+  .activeScheduleTime{font-size:23px}
+  .activeSessionLine{font-size:11px}
   .activePanel .activePerson{grid-template-columns:16px minmax(0,1fr) 24px;gap:5px}
-  .multiSportStamp{padding:3px 5px;font-size:8px}
+  .multiSportStamp{padding:3px 5px;font-size:7px}
 }
 </style>
 
@@ -1084,7 +1084,7 @@ html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!imp
     <button class="btn stopBookings" id="stopBookingsBtn" onclick="stopBookings()">СТОП НА ЗАПИСВАНИЯТА</button>
   </div>
   <div class="bookingWarning">Използвай „Активирай“ само когато искаш записванията да започнат веднага. „СТОП“ ги прекратява веднага.</div>
-</div><div class="regs" id="regsBlock" style="display:none"><div class="regsHead"><h3>Записани участници</h3><span id="regCount" style="font-size:11px;color:var(--muted)"></span></div><div style="overflow:auto"><table><thead><tr><th>#</th><th>Име</th><th>Телефон</th><th>Записан на</th><th></th></tr></thead><tbody id="regTable"></tbody></table></div></div></div></div>
+</div><div class="regs" id="regsBlock" style="display:none"><div class="regsHead"><h3>Записани участници</h3><span id="regCount" style="font-size:10px;color:var(--muted)"></span></div><div style="overflow:auto"><table><thead><tr><th>#</th><th>Име</th><th>Телефон</th><th>Записан на</th><th></th></tr></thead><tbody id="regTable"></tbody></table></div></div></div></div>
 
 <div class="settingsOv" id="settingsOv"><div class="settingsPanel">
   <div class="settingsHead"><div><h2>⚙ Настройки</h2><p>Промени текста върху главната снимка или управлявай шаблоните за тренировки.</p></div><button class="btn" onclick="closeSettings()">✕</button></div>
