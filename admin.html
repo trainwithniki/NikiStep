@@ -871,9 +871,15 @@ html{-webkit-text-size-adjust:100%}html,body{max-width:100%;overflow-x:hidden}bu
 </style>
 <style id="v29-auth">
 html.authLocked,html.authLocked body,html.authChecking,html.authChecking body{overflow:hidden!important}
-html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!important}
+html.authChecking .shell,html.authChecking #adminLoginForm,html.authChecking .adminBackToSite{visibility:hidden!important}
 #adminAuthGate{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;background:linear-gradient(145deg,#f4f7f5,#fff)}
 #adminAuthGate.hidden{display:none!important}
+.adminAuthLoading{display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#26322c}
+html.authChecking .adminAuthLoading{display:flex}
+.adminAuthLoadingMark{width:62px;height:62px;display:grid;place-items:center;border-radius:19px;background:linear-gradient(145deg,#13a45b,#29d17a);box-shadow:0 12px 32px rgba(19,164,91,.24);color:#fff;font-size:33px;font-weight:950}
+.adminAuthSpinner{width:30px;height:30px;margin:19px 0 13px;border:3px solid rgba(19,164,91,.16);border-top-color:#13a45b;border-radius:50%;animation:adminAuthSpin .8s linear infinite}
+.adminAuthLoading strong{font-size:15px;letter-spacing:-.01em}.adminAuthLoading span{margin-top:5px;color:#77817b;font-size:10px;font-weight:750}
+@keyframes adminAuthSpin{to{transform:rotate(360deg)}}
 .adminBackToSite{position:absolute;top:max(14px,env(safe-area-inset-top));left:max(14px,env(safe-area-inset-left));display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:9px 13px;border:1px solid #dce4df;border-radius:11px;background:rgba(255,255,255,.92);box-shadow:0 7px 20px rgba(22,55,38,.08);color:#343a3f;font-size:11px;font-weight:900;text-decoration:none}
 .adminLoginCard{width:min(100%,390px);padding:24px 20px;border-radius:22px;background:#fff;border:1px solid #e1e7e3;box-shadow:0 20px 55px rgba(22,55,38,.14)}
 .adminLoginBrand{text-align:center;margin-bottom:18px}
@@ -979,6 +985,12 @@ html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!imp
 
 <div id="adminAuthGate">
   <a class="adminBackToSite" href="./" target="_blank" rel="noopener" aria-label="Назад към публичния сайт">← Назад към сайта</a>
+  <div class="adminAuthLoading" role="status" aria-live="polite">
+    <div class="adminAuthLoadingMark" aria-hidden="true">N</div>
+    <div class="adminAuthSpinner" aria-hidden="true"></div>
+    <strong>Зареждане на админ панела…</strong>
+    <span>Проверяваме достъпа ви</span>
+  </div>
   <form class="adminLoginCard" id="adminLoginForm" autocomplete="on">
     <div class="adminLoginBrand">
       <div class="loginMark">N</div>
