@@ -101,15 +101,23 @@
         const session = sessions.find(item => item.id === row.session_id);
         if (session) session.registrations.push({ id: row.id, name: row.name, phone: row.phone, hasMultisport: isTrue(row.has_multisport), pending: row.pending, createdAt: row.created_at, cancelledAt: row.cancelled_at || null, bookedBy: row.booked_by || '' });
       });
-      const payments = await client.from('payment_adjustments').select('session_id,extra_individual,extra_multisport');
+      let payments = await client.from('payment_adjustments').select('session_id,extra_individual,extra_multisport,extra_card8,extra_card12');
       if (payments.error) {
+        const oldColumns = payments.error.code === '42703' || payments.error.code === 'PGRST204' || /(extra_card8|extra_card12)/i.test(String(payments.error.message || ''));
         const missing = payments.error.code === '42P01' || payments.error.code === 'PGRST205' || /payment_adjustments/i.test(String(payments.error.message || ''));
-        if (!missing) throw payments.error;
+        if (!missing && !oldColumns) throw payments.error;
         paymentsConfigured = false;
+        if (oldColumns) {
+          payments = await client.from('payment_adjustments').select('session_id,extra_individual,extra_multisport');
+          if (payments.error) throw payments.error;
+          (payments.data || []).forEach(row => {
+            paymentAdjustments[row.session_id] = { individual: Number(row.extra_individual) || 0, multisport: Number(row.extra_multisport) || 0, card8: 0, card12: 0 };
+          });
+        }
       } else {
         paymentsConfigured = true;
         (payments.data || []).forEach(row => {
-          paymentAdjustments[row.session_id] = { individual: Number(row.extra_individual) || 0, multisport: Number(row.extra_multisport) || 0 };
+          paymentAdjustments[row.session_id] = { individual: Number(row.extra_individual) || 0, multisport: Number(row.extra_multisport) || 0, card8: Number(row.extra_card8) || 0, card12: Number(row.extra_card12) || 0 };
         });
       }
       const rates = await client.from('payment_config').select('multisport_rate,individual_rate').eq('id', 'default').maybeSingle();
@@ -218,6 +226,8 @@
           session_id: sessionId,
           extra_individual: Math.max(0, Number(values?.individual) || 0),
           extra_multisport: Math.max(0, Number(values?.multisport) || 0),
+          extra_card8: Math.max(0, Number(values?.card8) || 0),
+          extra_card12: Math.max(0, Number(values?.card12) || 0),
           updated_at: new Date().toISOString()
         }));
         if (rows.length) {
@@ -289,6 +299,8 @@
         session_id: sessionId,
         extra_individual: Math.max(0, Number(values?.individual) || 0),
         extra_multisport: Math.max(0, Number(values?.multisport) || 0),
+        extra_card8: Math.max(0, Number(values?.card8) || 0),
+        extra_card12: Math.max(0, Number(values?.card12) || 0),
         updated_at: new Date().toISOString()
       }));
       if (!rows.length) return { error: null };

@@ -38,6 +38,10 @@ For the four editable external-training templates and the 8/12-visit card paymen
 
 `supabase/migrations/20260822_add_payment_templates_and_visit_cards.sql`
 
+For the 8-visit and 12-visit card counters on platform trainings, also run:
+
+`supabase/migrations/20260822_add_visit_card_payment_adjustments.sql`
+
 The table is protected by Row Level Security and is not readable from the public booking page.
 
 ## Local preview

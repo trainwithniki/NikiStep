@@ -38,6 +38,8 @@ create table if not exists public.payment_adjustments (
   session_id text primary key references public.sessions(id) on delete cascade,
   extra_individual integer not null default 0 check (extra_individual between 0 and 1000),
   extra_multisport integer not null default 0 check (extra_multisport between 0 and 1000),
+  extra_card8 integer not null default 0 check (extra_card8 between 0 and 1000),
+  extra_card12 integer not null default 0 check (extra_card12 between 0 and 1000),
   updated_by uuid references auth.users(id) on delete set null default auth.uid(),
   updated_at timestamptz not null default now()
 );
