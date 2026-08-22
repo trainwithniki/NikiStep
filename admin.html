@@ -1654,13 +1654,13 @@ function schedulePaymentSave(){
   paymentChangeVersion++;
   if(paymentSaveTimer)clearTimeout(paymentSaveTimer);
   if(paymentSaveCountdown)clearInterval(paymentSaveCountdown);
-  paymentSaveSeconds=10;
+  paymentSaveSeconds=5;
   setPaymentSaveState('dirty',`Незапазени промени · автоматично след ${paymentSaveSeconds} сек.`);
   paymentSaveCountdown=setInterval(()=>{
     paymentSaveSeconds--;
     if(paymentSaveSeconds>0)setPaymentSaveState('dirty',`Незапазени промени · автоматично след ${paymentSaveSeconds} сек.`);
   },1000);
-  paymentSaveTimer=setTimeout(()=>flushPaymentChanges(true),10000);
+  paymentSaveTimer=setTimeout(()=>flushPaymentChanges(true),5000);
 }
 async function flushPaymentChanges(automatic=false){
   if(!paymentDirty)return;
