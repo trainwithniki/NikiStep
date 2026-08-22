@@ -15,7 +15,13 @@
   const isAdminPage = /admin(?:\.html)?$/.test(location.pathname);
   const defaultSiteSettings = { heroText: 'MOVE. SWEAT.\nFEEL GOOD.', heroSubtitle: 'Енергична тренировка с музика, движение и настроение във Fit Body Center.' };
   const defaultPaymentRates = { multisport: 1.70, individual: 3.75 };
-  let cache = { sessions: [], siteSettings: { ...defaultSiteSettings }, paymentAdjustments: {}, paymentRates: { ...defaultPaymentRates }, manualPaymentSessions: [], paymentsConfigured: false, manualPaymentsConfigured: false };
+  const defaultManualPaymentTemplates = [
+    { id: 'pilates-mon', name: 'Пилатес Пон', title: 'Пилатес Пон', location: 'Fitness Line', time: '07:45', multisportRate: 1.70, individualRate: 3.75, card8Rate: 3.06, card12Rate: 2.54, sortOrder: 1 },
+    { id: 'pilates-fri', name: 'Пилатес Пт', title: 'Пилатес Пт', location: 'Fitness Line', time: '07:45', multisportRate: 1.70, individualRate: 3.75, card8Rate: 3.06, card12Rate: 2.54, sortOrder: 2 },
+    { id: 'step-fl-mon', name: 'STEP FL Пон', title: 'STEP FL Пон', location: 'Fitness Line', time: '18:30', multisportRate: 1.33, individualRate: 2.73, card8Rate: null, card12Rate: null, sortOrder: 3 },
+    { id: 'step-fl-fri', name: 'STEP FL Пт', title: 'STEP FL Пт', location: 'Fitness Line', time: '18:30', multisportRate: 1.33, individualRate: 2.73, card8Rate: null, card12Rate: null, sortOrder: 4 }
+  ];
+  let cache = { sessions: [], siteSettings: { ...defaultSiteSettings }, paymentAdjustments: {}, paymentRates: { ...defaultPaymentRates }, manualPaymentSessions: [], manualPaymentTemplates: JSON.parse(JSON.stringify(defaultManualPaymentTemplates)), paymentsConfigured: false, manualPaymentsConfigured: false, manualPaymentTemplatesConfigured: false };
   let ready = false;
   const cancelTokens = new Map();
   const isTrue = value => value === true || value === 'true' || value === 1 || value === '1';
@@ -40,20 +46,40 @@
   });
   const fromManualPaymentRow = row => ({
     id: String(row.id), date: String(row.date), time: String(row.time).slice(0, 5),
-    title: row.title, location: row.location,
+    title: row.title, location: row.location, templateId: row.template_id || '',
     multisportCount: Number(row.multisport_count) || 0,
     individualCount: Number(row.individual_count) || 0,
+    card8Count: Number(row.card8_count) || 0,
+    card12Count: Number(row.card12_count) || 0,
     multisportRate: Number(row.multisport_rate) || 0,
-    individualRate: Number(row.individual_rate) || 0
+    individualRate: Number(row.individual_rate) || 0,
+    card8Rate: row.card8_rate === null || row.card8_rate === undefined ? null : Number(row.card8_rate),
+    card12Rate: row.card12_rate === null || row.card12_rate === undefined ? null : Number(row.card12_rate)
   });
   const toManualPaymentRow = item => ({
     id: item.id, date: item.date, time: item.time || '18:30',
     title: item.title || 'Step Aerobics with Niki', location: item.location || 'Fitness Line',
+    template_id: item.templateId || null,
     multisport_count: Math.max(0, Number(item.multisportCount) || 0),
     individual_count: Math.max(0, Number(item.individualCount) || 0),
+    card8_count: Math.max(0, Number(item.card8Count) || 0),
+    card12_count: Math.max(0, Number(item.card12Count) || 0),
     multisport_rate: Math.max(0, Number(item.multisportRate) || 0),
     individual_rate: Math.max(0, Number(item.individualRate) || 0),
+    card8_rate: item.card8Rate === null || item.card8Rate === undefined ? null : Math.max(0, Number(item.card8Rate) || 0),
+    card12_rate: item.card12Rate === null || item.card12Rate === undefined ? null : Math.max(0, Number(item.card12Rate) || 0),
     updated_at: new Date().toISOString()
+  });
+  const fromManualPaymentTemplateRow = row => ({
+    id: String(row.id), name: String(row.name), title: String(row.title), location: String(row.location), time: String(row.time).slice(0, 5),
+    multisportRate: Number(row.multisport_rate) || 0, individualRate: Number(row.individual_rate) || 0,
+    card8Rate: row.card8_rate === null ? null : Number(row.card8_rate), card12Rate: row.card12_rate === null ? null : Number(row.card12_rate), sortOrder: Number(row.sort_order) || 0
+  });
+  const toManualPaymentTemplateRow = item => ({
+    id: String(item.id), name: String(item.name).trim(), title: String(item.title).trim(), location: String(item.location).trim(), time: String(item.time).slice(0, 5),
+    multisport_rate: Math.max(0, Number(item.multisportRate) || 0), individual_rate: Math.max(0, Number(item.individualRate) || 0),
+    card8_rate: item.card8Rate === null ? null : Math.max(0, Number(item.card8Rate) || 0), card12_rate: item.card12Rate === null ? null : Math.max(0, Number(item.card12Rate) || 0),
+    sort_order: Number(item.sortOrder) || 0, updated_at: new Date().toISOString()
   });
 
   async function refresh() {
@@ -61,8 +87,10 @@
     let paymentAdjustments = {};
     let paymentRates = { ...defaultPaymentRates };
     let manualPaymentSessions = [];
+    let manualPaymentTemplates = JSON.parse(JSON.stringify(defaultManualPaymentTemplates));
     let paymentsConfigured = !isAdminPage;
     let manualPaymentsConfigured = !isAdminPage;
+    let manualPaymentTemplatesConfigured = !isAdminPage;
     if (isAdminPage) {
       const result = await client.from('sessions').select('*').order('date');
       if (result.error) throw result.error;
@@ -92,14 +120,28 @@
       } else if (rates.data) {
         paymentRates = { multisport: Number(rates.data.multisport_rate), individual: Number(rates.data.individual_rate) };
       }
-      const manualPayments = await client.from('manual_payment_sessions').select('id,date,time,title,location,multisport_count,individual_count,multisport_rate,individual_rate').order('date');
+      let manualPayments = await client.from('manual_payment_sessions').select('id,date,time,title,location,template_id,multisport_count,individual_count,card8_count,card12_count,multisport_rate,individual_rate,card8_rate,card12_rate').order('date');
       if (manualPayments.error) {
         const missing = manualPayments.error.code === '42P01' || manualPayments.error.code === 'PGRST205' || /manual_payment_sessions/i.test(String(manualPayments.error.message || ''));
-        if (!missing) throw manualPayments.error;
+        const oldColumns = manualPayments.error.code === '42703' || manualPayments.error.code === 'PGRST204' || /(template_id|card8_count|card12_count|card8_rate|card12_rate)/i.test(String(manualPayments.error.message || ''));
+        if (!missing && !oldColumns) throw manualPayments.error;
         manualPaymentsConfigured = false;
+        if (oldColumns) {
+          manualPayments = await client.from('manual_payment_sessions').select('id,date,time,title,location,multisport_count,individual_count,multisport_rate,individual_rate').order('date');
+          if (!manualPayments.error) manualPaymentSessions = (manualPayments.data || []).map(fromManualPaymentRow);
+        }
       } else {
         manualPaymentsConfigured = true;
         manualPaymentSessions = (manualPayments.data || []).map(fromManualPaymentRow);
+      }
+      const manualTemplates = await client.from('manual_payment_templates').select('id,name,title,location,time,multisport_rate,individual_rate,card8_rate,card12_rate,sort_order').order('sort_order');
+      if (manualTemplates.error) {
+        const missing = manualTemplates.error.code === '42P01' || manualTemplates.error.code === 'PGRST205' || /manual_payment_templates/i.test(String(manualTemplates.error.message || ''));
+        if (!missing) throw manualTemplates.error;
+        manualPaymentTemplatesConfigured = false;
+      } else {
+        manualPaymentTemplatesConfigured = true;
+        if ((manualTemplates.data || []).length) manualPaymentTemplates = manualTemplates.data.map(fromManualPaymentTemplateRow);
       }
     } else {
       const result = await client.rpc('public_sessions');
@@ -116,7 +158,7 @@
       if (setting.key === 'hero_text' && setting.value) siteSettings.heroText = String(setting.value);
       if (setting.key === 'hero_subtitle' && setting.value) siteSettings.heroSubtitle = String(setting.value);
     });
-    cache = { sessions, siteSettings, paymentAdjustments, paymentRates, manualPaymentSessions, paymentsConfigured, manualPaymentsConfigured };
+    cache = { sessions, siteSettings, paymentAdjustments, paymentRates, manualPaymentSessions, manualPaymentTemplates, paymentsConfigured, manualPaymentsConfigured, manualPaymentTemplatesConfigured };
     ready = true;
     document.documentElement.classList.remove('appLoading');
     if (typeof window.renderAll === 'function') window.renderAll();
@@ -271,10 +313,15 @@
         id: String(item.id), date: String(item.date), time: String(item.time || '18:30').slice(0, 5),
         title: String(item.title || 'Step Aerobics with Niki').trim(),
         location: String(item.location || 'Fitness Line').trim(),
+        templateId: item.templateId ? String(item.templateId) : '',
         multisportCount: Math.min(1000, Math.max(0, Math.floor(Number(item.multisportCount) || 0))),
         individualCount: Math.min(1000, Math.max(0, Math.floor(Number(item.individualCount) || 0))),
+        card8Count: Math.min(1000, Math.max(0, Math.floor(Number(item.card8Count) || 0))),
+        card12Count: Math.min(1000, Math.max(0, Math.floor(Number(item.card12Count) || 0))),
         multisportRate: Math.min(999999.99, Math.max(0, Number(item.multisportRate) || 0)),
-        individualRate: Math.min(999999.99, Math.max(0, Number(item.individualRate) || 0))
+        individualRate: Math.min(999999.99, Math.max(0, Number(item.individualRate) || 0)),
+        card8Rate: item.card8Rate === null || item.card8Rate === undefined ? null : Math.min(999999.99, Math.max(0, Number(item.card8Rate) || 0)),
+        card12Rate: item.card12Rate === null || item.card12Rate === undefined ? null : Math.min(999999.99, Math.max(0, Number(item.card12Rate) || 0))
       }));
       const nextIds = new Set(values.map(item => item.id));
       const removedIds = (cache.manualPaymentSessions || []).filter(item => !nextIds.has(String(item.id))).map(item => item.id);
@@ -288,6 +335,16 @@
       }
       cache.manualPaymentSessions = JSON.parse(JSON.stringify(values));
       return { error: null };
+    },
+    async saveManualPaymentTemplates(items) {
+      const values = (items || []).map((item, index) => ({
+        id: String(item.id), name: String(item.name || '').trim(), title: String(item.title || '').trim(), location: String(item.location || '').trim(),
+        time: String(item.time || '18:30').slice(0, 5), multisportRate: Math.max(0, Number(item.multisportRate) || 0), individualRate: Math.max(0, Number(item.individualRate) || 0),
+        card8Rate: item.card8Rate === null ? null : Math.max(0, Number(item.card8Rate) || 0), card12Rate: item.card12Rate === null ? null : Math.max(0, Number(item.card12Rate) || 0), sortOrder: Number(item.sortOrder) || index + 1
+      }));
+      const result = await client.from('manual_payment_templates').upsert(values.map(toManualPaymentTemplateRow), { onConflict: 'id' });
+      if (!result.error) cache.manualPaymentTemplates = JSON.parse(JSON.stringify(values));
+      return result;
     },
     refresh
   };

@@ -34,6 +34,10 @@ Run new files from `supabase/migrations/` in date order through **Supabase → S
 
 `supabase/migrations/20260821_add_manual_payment_sessions.sql`
 
+For the four editable external-training templates and the 8/12-visit card payment types, then run:
+
+`supabase/migrations/20260822_add_payment_templates_and_visit_cards.sql`
+
 The table is protected by Row Level Security and is not readable from the public booking page.
 
 ## Local preview

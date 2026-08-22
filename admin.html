@@ -965,6 +965,8 @@ html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!imp
 .paymentSaveBar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 11px;padding:10px 11px;border:1px solid #dfe4e7;border-radius:13px;background:#fff}.paymentSaveStatus{font-size:8px;font-weight:850;color:#737981}.paymentSaveStatus.dirty{color:#9b650d}.paymentSaveStatus.saving{color:#245b91}.paymentSaveStatus.saved{color:#14734e}.paymentSaveNow{border:0;border-radius:9px;min-width:92px;min-height:38px;padding:7px 12px;background:#176f50;color:#fff;font-size:10px;font-weight:950;cursor:pointer}.paymentSaveNow:disabled{background:#c9ced2;color:#737980;cursor:default}
 .externalPaymentToolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px;padding:12px;border:1px solid #cadcd4;border-radius:15px;background:linear-gradient(145deg,#f3fbf7,#fff)}.externalPaymentToolbarText strong{display:block;font-size:11px}.externalPaymentToolbarText span{display:block;margin-top:3px;color:#70767d;font-size:8px;font-weight:750}.externalPaymentAdd{border:0;border-radius:11px;min-height:42px;padding:8px 13px;background:#176f50;color:#fff;font-size:10px;font-weight:950;cursor:pointer;white-space:nowrap}.manualPaymentsSetupNote{display:none;margin:0 0 10px;padding:10px 11px;border-radius:11px;background:#fff4e6;border:1px solid #f0cf9c;color:#7b5314;font-size:8px;font-weight:850}.manualPaymentsPreviewMode .manualPaymentsSetupNote{display:block}.manualPaymentCard{border-color:#c9ddd4}.manualPaymentCard .paymentCardHead p:before{content:'РЪЧНО · ';color:#177251;font-weight:950}.manualPaymentEditorGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.manualPaymentField{display:flex;flex-direction:column;gap:5px;padding:10px;border-radius:12px;background:#f6f8f8}.manualPaymentField span{font-size:8px;font-weight:900;color:#646b72}.manualPaymentField label{display:grid;grid-template-columns:1fr auto;align-items:center;gap:6px;font-size:8px;font-weight:800;color:#737980}.manualPaymentField input{width:82px;min-width:0;border:1px solid #d7dde0;border-radius:8px;background:#fff;padding:7px;text-align:right;font-size:12px;font-weight:900}.manualPaymentCountControl{display:grid;grid-template-columns:30px minmax(45px,1fr) 30px;align-items:center;gap:5px}.manualPaymentCountControl button{height:30px;border:1px solid #d5dcdf;border-radius:8px;background:#fff;font-size:16px;font-weight:950;cursor:pointer}.manualPaymentCountControl strong{text-align:center;font-size:15px}.manualPaymentDelete{width:100%;margin-top:11px;min-height:38px;border:1px solid #efc6cd;border-radius:10px;background:#fff5f6;color:#ad263d;font-size:9px;font-weight:950;cursor:pointer}.manualPaymentFormGrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px 7px}.manualPaymentFormGrid .field{min-width:0}.manualPaymentFormGrid .field.full{grid-column:1/-1}.manualPaymentFormGrid .field label{margin-bottom:3px;font-size:8px;letter-spacing:.03em}.manualPaymentFormGrid input,.manualPaymentFormGrid select{width:100%;height:32px;border:1px solid var(--line);border-radius:8px;background:#fafbfc;padding:0 8px;font:800 11px/1 Inter,system-ui}.manualPaymentDateFields{display:grid;grid-template-columns:.7fr 1.35fr 1fr;gap:5px}.manualPaymentDateFields select,.manualPaymentTimeFields select{appearance:none;background:#fafbfc linear-gradient(45deg,transparent 50%,#687078 50%) calc(100% - 11px) 13px/4px 4px no-repeat;padding-right:18px}.manualPaymentTimeFields{display:grid;grid-template-columns:1fr 1fr;gap:5px}.manualPaymentTimeFields label{position:relative;margin:0}.manualPaymentTimeFields label span{position:absolute;right:24px;top:50%;z-index:1;transform:translateY(-50%);color:#7a8188;font-size:8px;font-weight:850;pointer-events:none}.manualPaymentTimeFields select{padding-right:48px}.manualPaymentFormActions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}.manualPaymentFormActions button{min-height:36px;border-radius:9px;font-size:10px;font-weight:950}.manualPaymentFormActions .save{border:0;background:#176f50;color:#fff}.manualPaymentFormActions .cancel{border:1px solid var(--line);background:#fff;color:#4f555c}
 @media(max-width:560px){.adminSectionTabs{width:100%}.adminSectionTab{flex:1}.paymentsHero{padding:15px}.paymentsTotal strong{font-size:34px}.paymentsRateLegend,.paymentBreakdown,.paymentManualButtons{grid-template-columns:1fr 1fr}.paymentCard{padding:12px}.paymentCardDate strong{font-size:20px}.paymentCardAmount strong{font-size:20px}.externalPaymentToolbar{align-items:stretch;flex-direction:column}.externalPaymentAdd{width:100%}.manualPaymentEditorGrid{grid-template-columns:1fr}.manualPaymentFormGrid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.manualPaymentFormGrid .field.full{grid-column:1/-1}}
+.manualPaymentTemplates{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-bottom:8px}.manualPaymentTemplateButton{min-width:0;min-height:35px;border:1px solid #d6dce0;border-radius:9px;background:#f7f8f9;color:#4f565e;padding:5px 4px;font-size:8px;font-weight:900;cursor:pointer}.manualPaymentTemplateButton.active{border-color:#176f50;background:#eaf7f1;color:#135f45;box-shadow:inset 0 0 0 1px #176f50}.manualPaymentSettingsHint{margin:-2px 0 7px;padding:6px 8px;border-radius:8px;background:#f3f5f6;color:#707780;font-size:7px;font-weight:800}.manualPaymentSettingsHint.editing{background:#fff3d7;color:#79540c}.manualTemplateSettingField input[readonly],.manualPaymentFormGrid input[readonly],.manualPaymentFormGrid select:disabled{border-color:transparent;background:#eef1f3;color:#5e666e;opacity:1;cursor:not-allowed}.manualPaymentCardVisitFields{display:contents}.manualPaymentCardVisitFields.hidden{display:none}.manualPaymentFormActions{grid-template-columns:repeat(3,minmax(0,1fr))}.manualPaymentFormActions .settings{border:1px solid #d9c58d;background:#fff7df;color:#79540c}.manualPaymentFormActions .settings.editing{border-color:#176f50;background:#eaf7f1;color:#135f45}.manualPaymentFormActions button{padding:5px 4px;line-height:1.15}.manualPaymentField.card8{background:#fff8e9}.manualPaymentField.card12{background:#f5f1ff}.paymentTypeBadge.card8{background:#fff1c8;color:#77520b}.paymentTypeBadge.card12{background:#eee7ff;color:#5c3991}
+@media(max-width:560px){.manualPaymentTemplates{grid-template-columns:repeat(2,minmax(0,1fr))}.manualPaymentFormActions button{font-size:8px}}
 </style>
 
 </head><body>
@@ -1013,11 +1015,36 @@ html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!imp
   <div class="externalPaymentToolbar"><div class="externalPaymentToolbarText"><strong>Тренировка извън платформата</strong><span>Например Fitness Line — със собствени бройки и цени</span></div><button class="externalPaymentAdd" type="button" onclick="openManualPaymentForm()">+ Добави външна тренировка</button></div>
   <div class="paymentsRateLegend"><div class="paymentRate multi"><span>MultiSport · на човек</span><label class="paymentRateEdit"><input id="multisportRateInput" type="number" min="0" step="0.05" inputmode="decimal" aria-label="Такса MultiSport" readonly> €</label></div><div class="paymentRate individual"><span>Индивидуално · на човек</span><label class="paymentRateEdit"><input id="individualRateInput" type="number" min="0" step="0.05" inputmode="decimal" aria-label="Индивидуална такса" readonly> €</label></div><button class="paymentRatesSave" id="paymentRatesButton" type="button" onclick="togglePaymentRatesEdit()">Редактирай таксите</button></div>
   <div class="paymentsPreviewNote">Това е локален преглед. Ръчните добавяния ще се запазват след активиране на защитената таблица в Supabase.</div>
-  <div class="manualPaymentsSetupNote">За външните тренировки трябва еднократно да изпълниш новата Supabase миграция <strong>20260821_add_manual_payment_sessions.sql</strong>.</div>
+  <div class="manualPaymentsSetupNote">За новите шаблони и картите с 8/12 посещения изпълни еднократно Supabase миграцията <strong>20260822_add_payment_templates_and_visit_cards.sql</strong>.</div>
   <div class="paymentSaveBar"><span class="paymentSaveStatus saved" id="paymentSaveStatus">Всички промени са запазени.</span><button class="paymentSaveNow" id="paymentSaveNow" type="button" onclick="flushPaymentChanges()" disabled>Запази</button></div>
   <div class="paymentCards" id="paymentCards"></div>
 </section></div>
-<div class="overlay" id="manualPaymentOverlay"><form class="editor" id="manualPaymentForm" onsubmit="saveNewManualPayment(event)"><div class="handle"></div><div class="edHead"><div><h2>Добави външна тренировка</h2><p>Този запис е само в админските плащания и няма да се вижда в потребителския сайт.</p></div><button class="btn" type="button" onclick="closeManualPaymentForm()">✕</button></div><div class="manualPaymentFormGrid"><div class="field full"><label>ДАТА · ДЕН / МЕСЕЦ / ГОДИНА</label><div class="manualPaymentDateFields"><select id="manualPaymentDay" aria-label="Ден" required></select><select id="manualPaymentMonth" aria-label="Месец" onchange="refreshManualPaymentDays()" required></select><select id="manualPaymentYear" aria-label="Година" onchange="refreshManualPaymentDays()" required></select></div></div><div class="field full"><label>ЧАС · 24-ЧАСОВ ФОРМАТ</label><div class="manualPaymentTimeFields"><label><select id="manualPaymentHour" aria-label="Час" required></select><span>час</span></label><label><select id="manualPaymentMinute" aria-label="Минути" required></select><span>мин.</span></label></div></div><div class="field full"><label for="manualPaymentTitle">ТРЕНИРОВКА</label><input id="manualPaymentTitle" value="Step Aerobics with Niki" maxlength="120" required></div><div class="field full"><label for="manualPaymentLocation">МЯСТО</label><input id="manualPaymentLocation" value="Fitness Line" list="manualPaymentLocations" maxlength="120" required><datalist id="manualPaymentLocations"><option value="Fitness Line"><option value="Fit Body Center"></datalist></div><div class="field"><label for="manualPaymentMultiCount">БРОЙ MULTISPORT</label><input id="manualPaymentMultiCount" type="number" min="0" max="1000" step="1" value="0" inputmode="numeric" required></div><div class="field"><label for="manualPaymentMultiRate">ЦЕНА MULTISPORT · €</label><input id="manualPaymentMultiRate" type="number" min="0" step="0.05" value="1.70" inputmode="decimal" required></div><div class="field"><label for="manualPaymentIndividualCount">БРОЙ БЕЗ MULTISPORT</label><input id="manualPaymentIndividualCount" type="number" min="0" max="1000" step="1" value="0" inputmode="numeric" required></div><div class="field"><label for="manualPaymentIndividualRate">ЦЕНА БЕЗ MULTISPORT · €</label><input id="manualPaymentIndividualRate" type="number" min="0" step="0.05" value="3.75" inputmode="decimal" required></div></div><div class="manualPaymentFormActions"><button class="cancel" type="button" onclick="closeManualPaymentForm()">Отказ</button><button class="save" type="submit">Добави тренировката</button></div></form></div>
+<div class="overlay" id="manualPaymentOverlay">
+  <form class="editor" id="manualPaymentForm" onsubmit="saveNewManualPayment(event)">
+    <div class="handle"></div>
+    <div class="edHead"><div><h2>Добави външна тренировка</h2><p>Избери шаблон, дата и въведи броя хора. Данните са само в админските плащания.</p></div><button class="btn" type="button" onclick="closeManualPaymentForm()">✕</button></div>
+    <div class="manualPaymentTemplates" id="manualPaymentTemplateButtons" aria-label="Шаблони за външни тренировки"></div>
+    <div class="manualPaymentSettingsHint" id="manualPaymentSettingsHint">Настройките на шаблона са заключени. За промяна използвай бутона „Настройки“.</div>
+    <div class="manualPaymentFormGrid">
+      <div class="field full manualTemplateSettingField"><label for="manualPaymentTemplateName">ИМЕ НА ШАБЛОНА</label><input id="manualPaymentTemplateName" maxlength="60" readonly required></div>
+      <div class="field full"><label>ДАТА · ДЕН / МЕСЕЦ / ГОДИНА</label><div class="manualPaymentDateFields"><select id="manualPaymentDay" aria-label="Ден" required></select><select id="manualPaymentMonth" aria-label="Месец" onchange="refreshManualPaymentDays()" required></select><select id="manualPaymentYear" aria-label="Година" onchange="refreshManualPaymentDays()" required></select></div></div>
+      <div class="field full manualTemplateSettingField"><label>ЧАС · 24-ЧАСОВ ФОРМАТ</label><div class="manualPaymentTimeFields"><label><select id="manualPaymentHour" aria-label="Час" disabled required></select><span>час</span></label><label><select id="manualPaymentMinute" aria-label="Минути" disabled required></select><span>мин.</span></label></div></div>
+      <div class="field full manualTemplateSettingField"><label for="manualPaymentTitle">ТРЕНИРОВКА</label><input id="manualPaymentTitle" maxlength="120" readonly required></div>
+      <div class="field full manualTemplateSettingField"><label for="manualPaymentLocation">МЯСТО</label><input id="manualPaymentLocation" list="manualPaymentLocations" maxlength="120" readonly required><datalist id="manualPaymentLocations"><option value="Fitness Line"><option value="Fit Body Center"></datalist></div>
+      <div class="field"><label for="manualPaymentMultiCount">БРОЙ MULTISPORT</label><input id="manualPaymentMultiCount" type="number" min="0" max="1000" step="1" value="0" inputmode="numeric" required></div>
+      <div class="field manualTemplateSettingField"><label for="manualPaymentMultiRate">ЦЕНА MULTISPORT · €</label><input id="manualPaymentMultiRate" type="number" min="0" step="0.01" inputmode="decimal" readonly required></div>
+      <div class="field"><label for="manualPaymentIndividualCount">БРОЙ БЕЗ MULTISPORT</label><input id="manualPaymentIndividualCount" type="number" min="0" max="1000" step="1" value="0" inputmode="numeric" required></div>
+      <div class="field manualTemplateSettingField"><label for="manualPaymentIndividualRate">ЦЕНА БЕЗ MULTISPORT · €</label><input id="manualPaymentIndividualRate" type="number" min="0" step="0.01" inputmode="decimal" readonly required></div>
+      <div class="manualPaymentCardVisitFields" id="manualPaymentCardVisitFields">
+        <div class="field"><label for="manualPaymentCard8Count">БРОЙ С КАРТА 8</label><input id="manualPaymentCard8Count" type="number" min="0" max="1000" step="1" value="0" inputmode="numeric"></div>
+        <div class="field manualTemplateSettingField"><label for="manualPaymentCard8Rate">ЦЕНА С КАРТА 8 · €</label><input id="manualPaymentCard8Rate" type="number" min="0" step="0.01" inputmode="decimal" readonly></div>
+        <div class="field"><label for="manualPaymentCard12Count">БРОЙ С КАРТА 12</label><input id="manualPaymentCard12Count" type="number" min="0" max="1000" step="1" value="0" inputmode="numeric"></div>
+        <div class="field manualTemplateSettingField"><label for="manualPaymentCard12Rate">ЦЕНА С КАРТА 12 · €</label><input id="manualPaymentCard12Rate" type="number" min="0" step="0.01" inputmode="decimal" readonly></div>
+      </div>
+    </div>
+    <div class="manualPaymentFormActions"><button class="settings" id="manualTemplateSettingsButton" type="button" onclick="toggleManualTemplateSettings()">⚙ Настройки</button><button class="cancel" type="button" onclick="closeManualPaymentForm()">Отказ</button><button class="save" type="submit">Добави</button></div>
+  </form>
+</div>
 <div class="overlay" id="editorOverlay"><div class="editor"><div class="handle"></div><div class="edHead"><div><h2 id="editorTitle">Нова тренировка</h2><p>Избери дата от календара и кога автоматично да започне записването.</p></div><button class="btn" onclick="closeEditor()">✕</button></div><div class="form"><div class="templateQuick"><div class="templateQuickTitle"><strong>Шаблон за тренировка</strong><span>попълва настройките автоматично</span></div><div class="templateQuickRow"><select id="fTemplate"><option value="">Без шаблон</option></select><button type="button" class="btn" onclick="applySelectedTemplate()">Зареди</button></div></div><div class="field"><label>ДАТА</label><div class="dateControl"><button type="button" class="dateButton" id="fDateButton" onclick="toggleDatePicker()"><span id="fDateText">Избери дата</span><span class="calIcon">▦</span></button><input id="fDate" type="hidden"><div class="datePicker" id="datePicker"><div class="dpHead"><button type="button" class="dpNav" onclick="moveDatePicker(-1)">‹</button><strong id="dpTitle"></strong><button type="button" class="dpNav" onclick="moveDatePicker(1)">›</button></div><div class="dpWeek"><span>ПН</span><span>ВТ</span><span>СР</span><span>ЧТ</span><span>ПТ</span><span>СБ</span><span>НД</span></div><div class="dpDays" id="dpDays"></div></div></div></div><div class="field"><label>ЧАС (24 ЧАСА)</label><div class="timePickerWrap"><select id="fHour" class="timeSelect" onchange="syncTimePreview()"></select><select id="fMinute" class="timeSelect" onchange="syncTimePreview()"></select><div class="timePreview" id="fTimePreview">18:30</div></div><input id="fTime" type="hidden"></div><div class="field"><label>ПРОДЪЛЖИТЕЛНОСТ</label><input id="fDuration" type="number" min="10" step="5"><div class="help">По подразбиране: 60 минути.</div></div><div class="field"><label>ЗАГЛАВИЕ</label><input id="fTitle"></div><div class="field"><label>ТРЕНЬОР</label><input id="fTrainer"></div><div class="field"><label>МЯСТО</label>
 <select id="fLocation">
   <option value="Fit Body Center">Fit Body Center</option>
@@ -1347,6 +1374,12 @@ function renderList(){
 }
 
 const DEFAULT_PAYMENT_RATES={multisport:1.70,individual:3.75};
+const DEFAULT_MANUAL_PAYMENT_TEMPLATES=[
+  {id:'pilates-mon',name:'Пилатес Пон',title:'Пилатес Пон',location:'Fitness Line',time:'07:45',multisportRate:1.70,individualRate:3.75,card8Rate:3.06,card12Rate:2.54,sortOrder:1},
+  {id:'pilates-fri',name:'Пилатес Пт',title:'Пилатес Пт',location:'Fitness Line',time:'07:45',multisportRate:1.70,individualRate:3.75,card8Rate:3.06,card12Rate:2.54,sortOrder:2},
+  {id:'step-fl-mon',name:'STEP FL Пон',title:'STEP FL Пон',location:'Fitness Line',time:'18:30',multisportRate:1.33,individualRate:2.73,card8Rate:null,card12Rate:null,sortOrder:3},
+  {id:'step-fl-fri',name:'STEP FL Пт',title:'STEP FL Пт',location:'Fitness Line',time:'18:30',multisportRate:1.33,individualRate:2.73,card8Rate:null,card12Rate:null,sortOrder:4}
+];
 let paymentMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);
 function moneyEUR(value){return Number(value||0).toLocaleString('bg-BG',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function paymentRates(){const multi=Number(data.paymentRates?.multisport),individual=Number(data.paymentRates?.individual);return {multisport:Number.isFinite(multi)&&multi>=0?multi:DEFAULT_PAYMENT_RATES.multisport,individual:Number.isFinite(individual)&&individual>=0?individual:DEFAULT_PAYMENT_RATES.individual}}
@@ -1377,9 +1410,13 @@ function paymentNumbers(session){
 function manualPaymentNumbers(item){
   const multisport=Math.max(0,Number(item.multisportCount)||0);
   const individual=Math.max(0,Number(item.individualCount)||0);
+  const card8=Math.max(0,Number(item.card8Count)||0);
+  const card12=Math.max(0,Number(item.card12Count)||0);
   const multisportRate=Math.max(0,Number(item.multisportRate)||0);
   const individualRate=Math.max(0,Number(item.individualRate)||0);
-  return {multisport,individual,multisportRate,individualRate,total:multisport*multisportRate+individual*individualRate};
+  const card8Rate=Math.max(0,Number(item.card8Rate)||0);
+  const card12Rate=Math.max(0,Number(item.card12Rate)||0);
+  return {multisport,individual,card8,card12,multisportRate,individualRate,card8Rate,card12Rate,total:multisport*multisportRate+individual*individualRate+card8*card8Rate+card12*card12Rate};
 }
 function manualPaymentById(id){return (data.manualPaymentSessions||[]).find(item=>String(item.id)===String(id))}
 function paymentInputNumber(value){return Number(String(value??'').replace(',','.'))}
@@ -1432,36 +1469,96 @@ function manualPaymentTimeValue(){
   const hour=document.getElementById('manualPaymentHour').value,minute=document.getElementById('manualPaymentMinute').value;
   return /^(?:[01]\d|2[0-3])$/.test(hour)&&/^[0-5]\d$/.test(minute)?`${hour}:${minute}`:'';
 }
+function manualPaymentTemplates(){
+  const saved=Array.isArray(data.manualPaymentTemplates)?data.manualPaymentTemplates:[];
+  return DEFAULT_MANUAL_PAYMENT_TEMPLATES.map(fallback=>{
+    const item=saved.find(entry=>String(entry.id)===fallback.id)||{};
+    const nullableRate=(value,defaultValue)=>value===null?null:(Number.isFinite(Number(value))&&Number(value)>=0?Number(value):defaultValue);
+    return {...fallback,...item,id:fallback.id,name:String(item.name||fallback.name),title:String(item.title||fallback.title),location:String(item.location||fallback.location),time:/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(String(item.time||''))?String(item.time):fallback.time,multisportRate:nullableRate(item.multisportRate,fallback.multisportRate),individualRate:nullableRate(item.individualRate,fallback.individualRate),card8Rate:nullableRate(item.card8Rate,fallback.card8Rate),card12Rate:nullableRate(item.card12Rate,fallback.card12Rate)};
+  }).sort((a,b)=>(Number(a.sortOrder)||0)-(Number(b.sortOrder)||0));
+}
+let activeManualPaymentTemplateId=DEFAULT_MANUAL_PAYMENT_TEMPLATES[0].id,manualTemplateSettingsUnlocked=false;
+function activeManualPaymentTemplate(){return manualPaymentTemplates().find(item=>item.id===activeManualPaymentTemplateId)||manualPaymentTemplates()[0]}
+function renderManualPaymentTemplateButtons(){
+  const box=document.getElementById('manualPaymentTemplateButtons');if(!box)return;
+  box.innerHTML=manualPaymentTemplates().map(item=>`<button class="manualPaymentTemplateButton ${item.id===activeManualPaymentTemplateId?'active':''}" type="button" onclick="selectManualPaymentTemplate('${item.id}')">${esc(item.name)}</button>`).join('');
+}
+function setManualTemplateLocked(locked){
+  manualTemplateSettingsUnlocked=!locked;
+  ['manualPaymentTemplateName','manualPaymentTitle','manualPaymentLocation','manualPaymentMultiRate','manualPaymentIndividualRate','manualPaymentCard8Rate','manualPaymentCard12Rate'].forEach(id=>{const input=document.getElementById(id);if(input)input.readOnly=locked});
+  ['manualPaymentHour','manualPaymentMinute'].forEach(id=>{const input=document.getElementById(id);if(input)input.disabled=locked});
+  manualTemplateSettingsButton.textContent=locked?'⚙ Настройки':'✓ Запази настройки';
+  manualTemplateSettingsButton.classList.toggle('editing',!locked);
+  manualPaymentSettingsHint.classList.toggle('editing',!locked);
+  manualPaymentSettingsHint.textContent=locked?'Настройките на шаблона са заключени. За промяна използвай бутона „Настройки“.':'Редактираш избрания шаблон. Натисни „Запази настройки“, когато си готова.';
+}
+function applyManualPaymentTemplate(item,resetCounts=true){
+  if(!item)return;
+  manualPaymentTemplateName.value=item.name;
+  manualPaymentTitle.value=item.title;
+  manualPaymentLocation.value=item.location;
+  setManualPaymentTime(item.time);
+  manualPaymentMultiRate.value=Number(item.multisportRate).toFixed(2);
+  manualPaymentIndividualRate.value=Number(item.individualRate).toFixed(2);
+  const hasVisitCards=item.card8Rate!==null||item.card12Rate!==null;
+  manualPaymentCardVisitFields.classList.toggle('hidden',!hasVisitCards);
+  manualPaymentCard8Rate.value=item.card8Rate===null?'':Number(item.card8Rate).toFixed(2);
+  manualPaymentCard12Rate.value=item.card12Rate===null?'':Number(item.card12Rate).toFixed(2);
+  if(resetCounts){manualPaymentMultiCount.value='0';manualPaymentIndividualCount.value='0';manualPaymentCard8Count.value='0';manualPaymentCard12Count.value='0'}
+  renderManualPaymentTemplateButtons();
+}
+function selectManualPaymentTemplate(id){
+  if(manualTemplateSettingsUnlocked&&id!==activeManualPaymentTemplateId){showToast('Първо запази настройките на текущия шаблон.');return}
+  activeManualPaymentTemplateId=id;
+  applyManualPaymentTemplate(activeManualPaymentTemplate());
+}
+async function toggleManualTemplateSettings(){
+  if(!manualTemplateSettingsUnlocked){setManualTemplateLocked(false);manualPaymentTemplateName.focus();manualPaymentTemplateName.select();return}
+  const multisportRate=paymentInputNumber(manualPaymentMultiRate.value),individualRate=paymentInputNumber(manualPaymentIndividualRate.value);
+  const hasVisitCards=!manualPaymentCardVisitFields.classList.contains('hidden');
+  const card8Rate=hasVisitCards?paymentInputNumber(manualPaymentCard8Rate.value):null,card12Rate=hasVisitCards?paymentInputNumber(manualPaymentCard12Rate.value):null;
+  const name=manualPaymentTemplateName.value.trim(),title=manualPaymentTitle.value.trim(),location=manualPaymentLocation.value.trim(),time=manualPaymentTimeValue();
+  const rates=[multisportRate,individualRate,...(hasVisitCards?[card8Rate,card12Rate]:[])];
+  if(name.length<2||title.length<2||location.length<2||!time||rates.some(value=>!Number.isFinite(value)||value<0)){showToast('Провери името, часа, мястото и цените на шаблона.');return}
+  const current=activeManualPaymentTemplate();
+  const updated={...current,name,title,location,time,multisportRate,individualRate,card8Rate,card12Rate};
+  data.manualPaymentTemplates=manualPaymentTemplates().map(item=>item.id===updated.id?updated:item);
+  setManualTemplateLocked(true);renderManualPaymentTemplateButtons();
+  if(data.manualPaymentTemplatesConfigured===false||!window.nikiAdmin?.saveManualPaymentTemplates){showToast('Настройката е само за преглед. Изпълни новата Supabase миграция.');return}
+  const result=await window.nikiAdmin.saveManualPaymentTemplates(data.manualPaymentTemplates);
+  showToast(result.error?'Настройките не бяха запазени.':'Шаблонът е запазен и заключен.');
+}
 function openManualPaymentForm(){
   const now=new Date();
   const sameMonth=now.getFullYear()===paymentMonth.getFullYear()&&now.getMonth()===paymentMonth.getMonth();
   const target=sameMonth?now:new Date(paymentMonth.getFullYear(),paymentMonth.getMonth(),1);
   setManualPaymentDate(target);
-  setManualPaymentTime('18:30');
-  manualPaymentTitle.value='Step Aerobics with Niki';
-  manualPaymentLocation.value='Fitness Line';
-  manualPaymentMultiCount.value='0';
-  manualPaymentIndividualCount.value='0';
-  const rates=paymentRates();
-  manualPaymentMultiRate.value=rates.multisport.toFixed(2);
-  manualPaymentIndividualRate.value=rates.individual.toFixed(2);
+  setManualTemplateLocked(true);
+  activeManualPaymentTemplateId=manualPaymentTemplates()[0].id;
+  applyManualPaymentTemplate(activeManualPaymentTemplate());
   manualPaymentOverlay.classList.add('open');
 }
-function closeManualPaymentForm(){manualPaymentOverlay.classList.remove('open')}
+function closeManualPaymentForm(){setManualTemplateLocked(true);manualPaymentOverlay.classList.remove('open')}
 function saveNewManualPayment(event){
   event.preventDefault();
+  if(manualTemplateSettingsUnlocked){showToast('Първо запази и заключи настройките на шаблона.');return}
   const multisportCount=Math.floor(paymentInputNumber(manualPaymentMultiCount.value));
   const individualCount=Math.floor(paymentInputNumber(manualPaymentIndividualCount.value));
+  const hasVisitCards=!manualPaymentCardVisitFields.classList.contains('hidden');
+  const card8Count=hasVisitCards?Math.floor(paymentInputNumber(manualPaymentCard8Count.value)):0;
+  const card12Count=hasVisitCards?Math.floor(paymentInputNumber(manualPaymentCard12Count.value)):0;
   const multisportRate=paymentInputNumber(manualPaymentMultiRate.value);
   const individualRate=paymentInputNumber(manualPaymentIndividualRate.value);
+  const card8Rate=hasVisitCards?paymentInputNumber(manualPaymentCard8Rate.value):null;
+  const card12Rate=hasVisitCards?paymentInputNumber(manualPaymentCard12Rate.value):null;
   const date=manualPaymentDateValue(),time=manualPaymentTimeValue();
   const title=manualPaymentTitle.value.trim(),location=manualPaymentLocation.value.trim();
-  const validCounts=[multisportCount,individualCount].every(value=>Number.isInteger(value)&&value>=0&&value<=1000);
-  const validRates=[multisportRate,individualRate].every(value=>Number.isFinite(value)&&value>=0);
+  const validCounts=[multisportCount,individualCount,card8Count,card12Count].every(value=>Number.isInteger(value)&&value>=0&&value<=1000);
+  const validRates=[multisportRate,individualRate,...(hasVisitCards?[card8Rate,card12Rate]:[])].every(value=>Number.isFinite(value)&&value>=0);
   if(!date||!time||title.length<2||location.length<2||!validCounts||!validRates){showToast('Провери датата, мястото, бройките и цените.');return}
   const id=crypto.randomUUID?crypto.randomUUID():`00000000-0000-4000-8000-${Date.now().toString(16).padStart(12,'0').slice(-12)}`;
   data.manualPaymentSessions=data.manualPaymentSessions||[];
-  data.manualPaymentSessions.push({id,date,time,title,location,multisportCount,individualCount,multisportRate,individualRate});
+  data.manualPaymentSessions.push({id,date,time,title,location,templateId:activeManualPaymentTemplateId,multisportCount,individualCount,card8Count,card12Count,multisportRate,individualRate,card8Rate,card12Rate});
   const [year,month]=date.split('-').map(Number);
   paymentMonth=new Date(year,month-1,1);
   closeManualPaymentForm();
@@ -1480,7 +1577,8 @@ function updateManualPayment(id,field,value){
 }
 function changeManualPaymentCount(id,type,delta){
   const item=manualPaymentById(id);if(!item)return;
-  const field=type==='multisport'?'multisportCount':'individualCount';
+  const field={multisport:'multisportCount',individual:'individualCount',card8:'card8Count',card12:'card12Count'}[type];
+  if(!field)return;
   item[field]=Math.max(0,Math.min(1000,(Number(item[field])||0)+delta));
   renderPayments();
   if(data.manualPaymentsConfigured===false){showToast('Локален преглед — промяната още не е запазена.');return}
@@ -1556,6 +1654,21 @@ function changePaymentExtra(sessionId,type,delta){
   if(preview){showToast('Локален преглед — добавянето още не е запазено.');return}
   schedulePaymentSave();
 }
+function manualPaymentCategories(item,summary){
+  const categories=[
+    {type:'multisport',label:'MultiSport',count:summary.multisport,rate:summary.multisportRate,field:'multisportRate'},
+    {type:'individual',label:'Без MultiSport',count:summary.individual,rate:summary.individualRate,field:'individualRate'}
+  ];
+  if(item.card8Rate!==null&&item.card8Rate!==undefined)categories.push({type:'card8',label:'Карта 8 посещения',count:summary.card8,rate:summary.card8Rate,field:'card8Rate'});
+  if(item.card12Rate!==null&&item.card12Rate!==undefined)categories.push({type:'card12',label:'Карта 12 посещения',count:summary.card12,rate:summary.card12Rate,field:'card12Rate'});
+  return categories;
+}
+function manualPaymentBreakdownHtml(item,summary){
+  return manualPaymentCategories(item,summary).map(category=>`<div class="paymentBreakdownItem"><span>${category.label} · ${category.count} × ${moneyEUR(category.rate)} €</span><strong>${moneyEUR(category.count*category.rate)} €</strong></div>`).join('');
+}
+function manualPaymentEditorHtml(item,summary){
+  return manualPaymentCategories(item,summary).map(category=>`<div class="manualPaymentField ${category.type}"><span>${category.label}</span><div class="manualPaymentCountControl"><button type="button" onclick="changeManualPaymentCount('${item.id}','${category.type}',-1)">−</button><strong>${category.count}</strong><button type="button" onclick="changeManualPaymentCount('${item.id}','${category.type}',1)">+</button></div><label>Цена на човек <span><input type="number" min="0" step="0.01" value="${category.rate.toFixed(2)}" onchange="updateManualPayment('${item.id}','${category.field}',this.value)"> €</span></label></div>`).join('');
+}
 function renderPayments(){
   const cards=document.getElementById('paymentCards');
   if(!cards)return;
@@ -1574,7 +1687,7 @@ function renderPayments(){
   const totals=completed.map(paymentNumbers);
   const manualTotals=manualCompleted.map(manualPaymentNumbers);
   const monthTotal=totals.reduce((sum,item)=>sum+item.total,0)+manualTotals.reduce((sum,item)=>sum+item.total,0);
-  const peopleTotal=totals.reduce((sum,item)=>sum+item.multisport+item.individual,0)+manualTotals.reduce((sum,item)=>sum+item.multisport+item.individual,0);
+  const peopleTotal=totals.reduce((sum,item)=>sum+item.multisport+item.individual,0)+manualTotals.reduce((sum,item)=>sum+item.multisport+item.individual+item.card8+item.card12,0);
   const trainingCount=completed.length+manualCompleted.length;
   paymentsMonthTitle.textContent=paymentMonth.toLocaleDateString('bg-BG',{month:'long',year:'numeric'}).replace(/\s*г\.$/i,'');
   paymentsMonthTotal.textContent=moneyEUR(monthTotal);
@@ -1582,7 +1695,7 @@ function renderPayments(){
   if(document.activeElement!==multisportRateInput)multisportRateInput.value=rates.multisport.toFixed(2);
   if(document.activeElement!==individualRateInput)individualRateInput.value=rates.individual.toFixed(2);
   adminShell.classList.toggle('paymentsPreviewMode',data.paymentsConfigured===false);
-  adminShell.classList.toggle('manualPaymentsPreviewMode',data.manualPaymentsConfigured===false);
+  adminShell.classList.toggle('manualPaymentsPreviewMode',data.manualPaymentsConfigured===false||data.manualPaymentTemplatesConfigured===false);
   if(!trainingCount){cards.innerHTML='<div class="paymentsEmpty">Няма проведени тренировки през избрания месец.</div>';return}
   const platformCards=completed.map((session,index)=>{
     const summary=totals[index];
@@ -1604,11 +1717,8 @@ function renderPayments(){
     const cardId=`manual:${item.id}`;
     return `<details class="paymentCard manualPaymentCard" data-session-id="${cardId}" ${openCards.has(cardId)?'open':''}>
       <summary class="paymentCardHead"><div><div class="paymentCardDate"><strong>${fmtDDMM(item.date)}</strong><span>${fmtWeekday(item.date)} · ${esc(item.time)}</span></div><p>${esc(item.title)} · ${esc(item.location)}</p></div><div class="paymentCardAmount"><span>За тренировката</span><strong>${moneyEUR(summary.total)} €</strong></div></summary><div class="paymentCardBody">
-      <div class="paymentBreakdown"><div class="paymentBreakdownItem"><span>MultiSport · ${summary.multisport} × ${moneyEUR(summary.multisportRate)} €</span><strong>${moneyEUR(summary.multisport*summary.multisportRate)} €</strong></div><div class="paymentBreakdownItem"><span>Без MultiSport · ${summary.individual} × ${moneyEUR(summary.individualRate)} €</span><strong>${moneyEUR(summary.individual*summary.individualRate)} €</strong></div></div>
-      <div class="manualPaymentEditorGrid">
-        <div class="manualPaymentField"><span>MultiSport</span><div class="manualPaymentCountControl"><button type="button" onclick="changeManualPaymentCount('${item.id}','multisport',-1)">−</button><strong>${summary.multisport}</strong><button type="button" onclick="changeManualPaymentCount('${item.id}','multisport',1)">+</button></div><label>Цена на човек <span><input type="number" min="0" step="0.05" value="${summary.multisportRate.toFixed(2)}" onchange="updateManualPayment('${item.id}','multisportRate',this.value)"> €</span></label></div>
-        <div class="manualPaymentField"><span>Без MultiSport</span><div class="manualPaymentCountControl"><button type="button" onclick="changeManualPaymentCount('${item.id}','individual',-1)">−</button><strong>${summary.individual}</strong><button type="button" onclick="changeManualPaymentCount('${item.id}','individual',1)">+</button></div><label>Цена на човек <span><input type="number" min="0" step="0.05" value="${summary.individualRate.toFixed(2)}" onchange="updateManualPayment('${item.id}','individualRate',this.value)"> €</span></label></div>
-      </div>
+      <div class="paymentBreakdown">${manualPaymentBreakdownHtml(item,summary)}</div>
+      <div class="manualPaymentEditorGrid">${manualPaymentEditorHtml(item,summary)}</div>
       <button class="manualPaymentDelete" type="button" onclick="deleteManualPayment('${item.id}')">Изтрий тази външна тренировка</button>
     </div></details>`;
   }).join('');
@@ -1829,7 +1939,7 @@ function confirmRemoveReg(){
 function askDelete(id){const s=data.sessions.find(x=>x.id===id);if(!s)return;deleteId=id;deleteText.textContent=`Сигурни ли сте, че искате да изтриете тренировката на ${fmtDDMM(s.date)} в ${s.time}? Действието не може да бъде отменено.`;deleteConfirm.classList.add('open')}function closeDelete(){deleteId=null;deleteConfirm.classList.remove('open')}function confirmDelete(){if(!deleteId)return;data=loadData();data.sessions=data.sessions.filter(s=>s.id!==deleteId);saveData(data);closeDelete();renderAll();showToast('Тренировката е изтрита.')}function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}function renderAll(){data=loadData();renderActiveTraining();renderList();renderPayments()}window.addEventListener('storage',renderAll);buildTimePicker();setTimePicker('18:30');buildTplTime();renderTemplatesAll();renderAll();</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="supabase-sync.js?v=20260821-9"></script>
+<script src="supabase-sync.js?v=20260822-1"></script>
 <script id="supabase-auth-js">
 (function(){
   const gate=document.getElementById('adminAuthGate');
