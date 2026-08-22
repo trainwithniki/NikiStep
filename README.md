@@ -18,7 +18,9 @@ The protected administration page is an installable Progressive Web App. On an A
 2. Tap **Инсталирай** in the **Niki Admin** banner. If the banner says **Как?**, tap it for the manual installation steps.
 3. Confirm the installation. **Niki Admin** then appears on the Home screen and in the app launcher.
 
-The installed app starts directly at the protected administration login. The public booking page does not show an application-install banner.
+The installed app starts directly at the protected administration login. The public booking page never shows the **Niki Admin** installation banner.
+
+The public booking page also has its own **Step с Niki** application. Its inline installation card appears below the featured training and before the MultiSport information when the training date scrolls into view.
 
 ## First-time Supabase setup
 

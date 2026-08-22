@@ -1,6 +1,9 @@
-const CACHE_NAME='niki-admin-v3';
+const CACHE_NAME='niki-apps-v4';
 const APP_SHELL=[
+  './',
   './index.html',
+  './public.webmanifest',
+  './public-pwa-install.js?v=20260822-1',
   './admin.html',
   './admin.webmanifest',
   './modal-scroll-lock.js?v=20260822-1',
@@ -10,7 +13,15 @@ const APP_SHELL=[
   './assets/admin-icons/admin-icon-192.png',
   './assets/admin-icons/admin-icon-512.png',
   './assets/admin-icons/admin-icon-maskable-512.png',
-  './assets/admin-icons/admin-apple-touch-icon.png'
+  './assets/admin-icons/admin-apple-touch-icon.png',
+  './assets/icons/icon-192.png',
+  './assets/icons/icon-512.png',
+  './assets/icons/icon-maskable-512.png',
+  './assets/icons/apple-touch-icon.png',
+  './assets/hero-niki-portrait.jpg',
+  './assets/hero-niki-text-mask.png',
+  './assets/multisport-card.webp',
+  './assets/fit-body-center-map.png'
 ];
 
 self.addEventListener('install',event=>{
