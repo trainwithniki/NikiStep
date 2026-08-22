@@ -1,19 +1,16 @@
-const CACHE_NAME='niki-step-v2';
+const CACHE_NAME='niki-admin-v3';
 const APP_SHELL=[
-  './',
   './index.html',
-  './manifest.webmanifest',
+  './admin.html',
+  './admin.webmanifest',
   './modal-scroll-lock.js?v=20260822-1',
   './config.js',
-  './supabase-sync.js?v=20260815-6',
-  './pwa-install.js?v=20260822-2',
-  './assets/hero-niki-portrait.jpg',
-  './assets/hero-niki-text-mask.png',
-  './assets/multisport-card.webp',
-  './assets/fit-body-center-map.png',
-  './assets/icons/icon-192.png',
-  './assets/icons/icon-512.png',
-  './assets/icons/icon-maskable-512.png'
+  './supabase-sync.js?v=20260822-3',
+  './admin-pwa-install.js?v=20260822-1',
+  './assets/admin-icons/admin-icon-192.png',
+  './assets/admin-icons/admin-icon-512.png',
+  './assets/admin-icons/admin-icon-maskable-512.png',
+  './assets/admin-icons/admin-apple-touch-icon.png'
 ];
 
 self.addEventListener('install',event=>{
@@ -33,7 +30,7 @@ self.addEventListener('fetch',event=>{
   const request=event.request;
   if(request.method!=='GET')return;
   const url=new URL(request.url);
-  if(url.origin!==self.location.origin||url.pathname.endsWith('/admin.html'))return;
+  if(url.origin!==self.location.origin)return;
 
   if(request.mode==='navigate'){
     event.respondWith(
@@ -43,7 +40,7 @@ self.addEventListener('fetch',event=>{
           caches.open(CACHE_NAME).then(cache=>cache.put(request,copy));
           return response;
         })
-        .catch(()=>caches.match(request).then(cached=>cached||caches.match('./index.html')))
+        .catch(()=>caches.match(request).then(cached=>cached||caches.match(url.pathname.endsWith('/admin.html')||url.pathname.endsWith('/admin')?'./admin.html':'./index.html')))
     );
     return;
   }
