@@ -22,6 +22,10 @@ The installed app starts directly at the protected administration login. The pub
 
 The public booking page also has its own **Step с Niki** application. Its inline installation card appears below the featured training and before the MultiSport information when the training date scrolls into view. After a successful installation, the card stays hidden on that device.
 
+## iPhone and iPad application
+
+The public **Step с Niki** application can be added from both Safari and Google Chrome on iOS/iPadOS 16.4 or newer. Open the Share menu, choose **Add to Home Screen**, and confirm with **Add**. The site detects iOS and shows these instructions instead of the Android prompt.
+
 ## First-time Supabase setup
 
 1. Open the Supabase project.
@@ -57,6 +61,10 @@ For the 8-visit and 12-visit card counters on platform trainings, also run:
 To show the anonymous public-app installation counter in the admin panel, run:
 
 `supabase/migrations/20260822_add_app_installations.sql`
+
+To include iPhone and iPad installations in the same counter, then run:
+
+`supabase/migrations/20260822_add_ios_app_installations.sql`
 
 The tables are protected by Row Level Security and are not readable from the public booking page. The installation counter stores only a random installation identifier, platform, and installation time—no name, phone number, IP address, or browser details.
 

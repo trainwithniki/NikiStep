@@ -102,7 +102,7 @@ create table if not exists public.site_settings (
 
 create table if not exists public.app_installations (
   installation_id uuid primary key,
-  platform text not null default 'android' check (platform = 'android'),
+  platform text not null default 'android' check (platform in ('android', 'ios')),
   installed_at timestamptz not null default now()
 );
 
@@ -154,7 +154,7 @@ revoke all on table public.app_installations from anon, authenticated, public;
 grant insert on table public.app_installations to anon, authenticated;
 grant select on table public.app_installations to authenticated;
 drop policy if exists "app installations public create" on public.app_installations;
-create policy "app installations public create" on public.app_installations for insert to anon, authenticated with check (platform = 'android');
+create policy "app installations public create" on public.app_installations for insert to anon, authenticated with check (platform in ('android', 'ios'));
 drop policy if exists "app installations admin read" on public.app_installations;
 create policy "app installations admin read" on public.app_installations for select to authenticated using (public.is_app_admin());
 

@@ -1001,7 +1001,7 @@ html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!imp
     <div class="adminLoginError" id="adminLoginError">Грешно потребителско име или парола.</div>
   </form>
 </div>
-<div class="shell" id="adminShell"><div class="head"><div><div class="eye">STEP AEROBICS WITH NIKI • FIT BODY CENTER</div><h1>Админ панел</h1></div><div class="adminNavActions"><a class="adminNavBtn" href="./">← Към сайта</a><button class="btn adminSettingsIcon" type="button" onclick="openSettings()" aria-label="Настройки" title="Настройки">⚙</button><button class="adminLogoutBtn" type="button" onclick="adminLogout()">Изход</button></div></div><div class="appInstallStats" id="appInstallStats" hidden><span class="appInstallStatsIcon" aria-hidden="true">📱</span><div class="appInstallStatsText"><strong id="appInstallStatsCount">0 инсталации на приложението</strong><span id="appInstallStatsLatest">Все още няма отчетена инсталация.</span></div></div><div class="adminSectionTabs"><button class="adminSectionTab active" id="trainingTab" type="button" onclick="switchAdminSection('training')">Тренировки</button><button class="adminSectionTab" id="paymentsTab" type="button" onclick="switchAdminSection('payments')">Плащания</button></div><div class="newTrainingRow"><button class="btn primary" onclick="openNew()">+ Нова тренировка</button></div><div id="activeTraining"></div>
+<div class="shell" id="adminShell"><div class="head"><div><div class="eye">STEP AEROBICS WITH NIKI • FIT BODY CENTER</div><h1>Админ панел</h1></div><div class="adminNavActions"><a class="adminNavBtn" href="./">← Към сайта</a><button class="btn adminSettingsIcon" type="button" onclick="openSettings()" aria-label="Настройки" title="Настройки">⚙</button><button class="adminLogoutBtn" type="button" onclick="adminLogout()">Изход</button></div></div><div class="appInstallStats" id="appInstallStats" hidden><span class="appInstallStatsIcon" aria-hidden="true">📱</span><div class="appInstallStatsText"><strong id="appInstallStatsCount">0 инсталации на приложението</strong><span id="appInstallStatsLatest">Android: 0 · iOS: 0 · Все още няма отчетена инсталация.</span></div></div><div class="adminSectionTabs"><button class="adminSectionTab active" id="trainingTab" type="button" onclick="switchAdminSection('training')">Тренировки</button><button class="adminSectionTab" id="paymentsTab" type="button" onclick="switchAdminSection('payments')">Плащания</button></div><div class="newTrainingRow"><button class="btn primary" onclick="openNew()">+ Нова тренировка</button></div><div id="activeTraining"></div>
 <div class="quickTemplates"><div class="quickTemplatesTop"><strong>Бърза тренировка от шаблон</strong><span>Шаблон → избери дата → активирай</span></div><div class="quickTemplateChips" id="quickTemplateChips"></div></div>
 <div class="card">
   <h2>Тренировки</h2>
@@ -1228,12 +1228,13 @@ function renderInstallStats(){
   const box=document.getElementById('appInstallStats'),stats=data.installStats||{};
   if(!box||stats.configured!==true){if(box)box.hidden=true;return}
   const count=Math.max(0,Number(stats.count)||0);
+  const androidCount=Math.max(0,Number(stats.androidCount)||0),iosCount=Math.max(0,Number(stats.iosCount)||0);
   box.hidden=false;
   document.getElementById('appInstallStatsCount').textContent=`${count} ${count===1?'инсталация':'инсталации'} на приложението`;
   if(stats.lastInstalledAt){
     const moment=new Date(stats.lastInstalledAt);
-    document.getElementById('appInstallStatsLatest').textContent=`Последна: ${moment.toLocaleString('bg-BG',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}`;
-  }else document.getElementById('appInstallStatsLatest').textContent='Все още няма отчетена инсталация.';
+    document.getElementById('appInstallStatsLatest').textContent=`Android: ${androidCount} · iOS: ${iosCount} · Последна: ${moment.toLocaleString('bg-BG',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}`;
+  }else document.getElementById('appInstallStatsLatest').textContent=`Android: ${androidCount} · iOS: ${iosCount} · Все още няма отчетена инсталация.`;
   if(lastRenderedInstallCount!==null&&count>lastRenderedInstallCount)showToast('Нова инсталация на приложението.');
   lastRenderedInstallCount=count;
 }
@@ -2010,7 +2011,7 @@ function askDelete(id){const s=data.sessions.find(x=>x.id===id);if(!s)return;del
 <script src="modal-scroll-lock.js?v=20260822-1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="supabase-sync.js?v=20260822-4"></script>
+<script src="supabase-sync.js?v=20260822-5"></script>
 <script src="admin-pwa-install.js?v=20260822-1"></script>
 <script id="supabase-auth-js">
 (function(){

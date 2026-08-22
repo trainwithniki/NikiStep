@@ -21,7 +21,7 @@
     { id: 'step-fl-mon', name: 'STEP FL Пон', title: 'STEP FL Пон', location: 'Fitness Line', time: '18:30', multisportRate: 1.33, individualRate: 2.73, card8Rate: null, card12Rate: null, sortOrder: 3 },
     { id: 'step-fl-fri', name: 'STEP FL Пт', title: 'STEP FL Пт', location: 'Fitness Line', time: '18:30', multisportRate: 1.33, individualRate: 2.73, card8Rate: null, card12Rate: null, sortOrder: 4 }
   ];
-  let cache = { sessions: [], siteSettings: { ...defaultSiteSettings }, paymentAdjustments: {}, paymentRates: { ...defaultPaymentRates }, manualPaymentSessions: [], manualPaymentTemplates: JSON.parse(JSON.stringify(defaultManualPaymentTemplates)), installStats: { configured: false, count: 0, lastInstalledAt: null }, paymentsConfigured: false, manualPaymentsConfigured: false, manualPaymentTemplatesConfigured: false };
+  let cache = { sessions: [], siteSettings: { ...defaultSiteSettings }, paymentAdjustments: {}, paymentRates: { ...defaultPaymentRates }, manualPaymentSessions: [], manualPaymentTemplates: JSON.parse(JSON.stringify(defaultManualPaymentTemplates)), installStats: { configured: false, count: 0, androidCount: 0, iosCount: 0, lastInstalledAt: null }, paymentsConfigured: false, manualPaymentsConfigured: false, manualPaymentTemplatesConfigured: false };
   let ready = false;
   const cancelTokens = new Map();
   const isTrue = value => value === true || value === 'true' || value === 1 || value === '1';
@@ -88,7 +88,7 @@
     let paymentRates = { ...defaultPaymentRates };
     let manualPaymentSessions = [];
     let manualPaymentTemplates = JSON.parse(JSON.stringify(defaultManualPaymentTemplates));
-    let installStats = { configured: !isAdminPage, count: 0, lastInstalledAt: null };
+    let installStats = { configured: !isAdminPage, count: 0, androidCount: 0, iosCount: 0, lastInstalledAt: null };
     let paymentsConfigured = !isAdminPage;
     let manualPaymentsConfigured = !isAdminPage;
     let manualPaymentTemplatesConfigured = !isAdminPage;
@@ -156,11 +156,17 @@
       if (installCount.error) {
         const missing = installCount.error.code === '42P01' || installCount.error.code === 'PGRST205' || /app_installations/i.test(String(installCount.error.message || ''));
         if (!missing) throw installCount.error;
-        installStats = { configured: false, count: 0, lastInstalledAt: null };
+        installStats = { configured: false, count: 0, androidCount: 0, iosCount: 0, lastInstalledAt: null };
       } else {
-        const latestInstall = await client.from('app_installations').select('installed_at').order('installed_at', { ascending: false }).limit(1).maybeSingle();
+        const [latestInstall, androidInstalls, iosInstalls] = await Promise.all([
+          client.from('app_installations').select('installed_at').order('installed_at', { ascending: false }).limit(1).maybeSingle(),
+          client.from('app_installations').select('installation_id', { count: 'exact', head: true }).eq('platform', 'android'),
+          client.from('app_installations').select('installation_id', { count: 'exact', head: true }).eq('platform', 'ios')
+        ]);
         if (latestInstall.error) throw latestInstall.error;
-        installStats = { configured: true, count: Number(installCount.count) || 0, lastInstalledAt: latestInstall.data?.installed_at || null };
+        if (androidInstalls.error) throw androidInstalls.error;
+        if (iosInstalls.error) throw iosInstalls.error;
+        installStats = { configured: true, count: Number(installCount.count) || 0, androidCount: Number(androidInstalls.count) || 0, iosCount: Number(iosInstalls.count) || 0, lastInstalledAt: latestInstall.data?.installed_at || null };
       }
     } else {
       const result = await client.rpc('public_sessions');
