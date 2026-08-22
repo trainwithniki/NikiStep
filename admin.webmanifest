@@ -5,7 +5,7 @@
   "description": "Защитен административен панел за Step Aerobics With Niki.",
   "lang": "bg",
   "start_url": "./admin.html",
-  "scope": "./",
+  "scope": "./admin.html",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#f4f5f7",

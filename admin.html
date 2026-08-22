@@ -978,7 +978,7 @@ html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!imp
 </head><body>
 
 <div id="adminAuthGate">
-  <a class="adminBackToSite" href="./" aria-label="Назад към публичния сайт">← Назад към сайта</a>
+  <a class="adminBackToSite" href="./" target="_blank" rel="noopener" aria-label="Назад към публичния сайт">← Назад към сайта</a>
   <form class="adminLoginCard" id="adminLoginForm" autocomplete="on">
     <div class="adminLoginBrand">
       <div class="loginMark">N</div>
@@ -1001,7 +1001,7 @@ html.authChecking .shell,html.authChecking #adminLoginForm{visibility:hidden!imp
     <div class="adminLoginError" id="adminLoginError">Грешно потребителско име или парола.</div>
   </form>
 </div>
-<div class="shell" id="adminShell"><div class="head"><div><div class="eye">STEP AEROBICS WITH NIKI • FIT BODY CENTER</div><h1>Админ панел</h1></div><div class="adminNavActions"><a class="adminNavBtn" href="./">← Към сайта</a><button class="btn adminSettingsIcon" type="button" onclick="openSettings()" aria-label="Настройки" title="Настройки">⚙</button><button class="adminLogoutBtn" type="button" onclick="adminLogout()">Изход</button></div></div><div class="adminSectionTabs"><button class="adminSectionTab active" id="trainingTab" type="button" onclick="switchAdminSection('training')">Тренировки</button><button class="adminSectionTab" id="paymentsTab" type="button" onclick="switchAdminSection('payments')">Плащания</button></div><div class="newTrainingRow"><button class="btn primary" onclick="openNew()">+ Нова тренировка</button></div><div id="activeTraining"></div>
+<div class="shell" id="adminShell"><div class="head"><div><div class="eye">STEP AEROBICS WITH NIKI • FIT BODY CENTER</div><h1>Админ панел</h1></div><div class="adminNavActions"><a class="adminNavBtn" href="./" target="_blank" rel="noopener">← Към сайта</a><button class="btn adminSettingsIcon" type="button" onclick="openSettings()" aria-label="Настройки" title="Настройки">⚙</button><button class="adminLogoutBtn" type="button" onclick="adminLogout()">Изход</button></div></div><div class="adminSectionTabs"><button class="adminSectionTab active" id="trainingTab" type="button" onclick="switchAdminSection('training')">Тренировки</button><button class="adminSectionTab" id="paymentsTab" type="button" onclick="switchAdminSection('payments')">Плащания</button></div><div class="newTrainingRow"><button class="btn primary" onclick="openNew()">+ Нова тренировка</button></div><div id="activeTraining"></div>
 <div class="quickTemplates"><div class="quickTemplatesTop"><strong>Бърза тренировка от шаблон</strong><span>Шаблон → избери дата → активирай</span></div><div class="quickTemplateChips" id="quickTemplateChips"></div></div>
 <div class="card">
   <h2>Тренировки</h2>

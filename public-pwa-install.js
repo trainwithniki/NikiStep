@@ -5,7 +5,7 @@
 
   let installPrompt=null;
   let helpOverlay=null;
-  const installedKey='niki-public-app-installed-v1';
+  const installedKey='niki-public-app-installed-v2';
   const installationIdKey='niki-public-app-installation-id-v1';
   const installationRecordedKey='niki-public-app-installation-recorded-v1';
   const section=document.getElementById('publicAppInstallSection');
@@ -19,8 +19,14 @@
     try{localStorage.setItem(key,value)}catch{}
   }
 
-  function isInstalled(){
+  function isStandalone(){
     return window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+  }
+
+  function isPublicAppContext(){
+    if(!isStandalone())return false;
+    if(new URLSearchParams(location.search||'').get('app')==='public')return true;
+    return !/\/admin(?:\.html)?(?:[?#]|$)/i.test(document.referrer||'');
   }
 
   function wasInstalled(){
@@ -89,7 +95,7 @@
   }
 
   function revealSection(){
-    if(!section||!isSupportedPhone()||isInstalled()||wasInstalled())return;
+    if(!section||!isSupportedPhone()||isPublicAppContext()||wasInstalled())return;
     section.hidden=false;
     requestAnimationFrame(()=>section.classList.add('visible'));
     updateAction();
@@ -126,7 +132,7 @@
   }
 
   function watchTrainingDate(){
-    if(!section||!isSupportedPhone()||isInstalled()||wasInstalled())return;
+    if(!section||!isSupportedPhone()||isPublicAppContext()||wasInstalled())return;
     const target=document.querySelector('.featuredDateTime')||document.getElementById('featured');
     if(!target){revealSection();return}
     if(!('IntersectionObserver' in window)){revealSection();return}
@@ -159,7 +165,7 @@
     rememberInstallation();
   });
   window.addEventListener('load',()=>{
-    if(isInstalled()||wasInstalled())rememberInstallation();
+    if(isPublicAppContext()||wasInstalled())rememberInstallation();
     else setTimeout(watchTrainingDate,350);
   });
 })();

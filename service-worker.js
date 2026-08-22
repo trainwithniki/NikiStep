@@ -1,9 +1,9 @@
-const CACHE_NAME='niki-apps-v6';
+const CACHE_NAME='niki-apps-v7';
 const APP_SHELL=[
   './',
   './index.html',
   './public.webmanifest',
-  './public-pwa-install.js?v=20260822-3',
+  './public-pwa-install.js?v=20260822-4',
   './admin.html',
   './admin.webmanifest',
   './modal-scroll-lock.js?v=20260822-1',
