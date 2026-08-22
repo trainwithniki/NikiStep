@@ -1,4 +1,4 @@
-const CACHE_NAME='niki-step-v1';
+const CACHE_NAME='niki-step-v2';
 const APP_SHELL=[
   './',
   './index.html',
@@ -6,6 +6,7 @@ const APP_SHELL=[
   './modal-scroll-lock.js?v=20260822-1',
   './config.js',
   './supabase-sync.js?v=20260815-6',
+  './pwa-install.js?v=20260822-2',
   './assets/hero-niki-portrait.jpg',
   './assets/hero-niki-text-mask.png',
   './assets/multisport-card.webp',
