@@ -655,9 +655,9 @@
 .tplList{display:flex;flex-direction:column;gap:7px}.tplItem{padding:10px;border:1px solid #e2e5e9;border-radius:11px;background:#fff;cursor:pointer}.tplItem.sel{border-color:#ff95b2;box-shadow:0 0 0 3px #fff0f5}
 .tplItem strong{display:block;font-size:11px}.tplItem p{margin:4px 0 0;color:#7b8089;font-size:8px;line-height:1.4}.tplActions{display:flex;gap:5px;margin-top:8px}.tplActions .btn{padding:5px 7px!important;font-size:8px!important}
 .tplEmpty{padding:14px;border:1px dashed #d6d9de;border-radius:11px;text-align:center;color:#858a93;font-size:9px}
-.tplForm{display:grid;grid-template-columns:1fr 1fr;gap:8px}.tplForm .full{grid-column:1/-1}.tplForm label{display:block;margin-bottom:4px;font-size:8px;font-weight:950}
-.tplForm input,.tplForm select,.tplForm textarea{width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 9px;background:#fff;font-size:11px}.tplForm textarea{min-height:64px;resize:vertical}
-.tplTime{display:grid;grid-template-columns:1fr 1fr;gap:5px}.tplEditorActions{display:flex;justify-content:flex-end;gap:6px;margin-top:10px}.tplDanger{border:1px solid #ffd0da!important;background:#fff1f4!important;color:#bf2948!important}
+.tplForm{display:grid;grid-template-columns:1fr 1fr;gap:6px}.tplForm .full{grid-column:1/-1}.tplForm label{display:block;margin-bottom:3px;font-size:8px;font-weight:950}
+.tplForm input,.tplForm select,.tplForm textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:#fff;font-size:11px}.tplForm textarea{min-height:52px;resize:vertical}
+.tplTime{display:grid;grid-template-columns:1fr 1fr;gap:4px}.tplEditorActions{display:flex;justify-content:flex-end;gap:6px;margin-top:8px}.tplDanger{border:1px solid #ffd0da!important;background:#fff1f4!important;color:#bf2948!important}
 .tplConfirm{display:none;position:fixed;inset:0;z-index:180;background:rgba(16,17,21,.62);align-items:center;justify-content:center;padding:18px}.tplConfirm.open{display:flex}
 .tplConfirmBox{width:min(360px,100%);background:#fff;border-radius:17px;padding:17px;box-shadow:0 24px 70px rgba(0,0,0,.28)}.tplConfirmBox h3{margin:0 0 6px;font-size:16px}.tplConfirmBox p{margin:0 0 13px;color:#747982;font-size:9px;line-height:1.4}.tplConfirmActions{display:flex;justify-content:flex-end;gap:6px}
 @media(max-width:700px){.settingsOv{align-items:flex-end;padding:0}.settingsPanel{width:100%;max-height:94vh;border-radius:22px 22px 0 0;padding:15px 13px calc(17px + env(safe-area-inset-bottom))}.settingsGrid{grid-template-columns:1fr}.tplForm{grid-template-columns:1fr}.tplForm .full{grid-column:auto}.headActions{width:100%}.headActions .btn{flex:1}}
@@ -853,6 +853,9 @@ html{-webkit-text-size-adjust:100%}html,body{max-width:100%;overflow-x:hidden}bu
   .acts .btn{width:auto!important;min-width:0!important;min-height:36px!important;padding:6px 9px!important;font-size:9px!important;flex:1 1 calc(50% - 5px)}
   .editor{height:auto;max-height:96dvh;padding:12px 12px calc(16px + env(safe-area-inset-bottom))}
   .field input,.field select,.field textarea,.tplForm input,.tplForm select,.tplForm textarea{font-size:16px!important;min-height:46px}
+  #settingsOv .tplForm{gap:5px}
+  #settingsOv .tplForm input,#settingsOv .tplForm select{height:38px;min-height:38px!important;padding:4px 7px!important}
+  #settingsOv .tplForm textarea{min-height:52px!important;padding:6px 7px!important}
   .edActs{display:grid;grid-template-columns:1fr 1fr}.edActs .btn{min-height:46px}
   .regs{overflow:hidden}.regs>div{overflow-x:auto;-webkit-overflow-scrolling:touch}
   .regs table{min-width:620px}
