@@ -981,7 +981,9 @@ html.authChecking .adminAuthLoading{display:flex}
 .manualPaymentCard{border-color:#efc08c}.manualPaymentCard .paymentCardHead p:before{color:#e66f0c}.manualPaymentCard .paymentCardDate strong,.manualPaymentCard .paymentCardDate span,.manualPaymentCard .paymentCardHead p,.manualPaymentCard .paymentCardAmount strong{color:#d9680d}
 .manualPaymentEntryCount{display:grid;grid-template-columns:30px 54px 30px;align-items:center;gap:4px}.manualPaymentEntryCount button{width:30px;height:30px;border:1px solid #d5dcdf;border-radius:8px;background:#fff;color:#26323e;font-size:20px;font-weight:950;cursor:pointer}.manualPaymentEntryCount button:first-child{border-color:#efc8cf;background:#fff6f7;color:#b4233d}.manualPaymentFormGrid .manualPaymentEntryCount input{width:54px;padding:0 4px;text-align:center;font-size:15px;font-weight:950}.manualPaymentEntryCount input::-webkit-inner-spin-button,.manualPaymentEntryCount input::-webkit-outer-spin-button{margin:0}
 #manualPaymentForm{padding-top:10px}#manualPaymentForm .handle{margin-bottom:8px}#manualPaymentForm .edHead{margin-bottom:8px}#manualPaymentForm .manualPaymentTemplates{gap:4px;margin-bottom:6px}#manualPaymentForm .manualPaymentTemplateButton{min-height:33px;padding:3px 4px}#manualPaymentForm .manualPaymentSettingsHint{margin:-1px 0 5px;padding:5px 7px}#manualPaymentForm .manualPaymentFormGrid{gap:4px 5px}#manualPaymentForm .manualPaymentFormGrid .field label{margin-bottom:2px}#manualPaymentForm .manualPaymentFormGrid input,#manualPaymentForm .manualPaymentFormGrid select{height:30px;border-radius:7px;padding-left:7px;padding-right:7px}#manualPaymentForm .manualPaymentDateFields,#manualPaymentForm .manualPaymentTimeFields{gap:4px}#manualPaymentForm .manualPaymentDateFields select,#manualPaymentForm .manualPaymentTimeFields select{background-position:calc(100% - 10px) 12px}#manualPaymentForm .manualPaymentDateFields select{padding-right:18px}#manualPaymentForm .manualPaymentTimeFields select{padding-right:38px}#manualPaymentForm .manualPaymentEntryCount input{width:54px;padding:0 4px}#manualPaymentForm .manualPaymentFormActions{gap:5px;margin-top:6px}#manualPaymentForm .manualPaymentFormActions button{min-height:34px}
+#manualPaymentForm.editing .manualPaymentFormActions{grid-template-columns:1fr 1fr}
 @media(max-width:560px){.manualPaymentTemplates{grid-template-columns:repeat(2,minmax(0,1fr))}.manualPaymentFormActions button{font-size:14px}}
+.manualPaymentCardActions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:11px}.manualPaymentEdit,.manualPaymentCardActions .manualPaymentDelete{width:100%;min-height:38px;margin-top:0;border-radius:10px;font-size:11px;font-weight:950;cursor:pointer}.manualPaymentEdit{border:1px solid #bad8ca;background:#eef9f3;color:#176f50}.manualPaymentCardActions .manualPaymentDelete{border:1px solid #efc6cd;background:#fff5f6;color:#ad263d}
 </style>
 
 </head><body>
@@ -1041,7 +1043,7 @@ html.authChecking .adminAuthLoading{display:flex}
 <div class="overlay" id="manualPaymentOverlay">
   <form class="editor" id="manualPaymentForm" onsubmit="saveNewManualPayment(event)">
     <div class="handle"></div>
-    <div class="edHead"><div><h2>Добави външна тренировка</h2><p>Избери шаблон, дата и въведи броя хора. Данните са само в админските плащания.</p></div><button class="btn" type="button" onclick="closeManualPaymentForm()">✕</button></div>
+    <div class="edHead"><div><h2 id="manualPaymentFormTitle">Добави външна тренировка</h2><p id="manualPaymentFormDescription">Избери шаблон, дата и въведи броя хора. Данните са само в админските плащания.</p></div><button class="btn" type="button" onclick="closeManualPaymentForm()">✕</button></div>
     <div class="manualPaymentTemplates" id="manualPaymentTemplateButtons" aria-label="Шаблони за външни тренировки"></div>
     <div class="manualPaymentSettingsHint" id="manualPaymentSettingsHint">Настройките на шаблона са заключени. За промяна използвай бутона „Настройки“.</div>
     <div class="manualPaymentFormGrid">
@@ -1061,7 +1063,7 @@ html.authChecking .adminAuthLoading{display:flex}
         <div class="field manualTemplateSettingField"><label for="manualPaymentCard12Rate">ЦЕНА С КАРТА 12 · €</label><input id="manualPaymentCard12Rate" type="number" min="0" step="0.01" inputmode="decimal" readonly></div>
       </div>
     </div>
-    <div class="manualPaymentFormActions"><button class="settings" id="manualTemplateSettingsButton" type="button" onclick="toggleManualTemplateSettings()">⚙ Настройки</button><button class="cancel" type="button" onclick="closeManualPaymentForm()">Отказ</button><button class="save" type="submit">Добави</button></div>
+    <div class="manualPaymentFormActions"><button class="settings" id="manualTemplateSettingsButton" type="button" onclick="toggleManualTemplateSettings()">⚙ Настройки</button><button class="cancel" type="button" onclick="closeManualPaymentForm()">Отказ</button><button class="save" id="manualPaymentSubmitButton" type="submit">Добави</button></div>
   </form>
 </div>
 <div class="overlay" id="editorOverlay"><div class="editor"><div class="handle"></div><div class="edHead"><div><h2 id="editorTitle">Нова тренировка</h2><p>Избери дата от календара и кога автоматично да започне записването.</p></div><button class="btn" onclick="closeEditor()">✕</button></div><div class="form"><div class="templateQuick"><div class="templateQuickTitle"><strong>Шаблон за тренировка</strong><span>попълва настройките автоматично</span></div><div class="templateQuickRow"><select id="fTemplate"><option value="">Без шаблон</option></select><button type="button" class="btn" onclick="applySelectedTemplate()">Зареди</button></div></div><div class="field"><label>ДАТА</label><div class="dateControl"><button type="button" class="dateButton" id="fDateButton" onclick="toggleDatePicker()"><span id="fDateText">Избери дата</span><span class="calIcon">▦</span></button><input id="fDate" type="hidden"><div class="datePicker" id="datePicker"><div class="dpHead"><button type="button" class="dpNav" onclick="moveDatePicker(-1)">‹</button><strong id="dpTitle"></strong><button type="button" class="dpNav" onclick="moveDatePicker(1)">›</button></div><div class="dpWeek"><span>ПН</span><span>ВТ</span><span>СР</span><span>ЧТ</span><span>ПТ</span><span>СБ</span><span>НД</span></div><div class="dpDays" id="dpDays"></div></div></div></div><div class="field"><label>ЧАС (24 ЧАСА)</label><div class="timePickerWrap"><select id="fHour" class="timeSelect" onchange="syncTimePreview()"></select><select id="fMinute" class="timeSelect" onchange="syncTimePreview()"></select><div class="timePreview" id="fTimePreview">18:30</div></div><input id="fTime" type="hidden"></div><div class="field"><label>ПРОДЪЛЖИТЕЛНОСТ</label><input id="fDuration" type="number" min="10" step="5"><div class="help">По подразбиране: 60 минути.</div></div><div class="field"><label>ЗАГЛАВИЕ</label><input id="fTitle"></div><div class="field"><label>ТРЕНЬОР</label><input id="fTrainer"></div><div class="field"><label>МЯСТО</label>
@@ -1541,7 +1543,7 @@ function manualPaymentTemplates(){
     return {...fallback,...item,id:fallback.id,name,title,location:String(item.location||fallback.location),time:/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(String(item.time||''))?String(item.time):fallback.time,multisportRate:nullableRate(item.multisportRate,fallback.multisportRate),individualRate:nullableRate(item.individualRate,fallback.individualRate),card8Rate:nullableRate(item.card8Rate,fallback.card8Rate),card12Rate:nullableRate(item.card12Rate,fallback.card12Rate)};
   }).sort((a,b)=>(Number(a.sortOrder)||0)-(Number(b.sortOrder)||0));
 }
-let activeManualPaymentTemplateId=DEFAULT_MANUAL_PAYMENT_TEMPLATES[0].id,manualTemplateSettingsUnlocked=false;
+let activeManualPaymentTemplateId=DEFAULT_MANUAL_PAYMENT_TEMPLATES[0].id,manualTemplateSettingsUnlocked=false,editingManualPaymentId=null;
 function activeManualPaymentTemplate(){return manualPaymentTemplates().find(item=>item.id===activeManualPaymentTemplateId)||manualPaymentTemplates()[0]}
 function renderManualPaymentTemplateButtons(){
   const box=document.getElementById('manualPaymentTemplateButtons');if(!box)return;
@@ -1602,6 +1604,12 @@ async function toggleManualTemplateSettings(){
   showToast(result.error?'Настройките не бяха запазени.':'Шаблонът е запазен и заключен.');
 }
 function openManualPaymentForm(){
+  editingManualPaymentId=null;
+  manualPaymentForm.classList.remove('editing');
+  manualPaymentFormTitle.textContent='Добави външна тренировка';
+  manualPaymentFormDescription.textContent='Избери шаблон, дата и въведи броя хора. Данните са само в админските плащания.';
+  manualPaymentSubmitButton.textContent='Добави';
+  manualTemplateSettingsButton.hidden=false;
   const now=new Date();
   const sameMonth=now.getFullYear()===paymentMonth.getFullYear()&&now.getMonth()===paymentMonth.getMonth();
   const target=sameMonth?now:new Date(paymentMonth.getFullYear(),paymentMonth.getMonth(),1);
@@ -1612,7 +1620,50 @@ function openManualPaymentForm(){
   setManualPaymentDateForTemplate(activeManualPaymentTemplateId);
   manualPaymentOverlay.classList.add('open');
 }
-function closeManualPaymentForm(){setManualTemplateLocked(true);manualPaymentOverlay.classList.remove('open')}
+function editManualPayment(id){
+  const item=manualPaymentById(id);if(!item)return;
+  editingManualPaymentId=String(item.id);
+  manualPaymentForm.classList.add('editing');
+  setManualTemplateLocked(true);
+  const templates=manualPaymentTemplates();
+  activeManualPaymentTemplateId=templates.some(template=>template.id===item.templateId)?item.templateId:templates[0].id;
+  const template=activeManualPaymentTemplate();
+  manualPaymentTemplateName.value=template?.name||'Ръчна тренировка';
+  const parsedDate=new Date(`${item.date}T12:00:00`);
+  setManualPaymentDate(Number.isNaN(parsedDate.getTime())?new Date():parsedDate);
+  setManualPaymentTime(item.time||template?.time||'18:30');
+  manualPaymentTitle.value=String(item.title||template?.title||'');
+  manualPaymentLocation.value=String(item.location||template?.location||'');
+  manualPaymentMultiCount.value=String(Math.max(0,Math.floor(Number(item.multisportCount)||0)));
+  manualPaymentIndividualCount.value=String(Math.max(0,Math.floor(Number(item.individualCount)||0)));
+  manualPaymentCard8Count.value=String(Math.max(0,Math.floor(Number(item.card8Count)||0)));
+  manualPaymentCard12Count.value=String(Math.max(0,Math.floor(Number(item.card12Count)||0)));
+  manualPaymentMultiRate.value=Number(item.multisportRate||0).toFixed(2);
+  manualPaymentIndividualRate.value=Number(item.individualRate||0).toFixed(2);
+  const hasVisitCards=item.card8Rate!==null&&item.card8Rate!==undefined||item.card12Rate!==null&&item.card12Rate!==undefined||Number(item.card8Count)>0||Number(item.card12Count)>0;
+  manualPaymentCardVisitFields.classList.toggle('hidden',!hasVisitCards);
+  manualPaymentCard8Rate.value=item.card8Rate===null||item.card8Rate===undefined?'':Number(item.card8Rate||0).toFixed(2);
+  manualPaymentCard12Rate.value=item.card12Rate===null||item.card12Rate===undefined?'':Number(item.card12Rate||0).toFixed(2);
+  ['manualPaymentTitle','manualPaymentLocation','manualPaymentMultiRate','manualPaymentIndividualRate','manualPaymentCard8Rate','manualPaymentCard12Rate'].forEach(fieldId=>{const field=document.getElementById(fieldId);if(field)field.readOnly=false});
+  manualPaymentHour.disabled=false;manualPaymentMinute.disabled=false;
+  manualTemplateSettingsButton.hidden=true;
+  manualPaymentSettingsHint.textContent='Коригираш само тази тренировка. Шаблонът няма да бъде променен.';
+  manualPaymentFormTitle.textContent='Редактирай външна тренировка';
+  manualPaymentFormDescription.textContent='Промени сгрешените данни и натисни „Запази промените“.';
+  manualPaymentSubmitButton.textContent='Запази промените';
+  renderManualPaymentTemplateButtons();
+  manualPaymentOverlay.classList.add('open');
+}
+function closeManualPaymentForm(){
+  setManualTemplateLocked(true);
+  editingManualPaymentId=null;
+  manualPaymentForm.classList.remove('editing');
+  manualTemplateSettingsButton.hidden=false;
+  manualPaymentFormTitle.textContent='Добави външна тренировка';
+  manualPaymentFormDescription.textContent='Избери шаблон, дата и въведи броя хора. Данните са само в админските плащания.';
+  manualPaymentSubmitButton.textContent='Добави';
+  manualPaymentOverlay.classList.remove('open');
+}
 function saveNewManualPayment(event){
   event.preventDefault();
   if(manualTemplateSettingsUnlocked){showToast('Първо запази и заключи настройките на шаблона.');return}
@@ -1630,15 +1681,22 @@ function saveNewManualPayment(event){
   const validCounts=[multisportCount,individualCount,card8Count,card12Count].every(value=>Number.isInteger(value)&&value>=0&&value<=1000);
   const validRates=[multisportRate,individualRate,...(hasVisitCards?[card8Rate,card12Rate]:[])].every(value=>Number.isFinite(value)&&value>=0);
   if(!date||!time||title.length<2||location.length<2||!validCounts||!validRates){showToast('Провери датата, мястото, бройките и цените.');return}
-  const id=crypto.randomUUID?crypto.randomUUID():`00000000-0000-4000-8000-${Date.now().toString(16).padStart(12,'0').slice(-12)}`;
+  const editingId=editingManualPaymentId;
+  const id=editingId||(crypto.randomUUID?crypto.randomUUID():`00000000-0000-4000-8000-${Date.now().toString(16).padStart(12,'0').slice(-12)}`);
+  const nextItem={id,date,time,title,location,templateId:activeManualPaymentTemplateId,multisportCount,individualCount,card8Count,card12Count,multisportRate,individualRate,card8Rate,card12Rate};
   data.manualPaymentSessions=data.manualPaymentSessions||[];
-  data.manualPaymentSessions.push({id,date,time,title,location,templateId:activeManualPaymentTemplateId,multisportCount,individualCount,card8Count,card12Count,multisportRate,individualRate,card8Rate,card12Rate});
+  if(editingId){
+    const index=data.manualPaymentSessions.findIndex(item=>String(item.id)===String(editingId));
+    if(index<0){showToast('Тренировката вече не е налична. Опресни страницата.');return}
+    data.manualPaymentSessions[index]={...data.manualPaymentSessions[index],...nextItem,id:data.manualPaymentSessions[index].id};
+  }else data.manualPaymentSessions.push(nextItem);
   const [year,month]=date.split('-').map(Number);
   paymentMonth=new Date(year,month-1,1);
   closeManualPaymentForm();
   renderPayments();
-  if(data.manualPaymentsConfigured===false){showToast('Добавено е само за преглед. Изпълни новата Supabase миграция, за да се запазва.');return}
+  if(data.manualPaymentsConfigured===false){showToast(editingId?'Корекцията е само за преглед. Изпълни новата Supabase миграция, за да се запазва.':'Добавено е само за преглед. Изпълни новата Supabase миграция, за да се запазва.');return}
   schedulePaymentSave();
+  if(editingId)showToast('Тренировката е коригирана. Промените ще се запазят автоматично.');
 }
 function updateManualPayment(id,field,value){
   const item=manualPaymentById(id);if(!item)return;
@@ -1817,7 +1875,7 @@ function renderPayments(){
       <summary class="paymentCardHead"><div><div class="paymentCardDate"><strong>${fmtDDMM(item.date)}</strong><span>${fmtWeekday(item.date)} · ${esc(item.time)}</span></div><p>${esc(item.title)} · ${esc(item.location)}</p></div><div class="paymentCardAmount"><span>За тренировката</span><strong>${moneyEUR(summary.total)} €</strong></div></summary><div class="paymentCardBody">
       <div class="paymentBreakdown">${manualPaymentBreakdownHtml(item,summary)}</div>
       <div class="manualPaymentEditorGrid">${manualPaymentEditorHtml(item,summary)}</div>
-      <button class="manualPaymentDelete" type="button" onclick="deleteManualPayment('${item.id}')">Изтрий тази външна тренировка</button>
+      <div class="manualPaymentCardActions"><button class="manualPaymentEdit" type="button" onclick="editManualPayment('${item.id}')">✎ Редактирай</button><button class="manualPaymentDelete" type="button" onclick="deleteManualPayment('${item.id}')">Изтрий тренировката</button></div>
     </div></details>`;
   }).join('');
   cards.innerHTML=platformCards+manualCards;
