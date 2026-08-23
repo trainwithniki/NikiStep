@@ -15,6 +15,18 @@
     return /Android/i.test(navigator.userAgent);
   }
 
+  function isIOS(){
+    return /iPad|iPhone|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  }
+
+  function isChromeIOS(){
+    return isIOS()&&/CriOS/i.test(navigator.userAgent);
+  }
+
+  function isSupportedPhone(){
+    return isAndroid()||isIOS();
+  }
+
   function isInAppBrowser(){
     return /FBAN|FBAV|Instagram|Messenger|Line\//i.test(navigator.userAgent);
   }
@@ -30,16 +42,21 @@
     document.documentElement.classList.remove('adminPwaHelpOpen');
   }
 
-  function showAndroidHelp(){
+  function showInstallHelp(){
     if(helpOverlay)return;
+    const ios=isIOS();
+    const iosBrowser=isChromeIOS()?'Google Chrome':'Safari или браузъра, който използваш';
+    const steps=ios
+      ? `<p class="adminPwaHelpWarning">Инсталиране през <strong>${iosBrowser}</strong></p><ol><li>Натисни бутона <strong>Споделяне</strong> — квадратчето със стрелка нагоре.</li><li>Намери и избери <strong>Добавяне към Начален екран</strong>.</li><li>Потвърди с <strong>Добавяне</strong> горе вдясно.</li><li>Отвори <strong>Niki Admin</strong> от новата икона на телефона.</li>${isChromeIOS()?'<li>Ако опцията липсва, обнови iOS или отвори админ панела в Safari.</li>':''}</ol>`
+      : `<ol><li>Отвори админ панела в <strong>Google Chrome</strong>.</li><li>Натисни менюто <strong>⋮</strong> горе вдясно.</li><li>Избери <strong>Инсталиране на приложението</strong> или <strong>Добавяне към началния екран</strong>.</li><li>Потвърди с <strong>Инсталирай</strong>.</li></ol>`;
     helpOverlay=document.createElement('div');
     helpOverlay.className='adminPwaHelpOverlay';
     helpOverlay.innerHTML=`<section class="adminPwaHelpCard" role="dialog" aria-modal="true" aria-labelledby="adminPwaHelpTitle">
       <button class="adminPwaHelpClose" type="button" aria-label="Затвори">×</button>
       <img src="assets/admin-icons/admin-icon-192.png" alt="">
       <h2 id="adminPwaHelpTitle">Инсталиране на Niki Admin</h2>
-      ${isInAppBrowser()?'<p class="adminPwaHelpWarning">Страницата е отворена във вътрешен браузър. Първо избери <strong>Отвори в Chrome</strong>.</p>':''}
-      <ol><li>Отвори админ панела в <strong>Google Chrome</strong>.</li><li>Натисни менюто <strong>⋮</strong> горе вдясно.</li><li>Избери <strong>Инсталиране на приложението</strong> или <strong>Добавяне към началния екран</strong>.</li><li>Потвърди с <strong>Инсталирай</strong>.</li></ol>
+      ${isInAppBrowser()?'<p class="adminPwaHelpWarning">Страницата е отворена във вътрешен браузър. Първо избери <strong>Отвори в Safari</strong> или <strong>Отвори в Chrome</strong>.</p>':''}
+      ${steps}
       <button class="adminPwaHelpDone" type="button">Разбрах</button>
     </section>`;
     document.documentElement.classList.add('adminPwaHelpOpen');
@@ -51,17 +68,17 @@
 
   function updateBanner(){
     if(!installBanner)return;
-    installBanner.querySelector('small').textContent=installPrompt?'Добави админ приложението':'Android · админ приложение';
-    installBanner.querySelector('.adminPwaInstallAction').textContent=installPrompt?'Инсталирай':'Как?';
+    installBanner.querySelector('small').textContent=installPrompt&&!isIOS()?'Добави админ приложението':`${isIOS()?'iOS':'Android'} · админ приложение`;
+    installBanner.querySelector('.adminPwaInstallAction').textContent=installPrompt&&!isIOS()?'Инсталирай':'Как?';
   }
 
   function showInstallBanner(){
-    if(isInstalled()||(!installPrompt&&!isAndroid()))return;
+    if(isInstalled()||(!installPrompt&&!isSupportedPhone()))return;
     if(installBanner){updateBanner();return}
     installBanner=document.createElement('aside');
     installBanner.className='adminPwaInstallBanner';
     installBanner.setAttribute('aria-label','Инсталиране на админ приложението');
-    installBanner.innerHTML='<img src="assets/admin-icons/admin-icon-192.png" alt=""><span><strong>Niki Admin</strong><small>Android · админ приложение</small></span><button class="adminPwaInstallAction" type="button">Как?</button><button class="adminPwaInstallClose" type="button" aria-label="Затвори">×</button>';
+    installBanner.innerHTML=`<img src="assets/admin-icons/admin-icon-192.png" alt=""><span><strong>Niki Admin</strong><small>${isIOS()?'iOS':'Android'} · админ приложение</small></span><button class="adminPwaInstallAction" type="button">Как?</button><button class="adminPwaInstallClose" type="button" aria-label="Затвори">×</button>`;
 
     if(!document.getElementById('adminPwaInstallStyles')){
       const style=document.createElement('style');
@@ -73,7 +90,7 @@
     updateBanner();
 
     installBanner.querySelector('.adminPwaInstallAction').addEventListener('click',async()=>{
-      if(!installPrompt){showAndroidHelp();return}
+      if(!installPrompt||isIOS()){showInstallHelp();return}
       installPrompt.prompt();
       const choice=await installPrompt.userChoice;
       if(choice.outcome==='accepted')removeBanner();

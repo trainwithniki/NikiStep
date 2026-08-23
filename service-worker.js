@@ -1,4 +1,4 @@
-const CACHE_NAME='niki-apps-v7';
+const CACHE_NAME='niki-apps-v8';
 const APP_SHELL=[
   './',
   './index.html',
@@ -9,7 +9,7 @@ const APP_SHELL=[
   './modal-scroll-lock.js?v=20260822-1',
   './config.js',
   './supabase-sync.js?v=20260822-5',
-  './admin-pwa-install.js?v=20260822-1',
+  './admin-pwa-install.js?v=20260823-2',
   './assets/admin-icons/admin-icon-192.png',
   './assets/admin-icons/admin-icon-512.png',
   './assets/admin-icons/admin-icon-maskable-512.png',
