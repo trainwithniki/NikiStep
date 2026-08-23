@@ -52,6 +52,13 @@ create table if not exists public.payment_config (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.registration_payment_overrides (
+  registration_id text primary key references public.registrations(id) on delete cascade,
+  payment_type text not null check (payment_type in ('multisport', 'individual', 'card8', 'card12')),
+  updated_by uuid references auth.users(id) on delete set null default auth.uid(),
+  updated_at timestamptz not null default now()
+);
+
 create table if not exists public.manual_payment_sessions (
   id uuid primary key default gen_random_uuid(),
   date date not null,
@@ -130,6 +137,7 @@ alter table public.sessions enable row level security;
 alter table public.registrations enable row level security;
 alter table public.payment_adjustments enable row level security;
 alter table public.payment_config enable row level security;
+alter table public.registration_payment_overrides enable row level security;
 alter table public.manual_payment_sessions enable row level security;
 alter table public.manual_payment_templates enable row level security;
 alter table public.training_templates enable row level security;
@@ -200,6 +208,12 @@ create policy "payment config admin only" on public.payment_config
 for all to authenticated using (public.is_app_admin()) with check (public.is_app_admin());
 insert into public.payment_config(id,multisport_rate,individual_rate)
 values ('default',1.70,3.75) on conflict (id) do nothing;
+
+revoke all on table public.registration_payment_overrides from anon, public;
+grant select, insert, update, delete on table public.registration_payment_overrides to authenticated;
+drop policy if exists "registration payment overrides admin only" on public.registration_payment_overrides;
+create policy "registration payment overrides admin only" on public.registration_payment_overrides
+for all to authenticated using (public.is_app_admin()) with check (public.is_app_admin());
 
 revoke all on table public.manual_payment_sessions from anon, public;
 grant select, insert, update, delete on table public.manual_payment_sessions to authenticated;
@@ -275,6 +289,9 @@ do $$ begin
 exception when duplicate_object then null; end $$;
 do $$ begin
   alter publication supabase_realtime add table public.payment_config;
+exception when duplicate_object then null; end $$;
+do $$ begin
+  alter publication supabase_realtime add table public.registration_payment_overrides;
 exception when duplicate_object then null; end $$;
 do $$ begin
   alter publication supabase_realtime add table public.manual_payment_sessions;

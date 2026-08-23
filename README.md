@@ -70,6 +70,10 @@ To synchronize the admin quick-training templates between phones and computers, 
 
 `supabase/migrations/20260823_add_training_templates.sql`
 
+For admin-only corrections to each attendee's payment tariff, also run:
+
+`supabase/migrations/20260823_add_registration_payment_overrides.sql`
+
 The tables are protected by Row Level Security and are not readable from the public booking page. The installation counter stores only a random installation identifier, platform, and installation time—no name, phone number, IP address, or browser details.
 
 ## Local preview

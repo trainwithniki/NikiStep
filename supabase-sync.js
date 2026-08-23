@@ -22,7 +22,7 @@
     { id: 'step-fl-mon', name: 'STEP FL Пон', title: 'STEP FL Пон', location: 'Fitness Line', time: '18:30', multisportRate: 1.33, individualRate: 2.73, card8Rate: null, card12Rate: null, sortOrder: 3 },
     { id: 'step-fl-fri', name: 'STEP FL Пт', title: 'STEP FL Пт', location: 'Fitness Line', time: '18:30', multisportRate: 1.33, individualRate: 2.73, card8Rate: null, card12Rate: null, sortOrder: 4 }
   ];
-  let cache = { sessions: [], trainingTemplates: [], siteSettings: { ...defaultSiteSettings }, paymentAdjustments: {}, paymentRates: { ...defaultPaymentRates }, manualPaymentSessions: [], manualPaymentTemplates: JSON.parse(JSON.stringify(defaultManualPaymentTemplates)), installStats: { configured: false, count: 0, androidCount: 0, iosCount: 0, lastInstalledAt: null }, trainingTemplatesConfigured: false, paymentsConfigured: false, manualPaymentsConfigured: false, manualPaymentTemplatesConfigured: false };
+  let cache = { sessions: [], trainingTemplates: [], siteSettings: { ...defaultSiteSettings }, paymentAdjustments: {}, paymentRates: { ...defaultPaymentRates }, registrationPaymentOverrides: {}, manualPaymentSessions: [], manualPaymentTemplates: JSON.parse(JSON.stringify(defaultManualPaymentTemplates)), installStats: { configured: false, count: 0, androidCount: 0, iosCount: 0, lastInstalledAt: null }, trainingTemplatesConfigured: false, paymentsConfigured: false, registrationPaymentOverridesConfigured: false, manualPaymentsConfigured: false, manualPaymentTemplatesConfigured: false };
   let ready = false;
   const cancelTokens = new Map();
   const isTrue = value => value === true || value === 'true' || value === 1 || value === '1';
@@ -124,10 +124,12 @@
     let trainingTemplates = [];
     let paymentAdjustments = {};
     let paymentRates = { ...defaultPaymentRates };
+    let registrationPaymentOverrides = {};
     let manualPaymentSessions = [];
     let manualPaymentTemplates = JSON.parse(JSON.stringify(defaultManualPaymentTemplates));
     let installStats = { configured: !isAdminPage, count: 0, androidCount: 0, iosCount: 0, lastInstalledAt: null };
     let paymentsConfigured = !isAdminPage;
+    let registrationPaymentOverridesConfigured = !isAdminPage;
     let manualPaymentsConfigured = !isAdminPage;
     let manualPaymentTemplatesConfigured = !isAdminPage;
     let trainingTemplatesConfigured = !isAdminPage;
@@ -187,6 +189,17 @@
       } else if (rates.data) {
         paymentRates = { multisport: Number(rates.data.multisport_rate), individual: Number(rates.data.individual_rate) };
       }
+      const registrationTariffs = await client.from('registration_payment_overrides').select('registration_id,payment_type');
+      if (registrationTariffs.error) {
+        const missing = registrationTariffs.error.code === '42P01' || registrationTariffs.error.code === 'PGRST205' || /registration_payment_overrides/i.test(String(registrationTariffs.error.message || ''));
+        if (!missing) throw registrationTariffs.error;
+        registrationPaymentOverridesConfigured = false;
+      } else {
+        registrationPaymentOverridesConfigured = true;
+        (registrationTariffs.data || []).forEach(row => {
+          if (['multisport', 'individual', 'card8', 'card12'].includes(row.payment_type)) registrationPaymentOverrides[row.registration_id] = row.payment_type;
+        });
+      }
       let manualPayments = await client.from('manual_payment_sessions').select('id,date,time,title,location,template_id,multisport_count,individual_count,card8_count,card12_count,multisport_rate,individual_rate,card8_rate,card12_rate').order('date');
       if (manualPayments.error) {
         const missing = manualPayments.error.code === '42P01' || manualPayments.error.code === 'PGRST205' || /manual_payment_sessions/i.test(String(manualPayments.error.message || ''));
@@ -241,7 +254,7 @@
       if (setting.key === 'hero_text' && setting.value) siteSettings.heroText = String(setting.value);
       if (setting.key === 'hero_subtitle' && setting.value) siteSettings.heroSubtitle = String(setting.value);
     });
-    cache = { sessions, trainingTemplates, siteSettings, paymentAdjustments, paymentRates, manualPaymentSessions, manualPaymentTemplates, installStats, trainingTemplatesConfigured, paymentsConfigured, manualPaymentsConfigured, manualPaymentTemplatesConfigured };
+    cache = { sessions, trainingTemplates, siteSettings, paymentAdjustments, paymentRates, registrationPaymentOverrides, manualPaymentSessions, manualPaymentTemplates, installStats, trainingTemplatesConfigured, paymentsConfigured, registrationPaymentOverridesConfigured, manualPaymentsConfigured, manualPaymentTemplatesConfigured };
     ready = true;
     document.documentElement.classList.remove('appLoading');
     if (typeof window.renderAll === 'function') window.renderAll();
@@ -411,6 +424,26 @@
       if (!result.error) cache.paymentRates = values;
       return result;
     },
+    async saveRegistrationPaymentOverrides(overrides) {
+      const allowed = new Set(['multisport', 'individual', 'card8', 'card12']);
+      const values = Object.entries(overrides || {}).filter(([, type]) => allowed.has(type));
+      const rows = values.map(([registrationId, type]) => ({
+        registration_id: String(registrationId), payment_type: type, updated_at: new Date().toISOString()
+      }));
+      if (rows.length) {
+        const saved = await client.from('registration_payment_overrides').upsert(rows, { onConflict: 'registration_id' });
+        if (saved.error) return saved;
+      }
+      const nextIds = new Set(values.map(([registrationId]) => String(registrationId)));
+      const removedIds = Object.keys(cache.registrationPaymentOverrides || {}).filter(registrationId => !nextIds.has(String(registrationId)));
+      if (removedIds.length) {
+        const removed = await client.from('registration_payment_overrides').delete().in('registration_id', removedIds);
+        if (removed.error) return removed;
+      }
+      cache.registrationPaymentOverrides = Object.fromEntries(values);
+      cache.registrationPaymentOverridesConfigured = true;
+      return { error: null };
+    },
     async saveManualPaymentSessions(items) {
       const values = (items || []).map(item => ({
         id: String(item.id), date: String(item.date), time: String(item.time || '18:30').slice(0, 5),
@@ -502,6 +535,7 @@
     .on('postgres_changes', { event: '*', schema: 'public', table: 'site_settings' }, refresh);
   if (isAdminPage) liveChannel.on('postgres_changes', { event: '*', schema: 'public', table: 'payment_adjustments' }, refresh);
   if (isAdminPage) liveChannel.on('postgres_changes', { event: '*', schema: 'public', table: 'payment_config' }, refresh);
+  if (isAdminPage) liveChannel.on('postgres_changes', { event: '*', schema: 'public', table: 'registration_payment_overrides' }, refresh);
   if (isAdminPage) liveChannel.on('postgres_changes', { event: '*', schema: 'public', table: 'training_templates' }, refresh);
   if (isAdminPage) liveChannel.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'app_installations' }, refresh);
   liveChannel.subscribe();
