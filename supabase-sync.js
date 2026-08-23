@@ -4,6 +4,7 @@
   if (!cfg || !window.supabase) return console.error('Supabase configuration is missing.');
   const rememberKey = 'niki-remember-admin';
   const bookingReceiptsKey = 'niki-booking-receipts-v1';
+  const trainingTemplatesStorageKey = 'stepAerobicsNikiTemplatesV16';
   const authStorage = {
     getItem(key) { return (localStorage.getItem(rememberKey) !== '0' ? localStorage : sessionStorage).getItem(key); },
     setItem(key, value) { return (localStorage.getItem(rememberKey) !== '0' ? localStorage : sessionStorage).setItem(key, value); },
@@ -21,12 +22,18 @@
     { id: 'step-fl-mon', name: 'STEP FL Пон', title: 'STEP FL Пон', location: 'Fitness Line', time: '18:30', multisportRate: 1.33, individualRate: 2.73, card8Rate: null, card12Rate: null, sortOrder: 3 },
     { id: 'step-fl-fri', name: 'STEP FL Пт', title: 'STEP FL Пт', location: 'Fitness Line', time: '18:30', multisportRate: 1.33, individualRate: 2.73, card8Rate: null, card12Rate: null, sortOrder: 4 }
   ];
-  let cache = { sessions: [], siteSettings: { ...defaultSiteSettings }, paymentAdjustments: {}, paymentRates: { ...defaultPaymentRates }, manualPaymentSessions: [], manualPaymentTemplates: JSON.parse(JSON.stringify(defaultManualPaymentTemplates)), installStats: { configured: false, count: 0, androidCount: 0, iosCount: 0, lastInstalledAt: null }, paymentsConfigured: false, manualPaymentsConfigured: false, manualPaymentTemplatesConfigured: false };
+  let cache = { sessions: [], trainingTemplates: [], siteSettings: { ...defaultSiteSettings }, paymentAdjustments: {}, paymentRates: { ...defaultPaymentRates }, manualPaymentSessions: [], manualPaymentTemplates: JSON.parse(JSON.stringify(defaultManualPaymentTemplates)), installStats: { configured: false, count: 0, androidCount: 0, iosCount: 0, lastInstalledAt: null }, trainingTemplatesConfigured: false, paymentsConfigured: false, manualPaymentsConfigured: false, manualPaymentTemplatesConfigured: false };
   let ready = false;
   const cancelTokens = new Map();
   const isTrue = value => value === true || value === 'true' || value === 1 || value === '1';
   const readReceipts = () => { try { return JSON.parse(localStorage.getItem(bookingReceiptsKey) || '{}'); } catch (_) { return {}; } };
   const writeReceipts = receipts => localStorage.setItem(bookingReceiptsKey, JSON.stringify(receipts));
+  const readLocalTrainingTemplates = () => {
+    try {
+      const value = JSON.parse(localStorage.getItem(trainingTemplatesStorageKey) || '[]');
+      return Array.isArray(value) ? value : [];
+    } catch (_) { return []; }
+  };
 
   const fromRow = row => ({
     id: row.id, date: String(row.date), time: String(row.time).slice(0, 5),
@@ -81,9 +88,40 @@
     card8_rate: item.card8Rate === null ? null : Math.max(0, Number(item.card8Rate) || 0), card12_rate: item.card12Rate === null ? null : Math.max(0, Number(item.card12Rate) || 0),
     sort_order: Number(item.sortOrder) || 0, updated_at: new Date().toISOString()
   });
+  const normalizeTrainingTemplate = (item, index = 0) => ({
+    id: String(item?.id || `tpl-${Date.now()}-${index}`).slice(0, 80),
+    name: String(item?.name || 'Шаблон').trim().slice(0, 80),
+    title: String(item?.title || 'Step Aerobics').trim().slice(0, 120),
+    trainer: String(item?.trainer || 'Niki').trim().slice(0, 80),
+    location: String(item?.location || 'Fit Body Center').trim().slice(0, 120),
+    time: String(item?.time || '18:30').slice(0, 5),
+    duration: Math.min(300, Math.max(10, Math.floor(Number(item?.duration) || 60))),
+    capacity: Math.min(200, Math.max(1, Math.floor(Number(item?.capacity) || 20))),
+    bookingDays: [1, 2, 3, 4].includes(Number(item?.bookingDays)) ? Number(item.bookingDays) : 2,
+    bookingCloseHours: Math.min(168, Math.max(0, Number(item?.bookingCloseHours) || 0)),
+    description: String(item?.description || '').trim().slice(0, 1200),
+    sortOrder: Number(item?.sortOrder) || index + 1
+  });
+  const fromTrainingTemplateRow = row => normalizeTrainingTemplate({
+    id: row.id, name: row.name, title: row.title, trainer: row.trainer, location: row.location,
+    time: String(row.time).slice(0, 5), duration: row.duration, capacity: row.capacity,
+    bookingDays: row.booking_days, bookingCloseHours: row.booking_close_hours,
+    description: row.description, sortOrder: row.sort_order
+  });
+  const toTrainingTemplateRow = (item, index) => {
+    const value = normalizeTrainingTemplate(item, index);
+    return {
+      id: value.id, name: value.name, title: value.title, trainer: value.trainer,
+      location: value.location, time: value.time, duration: value.duration,
+      capacity: value.capacity, booking_days: value.bookingDays,
+      booking_close_hours: value.bookingCloseHours, description: value.description,
+      sort_order: value.sortOrder, updated_at: new Date().toISOString()
+    };
+  };
 
   async function refresh() {
     let sessions;
+    let trainingTemplates = [];
     let paymentAdjustments = {};
     let paymentRates = { ...defaultPaymentRates };
     let manualPaymentSessions = [];
@@ -92,6 +130,7 @@
     let paymentsConfigured = !isAdminPage;
     let manualPaymentsConfigured = !isAdminPage;
     let manualPaymentTemplatesConfigured = !isAdminPage;
+    let trainingTemplatesConfigured = !isAdminPage;
     if (isAdminPage) {
       const result = await client.from('sessions').select('*').order('date');
       if (result.error) throw result.error;
@@ -102,6 +141,25 @@
         const session = sessions.find(item => item.id === row.session_id);
         if (session) session.registrations.push({ id: row.id, name: row.name, phone: row.phone, hasMultisport: isTrue(row.has_multisport), pending: row.pending, createdAt: row.created_at, cancelledAt: row.cancelled_at || null, bookedBy: row.booked_by || '' });
       });
+      const templateRows = await client.from('training_templates').select('id,name,title,trainer,location,time,duration,capacity,booking_days,booking_close_hours,description,sort_order').order('sort_order');
+      if (templateRows.error) {
+        const missing = templateRows.error.code === '42P01' || templateRows.error.code === 'PGRST205' || /training_templates/i.test(String(templateRows.error.message || ''));
+        if (!missing) throw templateRows.error;
+        trainingTemplatesConfigured = false;
+      } else {
+        trainingTemplatesConfigured = true;
+        trainingTemplates = (templateRows.data || []).map(fromTrainingTemplateRow);
+        if (!trainingTemplates.length) {
+          const localTemplates = readLocalTrainingTemplates().map(normalizeTrainingTemplate);
+          if (localTemplates.length) {
+            const imported = await client.from('training_templates').upsert(localTemplates.map(toTrainingTemplateRow), { onConflict: 'id' });
+            if (imported.error) {
+              console.error(imported.error);
+              trainingTemplatesConfigured = false;
+            } else trainingTemplates = localTemplates;
+          }
+        }
+      }
       let payments = await client.from('payment_adjustments').select('session_id,extra_individual,extra_multisport,extra_card8,extra_card12');
       if (payments.error) {
         const oldColumns = payments.error.code === '42703' || payments.error.code === 'PGRST204' || /(extra_card8|extra_card12)/i.test(String(payments.error.message || ''));
@@ -183,7 +241,7 @@
       if (setting.key === 'hero_text' && setting.value) siteSettings.heroText = String(setting.value);
       if (setting.key === 'hero_subtitle' && setting.value) siteSettings.heroSubtitle = String(setting.value);
     });
-    cache = { sessions, siteSettings, paymentAdjustments, paymentRates, manualPaymentSessions, manualPaymentTemplates, installStats, paymentsConfigured, manualPaymentsConfigured, manualPaymentTemplatesConfigured };
+    cache = { sessions, trainingTemplates, siteSettings, paymentAdjustments, paymentRates, manualPaymentSessions, manualPaymentTemplates, installStats, trainingTemplatesConfigured, paymentsConfigured, manualPaymentsConfigured, manualPaymentTemplatesConfigured };
     ready = true;
     document.documentElement.classList.remove('appLoading');
     if (typeof window.renderAll === 'function') window.renderAll();
@@ -325,6 +383,22 @@
       if (!result.error) cache.paymentAdjustments = JSON.parse(JSON.stringify(adjustments || {}));
       return result;
     },
+    async saveTrainingTemplates(items) {
+      const values = (items || []).map(normalizeTrainingTemplate);
+      const nextIds = new Set(values.map(item => item.id));
+      const removedIds = (cache.trainingTemplates || []).filter(item => !nextIds.has(String(item.id))).map(item => item.id);
+      if (values.length) {
+        const saved = await client.from('training_templates').upsert(values.map(toTrainingTemplateRow), { onConflict: 'id' });
+        if (saved.error) return saved;
+      }
+      if (removedIds.length) {
+        const removed = await client.from('training_templates').delete().in('id', removedIds);
+        if (removed.error) return removed;
+      }
+      cache.trainingTemplates = JSON.parse(JSON.stringify(values));
+      cache.trainingTemplatesConfigured = true;
+      return { error: null };
+    },
     async savePaymentRates(rates) {
       const values = {
         multisport: Math.max(0, Number(rates?.multisport) || 0),
@@ -428,6 +502,7 @@
     .on('postgres_changes', { event: '*', schema: 'public', table: 'site_settings' }, refresh);
   if (isAdminPage) liveChannel.on('postgres_changes', { event: '*', schema: 'public', table: 'payment_adjustments' }, refresh);
   if (isAdminPage) liveChannel.on('postgres_changes', { event: '*', schema: 'public', table: 'payment_config' }, refresh);
+  if (isAdminPage) liveChannel.on('postgres_changes', { event: '*', schema: 'public', table: 'training_templates' }, refresh);
   if (isAdminPage) liveChannel.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'app_installations' }, refresh);
   liveChannel.subscribe();
 

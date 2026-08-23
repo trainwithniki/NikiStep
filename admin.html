@@ -655,6 +655,7 @@
 .tplList{display:flex;flex-direction:column;gap:7px}.tplItem{padding:10px;border:1px solid #e2e5e9;border-radius:11px;background:#fff;cursor:pointer}.tplItem.sel{border-color:#ff95b2;box-shadow:0 0 0 3px #fff0f5}
 .tplItem strong{display:block;font-size:11px}.tplItem p{margin:4px 0 0;color:#7b8089;font-size:8px;line-height:1.4}.tplActions{display:flex;gap:5px;margin-top:8px}.tplActions .btn{padding:5px 7px!important;font-size:8px!important}
 .tplEmpty{padding:14px;border:1px dashed #d6d9de;border-radius:11px;text-align:center;color:#858a93;font-size:9px}
+.trainingTemplatesSetupNote{margin:0 0 8px;padding:7px 8px;border:1px solid #f0cf9c;border-radius:9px;background:#fff4e6;color:#7b5314;font-size:9px;font-weight:850;line-height:1.4}.trainingTemplatesSetupNote[hidden]{display:none!important}
 .tplForm{display:grid;grid-template-columns:1fr 1fr;gap:6px}.tplForm .full{grid-column:1/-1}.tplForm label{display:block;margin-bottom:3px;font-size:8px;font-weight:950}
 .tplForm input,.tplForm select,.tplForm textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:#fff;font-size:11px}.tplForm textarea{min-height:52px;resize:vertical}
 .tplTime{display:grid;grid-template-columns:1fr 1fr;gap:4px}.tplEditorActions{display:flex;justify-content:flex-end;gap:6px;margin-top:8px}.tplDanger{border:1px solid #ffd0da!important;background:#fff1f4!important;color:#bf2948!important}
@@ -1116,6 +1117,7 @@ html.authChecking .adminAuthLoading{display:flex}
     </div>
     <div class="tplBox">
       <h3 id="tplEditorTitle">Нов шаблон</h3>
+      <div class="trainingTemplatesSetupNote" id="trainingTemplatesSetupNote" hidden>За синхронизиране между устройствата изпълни миграцията <strong>20260823_add_training_templates.sql</strong> в Supabase.</div>
       <div class="tplForm">
         <div class="full"><label>ИМЕ НА ШАБЛОНА</label><input id="tName" placeholder="Напр. Вечерна тренировка"></div>
         <div><label>ТРЕНИРОВКА</label><input id="tTitle" value="Step Aerobics"></div>
@@ -1178,8 +1180,23 @@ function esc(v=''){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt
 
 
 const TEMPLATE_KEY='stepAerobicsNikiTemplatesV16';
-function loadTemplates(){try{const r=localStorage.getItem(TEMPLATE_KEY);if(r){const x=JSON.parse(r);if(Array.isArray(x))return x}}catch(e){}return[]}
-function storeTemplates(){localStorage.setItem(TEMPLATE_KEY,JSON.stringify(templates))}
+function loadTemplates(){
+  try{
+    const synced=typeof window.loadData==='function'?window.loadData():null;
+    if(synced?.trainingTemplatesConfigured===true&&Array.isArray(synced.trainingTemplates)){
+      localStorage.setItem(TEMPLATE_KEY,JSON.stringify(synced.trainingTemplates));
+      return synced.trainingTemplates;
+    }
+    const r=localStorage.getItem(TEMPLATE_KEY);if(r){const x=JSON.parse(r);if(Array.isArray(x))return x}
+  }catch(e){}
+  return[]
+}
+async function storeTemplates(){
+  localStorage.setItem(TEMPLATE_KEY,JSON.stringify(templates));
+  if(!window.nikiAdmin?.saveTrainingTemplates)return{error:null,localOnly:true};
+  const result=await window.nikiAdmin.saveTrainingTemplates(templates);
+  return result?.error?{...result,localOnly:true}:result
+}
 let templates=loadTemplates(),selectedTplId=null,pendingTplDelete=null;
 
 function buildTplTime(){
@@ -1197,15 +1214,15 @@ function editTemplate(id){
   const t=tplById(id);if(!t)return;selectedTplId=id;tplEditorTitle.textContent='Редакция на шаблон';tName.value=t.name||'';tTitle.value=t.title||'Step Aerobics';tTrainer.value=t.trainer||'Niki';tLocation.value=t.location||'Fit Body Center';
   const [hh,mm]=String(t.time||'18:30').split(':');tHour.value=hh||'18';tMinute.value=mm||'30';tDuration.value=t.duration||60;tCapacity.value=t.capacity||20;tBookingDays.value=String(t.bookingDays||2);tBookingCloseHours.value=String(bookingCloseHoursFor(t));tDescription.value=t.description||'';renderTplList()
 }
-function saveTemplate(){
+async function saveTemplate(){
   const name=tName.value.trim();if(!name){showToast('Напиши име на шаблона.');return}
   const v={name,title:tTitle.value.trim()||'Step Aerobics',trainer:tTrainer.value.trim()||'Niki',location:tLocation.value||'Fit Body Center',time:`${tHour.value}:${tMinute.value}`,duration:Math.max(10,Number(tDuration.value)||60),capacity:Math.max(1,Number(tCapacity.value)||20),bookingDays:[1,2,3,4].includes(Number(tBookingDays.value))?Number(tBookingDays.value):2,bookingCloseHours:Math.max(0,Number(tBookingCloseHours.value)||0),description:tDescription.value.trim()};
   if(selectedTplId){const t=tplById(selectedTplId);if(t)Object.assign(t,v)}else{selectedTplId='tpl-'+Date.now();templates.push({id:selectedTplId,...v})}
-  storeTemplates();renderTemplatesAll();editTemplate(selectedTplId);showToast('Шаблонът е запазен.')
+  const result=await storeTemplates();renderTemplatesAll();editTemplate(selectedTplId);showToast(result?.localOnly?'Шаблонът е запазен на това устройство. Активирай Supabase синхронизирането.':'Шаблонът е запазен и синхронизиран.')
 }
 function askDeleteTemplate(id){const t=tplById(id);if(!t)return;pendingTplDelete=id;tplConfirmText.textContent=`Сигурни ли сте, че искате да изтриете шаблона „${t.name}“?`;tplConfirm.classList.add('open')}
 function closeTplConfirm(){pendingTplDelete=null;tplConfirm.classList.remove('open')}
-function confirmDeleteTemplate(){if(!pendingTplDelete)return;templates=templates.filter(t=>t.id!==pendingTplDelete);storeTemplates();if(selectedTplId===pendingTplDelete)selectedTplId=null;closeTplConfirm();resetTemplateEditor();renderTemplatesAll();showToast('Шаблонът е изтрит.')}
+async function confirmDeleteTemplate(){if(!pendingTplDelete)return;templates=templates.filter(t=>t.id!==pendingTplDelete);const result=await storeTemplates();if(selectedTplId===pendingTplDelete)selectedTplId=null;closeTplConfirm();resetTemplateEditor();renderTemplatesAll();showToast(result?.localOnly?'Шаблонът е изтрит само от това устройство. Активирай Supabase синхронизирането.':'Шаблонът е изтрит от всички устройства.')}
 function renderTplList(){
   if(!document.getElementById('tplList'))return;tplList.innerHTML='';
   if(!templates.length){tplList.innerHTML='<div class="tplEmpty">Няма шаблони.<br>Натисни „+ Нов“.</div>';return}
@@ -1219,7 +1236,7 @@ function renderQuickTpl(){
   if(!templates.length){quickTemplateChips.innerHTML='<button class="quickTemplateChip" onclick="openSettings()">⚙ Създай първия шаблон</button>';return}
   templates.forEach(t=>{const b=document.createElement('button');b.className='quickTemplateChip';b.onclick=()=>openNewFromTemplate(t.id);b.innerHTML=`<b>＋</b> ${esc(t.name)} · ${esc(t.time)}`;quickTemplateChips.appendChild(b)})
 }
-function renderTemplatesAll(){templates=loadTemplates();renderTplList();renderTplSelect();renderQuickTpl()}
+function renderTemplatesAll(){templates=loadTemplates();renderTplList();renderTplSelect();renderQuickTpl();const note=document.getElementById('trainingTemplatesSetupNote');if(note){const state=typeof window.loadData==='function'?window.loadData():null;note.hidden=state?.trainingTemplatesConfigured!==false}}
 function applyTemplate(t){
   if(!t)return;setTimePicker(t.time||'18:30');fDuration.value=t.duration||60;fTitle.value=t.title||'Step Aerobics';fTrainer.value=t.trainer||'Niki';fLocation.value=t.location||'Fit Body Center';fCapacity.value=t.capacity||20;fBooking.value=String(t.bookingDays||2);fBookingCloseHours.value=String(bookingCloseHoursFor(t));fDescription.value=t.description||''
 }
@@ -2019,11 +2036,11 @@ function confirmRemoveReg(){
   showToast(`${removed?.name||'Участникът'} е премахнат.`);
 }
 
-function askDelete(id){const s=data.sessions.find(x=>x.id===id);if(!s)return;deleteId=id;deleteText.textContent=`Сигурни ли сте, че искате да изтриете тренировката на ${fmtDDMM(s.date)} в ${s.time}? Действието не може да бъде отменено.`;deleteConfirm.classList.add('open')}function closeDelete(){deleteId=null;deleteConfirm.classList.remove('open')}function confirmDelete(){if(!deleteId)return;data=loadData();data.sessions=data.sessions.filter(s=>s.id!==deleteId);saveData(data);closeDelete();renderAll();showToast('Тренировката е изтрита.')}function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}function renderAll(){data=loadData();renderInstallStats();renderActiveTraining();renderList();renderPayments()}window.addEventListener('storage',renderAll);buildTimePicker();setTimePicker('18:30');buildTplTime();renderTemplatesAll();renderAll();restoreAdminSection();</script>
+function askDelete(id){const s=data.sessions.find(x=>x.id===id);if(!s)return;deleteId=id;deleteText.textContent=`Сигурни ли сте, че искате да изтриете тренировката на ${fmtDDMM(s.date)} в ${s.time}? Действието не може да бъде отменено.`;deleteConfirm.classList.add('open')}function closeDelete(){deleteId=null;deleteConfirm.classList.remove('open')}function confirmDelete(){if(!deleteId)return;data=loadData();data.sessions=data.sessions.filter(s=>s.id!==deleteId);saveData(data);closeDelete();renderAll();showToast('Тренировката е изтрита.')}function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}function renderAll(){data=loadData();renderInstallStats();renderActiveTraining();renderList();renderPayments();renderTemplatesAll()}window.addEventListener('storage',renderAll);buildTimePicker();setTimePicker('18:30');buildTplTime();renderTemplatesAll();renderAll();restoreAdminSection();</script>
 <script src="modal-scroll-lock.js?v=20260822-1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="supabase-sync.js?v=20260822-5"></script>
+<script src="supabase-sync.js?v=20260823-6"></script>
 <script src="admin-pwa-install.js?v=20260823-2"></script>
 <script id="supabase-auth-js">
 (function(){

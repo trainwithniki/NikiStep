@@ -66,6 +66,10 @@ To include iPhone and iPad installations in the same counter, then run:
 
 `supabase/migrations/20260822_add_ios_app_installations.sql`
 
+To synchronize the admin quick-training templates between phones and computers, run:
+
+`supabase/migrations/20260823_add_training_templates.sql`
+
 The tables are protected by Row Level Security and are not readable from the public booking page. The installation counter stores only a random installation identifier, platform, and installation time—no name, phone number, IP address, or browser details.
 
 ## Local preview

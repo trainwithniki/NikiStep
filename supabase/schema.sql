@@ -90,6 +90,23 @@ create table if not exists public.manual_payment_templates (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.training_templates (
+  id text primary key check (char_length(id) between 1 and 80),
+  name text not null check (char_length(trim(name)) between 1 and 80),
+  title text not null check (char_length(trim(title)) between 1 and 120),
+  trainer text not null check (char_length(trim(trainer)) between 1 and 80),
+  location text not null check (char_length(trim(location)) between 1 and 120),
+  "time" time not null default '18:30',
+  duration integer not null default 60 check (duration between 10 and 300),
+  capacity integer not null default 20 check (capacity between 1 and 200),
+  booking_days integer not null default 2 check (booking_days between 1 and 4),
+  booking_close_hours numeric not null default 0 check (booking_close_hours between 0 and 168),
+  description text not null default '' check (char_length(description) <= 1200),
+  sort_order integer not null default 0,
+  updated_by uuid references auth.users(id) on delete set null default auth.uid(),
+  updated_at timestamptz not null default now()
+);
+
 create table if not exists public.app_admins (
   user_id uuid primary key references auth.users(id) on delete cascade
 );
@@ -115,6 +132,7 @@ alter table public.payment_adjustments enable row level security;
 alter table public.payment_config enable row level security;
 alter table public.manual_payment_sessions enable row level security;
 alter table public.manual_payment_templates enable row level security;
+alter table public.training_templates enable row level security;
 alter table public.app_admins enable row level security;
 alter table public.site_settings enable row level security;
 alter table public.app_installations enable row level security;
@@ -194,6 +212,12 @@ grant select, insert, update, delete on table public.manual_payment_templates to
 drop policy if exists "manual payment templates admin only" on public.manual_payment_templates;
 create policy "manual payment templates admin only" on public.manual_payment_templates
 for all to authenticated using (public.is_app_admin()) with check (public.is_app_admin());
+
+revoke all on table public.training_templates from anon, public;
+grant select, insert, update, delete on table public.training_templates to authenticated;
+drop policy if exists "training templates admin only" on public.training_templates;
+create policy "training templates admin only" on public.training_templates
+for all to authenticated using (public.is_app_admin()) with check (public.is_app_admin());
 insert into public.manual_payment_templates
   (id,name,title,location,"time",multisport_rate,individual_rate,card8_rate,card12_rate,sort_order)
 values
@@ -257,6 +281,9 @@ do $$ begin
 exception when duplicate_object then null; end $$;
 do $$ begin
   alter publication supabase_realtime add table public.manual_payment_templates;
+exception when duplicate_object then null; end $$;
+do $$ begin
+  alter publication supabase_realtime add table public.training_templates;
 exception when duplicate_object then null; end $$;
 do $$ begin
   alter publication supabase_realtime add table public.app_installations;
