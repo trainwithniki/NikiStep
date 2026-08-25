@@ -2327,6 +2327,155 @@ img{max-width:100%;height:auto}
 .cancelConfirmActions button{min-height:48px;border-radius:13px;font-weight:900;border:1px solid var(--line)}
 .cancelConfirmBack{background:#fff;color:#34383e}.cancelConfirmGo{background:#b4233d;color:#fff;border-color:#b4233d!important}
 </style>
+<style id="v34-training-artwork-layout">
+/* Date, centered training identity, and matching Step artwork tile. */
+.nextHead{
+  display:grid!important;
+  grid-template-columns:128px minmax(0,1fr) 128px!important;
+  align-items:stretch!important;
+  gap:10px!important;
+}
+.featuredDateTime{
+  width:128px!important;
+  min-width:128px!important;
+  min-height:148px!important;
+  flex:none!important;
+}
+.stepArtwork{
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  border:1.5px solid #ffd52a;
+  background:radial-gradient(circle at 50% 46%,rgba(255,249,183,.62),rgba(255,218,53,.2) 48%,rgba(255,183,0,.05) 74%);
+  box-shadow:0 0 6px rgba(255,215,42,.98),0 0 17px rgba(255,195,18,.68),0 0 30px rgba(255,181,0,.28),inset 0 0 14px rgba(255,231,105,.3);
+}
+.stepArtwork img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  filter:drop-shadow(0 5px 7px rgba(65,34,88,.24));
+}
+.featuredStepArtwork{
+  width:128px;
+  min-width:128px;
+  min-height:148px;
+  border-radius:22px;
+}
+.featuredText,
+.sessionMainInfo{
+  display:flex!important;
+  min-width:0;
+  flex-direction:column;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+}
+.trainingBrand{
+  width:100%;
+  align-items:center!important;
+  text-align:center!important;
+}
+.trainingBrandStep{
+  width:100%;
+  text-align:center!important;
+}
+.trainingBrandSignature{
+  display:flex;
+  width:100%;
+  align-items:baseline;
+  justify-content:center;
+  gap:5px;
+  white-space:nowrap;
+}
+.trainingBrandSignature .trainingBrandWith,
+.trainingBrandSignature .trainingBrandNiki{
+  display:inline-block!important;
+  width:auto!important;
+  max-width:none!important;
+  margin:0!important;
+}
+.trainingBrandSignature .trainingBrandNiki::after{display:none!important}
+.featuredText .trainingBrandWith{font-size:14px!important}
+.featuredText .trainingBrandNiki{font-size:34px!important}
+.sessionMainInfo .trainingBrandWith{font-size:10px!important}
+.sessionMainInfo .trainingBrandNiki{font-size:24px!important}
+.featuredText .pill{align-self:center;text-align:center}
+.sessionStatusRow{
+  display:flex;
+  width:100%;
+  justify-content:center;
+  margin:5px 0 4px;
+}
+.sessionStatusRow .status{text-align:center}
+.sessionTopVisual{
+  display:grid!important;
+  grid-template-columns:108px minmax(0,1fr) 108px!important;
+  align-items:stretch!important;
+  gap:9px!important;
+}
+.sessionDateBig{
+  width:108px!important;
+  min-width:108px!important;
+  min-height:112px!important;
+}
+.sessionStepArtwork{
+  width:108px;
+  min-width:108px;
+  min-height:112px;
+  border-radius:16px;
+}
+@media(max-width:430px){
+  .nextHead{
+    grid-template-columns:96px minmax(0,1fr) 96px!important;
+    gap:7px!important;
+  }
+  .featuredDateTime,
+  .featuredStepArtwork{
+    width:96px!important;
+    min-width:96px!important;
+    min-height:140px!important;
+  }
+  .sessionTopVisual{
+    grid-template-columns:96px minmax(0,1fr) 96px!important;
+    gap:7px!important;
+  }
+  .sessionDateBig,
+  .sessionStepArtwork{
+    width:96px!important;
+    min-width:96px!important;
+    min-height:112px!important;
+  }
+  .featuredText .trainingBrandStep{font-size:18px!important}
+  .featuredText .trainingBrandWith{font-size:12px!important}
+  .featuredText .trainingBrandNiki{font-size:29px!important}
+  .sessionMainInfo .trainingBrandStep{font-size:14px!important}
+  .sessionMainInfo .trainingBrandWith{font-size:9px!important}
+  .sessionMainInfo .trainingBrandNiki{font-size:22px!important}
+}
+@media(max-width:350px){
+  .nextHead{grid-template-columns:82px minmax(0,1fr) 82px!important}
+  .featuredDateTime,.featuredStepArtwork{
+    width:82px!important;
+    min-width:82px!important;
+    min-height:132px!important;
+  }
+  .sessionTopVisual{grid-template-columns:82px minmax(0,1fr) 82px!important}
+  .sessionDateBig,.sessionStepArtwork{
+    width:82px!important;
+    min-width:82px!important;
+    min-height:106px!important;
+  }
+}
+@media(min-width:760px){
+  .nextHead{grid-template-columns:142px minmax(0,1fr) 142px!important}
+  .featuredDateTime,.featuredStepArtwork{
+    width:142px!important;
+    min-width:142px!important;
+    min-height:158px!important;
+  }
+}
+</style>
 </head><body><div class="app"><header class="top">
   <div class="mark">N</div>
   <div class="brand brandTwoLine">
@@ -2563,8 +2712,13 @@ let data=loadData(),selectedId=null,bookingMode='self',currentView=new Date(new 
 function trainingBrandMarkup(s){
   return `<div class="trainingBrand" aria-label="${esc(s.title)} With ${esc(s.trainer)}">
     <span class="trainingBrandStep">${esc(s.title)}</span>
-    <span class="trainingBrandWith">With</span><span class="trainingBrandNiki">${esc(s.trainer)}</span>
+    <span class="trainingBrandSignature"><span class="trainingBrandWith">With</span><span class="trainingBrandNiki">${esc(s.trainer)}</span></span>
   </div>`;
+}
+function trainingCardStatusLabel(st,s){
+  if(st==='open')return 'Записването е отворено';
+  if(st==='closed'||st==='completed')return 'Записването е затворено';
+  return stateLabel(st,s);
 }
 
 function renderFeatured(){
@@ -2596,8 +2750,9 @@ function renderFeatured(){
       <div class="featuredText">
         
         ${trainingBrandMarkup(s)}
-        <span class="pill ${st}">${stateLabel(st,s)}</span>
+        <span class="pill ${st}">${trainingCardStatusLabel(st,s)}</span>
       </div>
+      <div class="stepArtwork featuredStepArtwork" aria-hidden="true"><img src="assets/training-art/step-aerobics.webp" alt=""></div>
     </div>
 
     ${announcement?`<div class="importantAnnouncement">${esc(announcement)}</div>`:''}
@@ -2769,10 +2924,11 @@ function sessionCard(s){
         <span class="sessionTimeInDate">${esc(s.time)}</span>
       </div>
       <div class="sessionMainInfo">
-        <div class="sessionStatusRow"><span class="status ${st}">${stateLabel(st,s)}</span></div>
         ${trainingBrandMarkup(s)}
+        <div class="sessionStatusRow"><span class="status ${st}">${trainingCardStatusLabel(st,s)}</span></div>
         <div class="sessionVenue">${esc(s.location)}</div>
       </div>
+      <div class="stepArtwork sessionStepArtwork" aria-hidden="true"><img src="assets/training-art/step-aerobics.webp" alt=""></div>
     </div>
 
     <div class="sessionStats">
