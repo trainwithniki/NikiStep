@@ -2386,6 +2386,7 @@ img{max-width:100%;height:auto}
   align-items:baseline;
   justify-content:center;
   gap:5px;
+  margin-top:4px;
   white-space:nowrap;
 }
 .trainingBrandSignature .trainingBrandWith,
@@ -2398,8 +2399,11 @@ img{max-width:100%;height:auto}
 .trainingBrandSignature .trainingBrandNiki::after{display:none!important}
 .featuredText .trainingBrandWith{font-size:14px!important}
 .featuredText .trainingBrandNiki{font-size:34px!important}
+.featuredText .trainingBrandStep{font-size:25px!important}
 .sessionMainInfo .trainingBrandWith{font-size:10px!important}
 .sessionMainInfo .trainingBrandNiki{font-size:24px!important}
+.sessionMainInfo .trainingBrandStep{font-size:20px!important}
+.sessionMainInfo .sessionVenue{font-size:15px!important}
 .featuredText .pill{align-self:center;text-align:center}
 .sessionStatusRow{
   display:flex;
@@ -2408,6 +2412,18 @@ img{max-width:100%;height:auto}
   margin:5px 0 4px;
 }
 .sessionStatusRow .status{text-align:center}
+.pill.open,.status.open{
+  background:#e9f8ef!important;
+  color:#12683f!important;
+}
+.pill.closed,.status.closed{
+  background:#ffe9ed!important;
+  color:#c71632!important;
+}
+.pill.completed,.status.completed{
+  background:#fff0dc!important;
+  color:#b85c00!important;
+}
 .sessionTopVisual{
   display:grid!important;
   grid-template-columns:108px minmax(0,1fr) 108px!important;
@@ -2446,10 +2462,10 @@ img{max-width:100%;height:auto}
     min-width:96px!important;
     min-height:112px!important;
   }
-  .featuredText .trainingBrandStep{font-size:18px!important}
+  .featuredText .trainingBrandStep{font-size:21px!important}
   .featuredText .trainingBrandWith{font-size:12px!important}
   .featuredText .trainingBrandNiki{font-size:29px!important}
-  .sessionMainInfo .trainingBrandStep{font-size:14px!important}
+  .sessionMainInfo .trainingBrandStep{font-size:17px!important}
   .sessionMainInfo .trainingBrandWith{font-size:9px!important}
   .sessionMainInfo .trainingBrandNiki{font-size:22px!important}
 }
@@ -2717,7 +2733,8 @@ function trainingBrandMarkup(s){
 }
 function trainingCardStatusLabel(st,s){
   if(st==='open')return 'Записването е отворено';
-  if(st==='closed'||st==='completed')return 'Записването е затворено';
+  if(st==='closed')return 'Записването е затворено';
+  if(st==='completed')return 'Проведена';
   return stateLabel(st,s);
 }
 
@@ -2925,8 +2942,8 @@ function sessionCard(s){
       </div>
       <div class="sessionMainInfo">
         ${trainingBrandMarkup(s)}
-        <div class="sessionStatusRow"><span class="status ${st}">${trainingCardStatusLabel(st,s)}</span></div>
         <div class="sessionVenue">${esc(s.location)}</div>
+        <div class="sessionStatusRow"><span class="status ${st}">${trainingCardStatusLabel(st,s)}</span></div>
       </div>
       <div class="stepArtwork sessionStepArtwork" aria-hidden="true"><img src="assets/training-art/step-aerobics.webp" alt=""></div>
     </div>
