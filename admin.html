@@ -459,6 +459,72 @@
   background:#fff0df!important;
   color:#d76705!important;
 }
+.completedInfoButton{
+  width:32px;
+  height:32px;
+  flex:0 0 32px;
+  display:grid;
+  place-items:center;
+  border:1px solid #f0a24f;
+  border-radius:50%;
+  padding:0;
+  background:#fff6e8;
+  color:#d46606;
+  font-family:Georgia,serif;
+  font-size:17px;
+  font-weight:950;
+  line-height:1;
+  box-shadow:0 3px 10px rgba(215,103,5,.16);
+  cursor:pointer;
+}
+.completedInfoButton:hover,.completedInfoButton:focus-visible{
+  background:#ffead0;
+  outline:2px solid rgba(215,103,5,.2);
+  outline-offset:2px;
+}
+.completedInfoDialog{
+  width:min(620px,100%);
+  max-height:min(88dvh,760px);
+  overflow:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+  touch-action:pan-y;
+  border-radius:22px 22px 0 0;
+  background:#fff;
+  padding:18px 16px calc(20px + env(safe-area-inset-bottom));
+  box-shadow:0 -20px 60px rgba(0,0,0,.22);
+}
+.completedInfoHead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.completedInfoHead h2{margin:0;font-size:19px;line-height:1.15}
+.completedInfoHead p{margin:5px 0 0;color:var(--muted);font-size:10px;line-height:1.4}
+.completedInfoClose{width:36px;height:36px;flex:0 0 36px;border:1px solid var(--line);border-radius:11px;background:#f7f8f9;color:#4d535a;font-size:20px;cursor:pointer}
+.completedInfoTotal{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:16px 0 10px;padding:12px 13px;border:1px solid #ffd4a5;border-radius:14px;background:linear-gradient(145deg,#fff8ee,#fff)}
+.completedInfoTotal span{color:#7a5b38;font-size:11px;font-weight:900}
+.completedInfoTotal strong{color:#d46606;font-size:24px;line-height:1}
+.completedInfoList{display:flex;flex-direction:column;gap:8px}
+.completedInfoPerson{display:grid;grid-template-columns:25px minmax(0,1fr) auto;align-items:center;gap:8px;padding:10px;border:1px solid #e7e9ec;border-radius:13px;background:#fbfcfd}
+.completedInfoNumber{color:#81868d;font-size:11px;font-weight:950;text-align:center}
+.completedInfoIdentity{min-width:0}
+.completedInfoNameLine{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.completedInfoName{font-size:12px;font-weight:950;color:#25292e}
+.completedInfoPhone{display:block;margin-top:3px;color:#687078;font-size:9px;font-weight:800}
+.completedInfoBookedBy{display:block;margin-top:3px;color:#687078;font-size:8px}
+.completedInfoCard{display:inline-flex;align-items:center;min-height:20px;padding:3px 7px;border:1px solid #cfd5da;border-radius:6px;background:#fff;color:#505860;font-size:8px;font-weight:950;white-space:nowrap}
+.completedInfoCard.multisport{border-color:#86c7a7;background:#effaf4;color:#14734e}
+.completedInfoCard.card8{border-color:#e5c875;background:#fff7dc;color:#77520b}
+.completedInfoCard.card12{border-color:#cbb8e9;background:#f5f0ff;color:#5c3991}
+.completedInfoRegistered{text-align:right;white-space:nowrap}
+.completedInfoRegistered span{display:block;color:#8a8f95;font-size:7px;font-weight:900;text-transform:uppercase;letter-spacing:.04em}
+.completedInfoRegistered strong{display:block;margin-top:3px;color:#4e555d;font-size:9px}
+.completedInfoEmpty{padding:24px 14px;border:1px dashed #d2d6da;border-radius:14px;text-align:center;color:#777d85;font-size:11px;font-weight:800}
+@media(max-width:650px){
+  .completedInfoDialog{border-radius:22px 22px 0 0}
+  .completedInfoPerson{grid-template-columns:21px minmax(0,1fr)}
+  .completedInfoRegistered{grid-column:2;text-align:left;white-space:normal;padding-top:2px}
+  .completedInfoRegistered span,.completedInfoRegistered strong{display:inline;font-size:8px}
+  .completedInfoRegistered strong{margin-left:4px}
+}
+@media(min-width:720px){.completedInfoDialog{border-radius:22px}}
 
 /* Fixed venue selector */
 #fLocation{
@@ -1138,6 +1204,16 @@ html.authChecking .adminAuthLoading{display:flex}
     </div>
   </div>
 </div></div>
+<div class="overlay" id="completedInfoOverlay" role="dialog" aria-modal="true" aria-labelledby="completedInfoTitle">
+  <section class="completedInfoDialog">
+    <div class="completedInfoHead">
+      <div><h2 id="completedInfoTitle">Информация за проведена тренировка</h2><p id="completedInfoMeta"></p></div>
+      <button class="completedInfoClose" type="button" onclick="closeCompletedInfo()" aria-label="Затвори">×</button>
+    </div>
+    <div class="completedInfoTotal"><span>Присъствали</span><strong id="completedInfoCount">0</strong></div>
+    <div class="completedInfoList" id="completedInfoList"></div>
+  </section>
+</div>
 <div class="tplConfirm" id="tplConfirm"><div class="tplConfirmBox"><h3>Изтриване на шаблон</h3><p id="tplConfirmText">Сигурни ли сте?</p><div class="tplConfirmActions"><button class="btn" onclick="closeTplConfirm()">Отказ</button><button class="btn tplDanger" onclick="confirmDeleteTemplate()">Да, изтрий</button></div></div></div>
 <div class="confirmOv" id="deleteConfirm"><div class="confirmBox"><h3>Изтриване на тренировка</h3><p id="deleteText"></p><div class="cActs"><button class="btn" onclick="closeDelete()">Отказ</button><button class="btn danger" onclick="confirmDelete()">Да, изтрий</button></div></div></div><div class="personConfirmOverlay" id="personConfirm">
   <div class="personConfirmBox">
@@ -1387,6 +1463,7 @@ function adminSessionRow(s){
     </div>
 
     <div class="acts">
+      ${isCompleted?`<button class="completedInfoButton" type="button" onclick="openCompletedInfo('${s.id}')" title="Информация за присъствалите" aria-label="Информация за проведената тренировка на ${fmtDDMMYYYY(s.date)}"><span aria-hidden="true">I</span></button>`:''}
       <button class="btn editSessionBtn" onclick="openEdit('${s.id}')">Редактирай</button>
       <button class="btn startSessionBtn" onclick="startSessionBookings('${s.id}')" ${isCompleted||st==='open'?'disabled':''}>Старт</button>
       <button class="btn stopSessionBtn" onclick="stopSessionBookings('${s.id}')" ${isCompleted||st==='closed'?'disabled':''}>Стоп</button>
@@ -1425,6 +1502,42 @@ function renderList(){
   document.getElementById('completedCount').textContent=completed.length;
   document.getElementById('completedDetails').style.display=completed.length?'block':'none';
 }
+
+function completedInfoCardType(person){
+  const type=registrationPaymentType(person);
+  return {
+    multisport:{label:'MultiSport',className:'multisport'},
+    card8:{label:'Карта 8 посещения',className:'card8'},
+    card12:{label:'Карта 12 посещения',className:'card12'},
+    individual:{label:'Без карта',className:'individual'}
+  }[type]||{label:'Без карта',className:'individual'};
+}
+function openCompletedInfo(sessionId){
+  data=loadData();
+  const session=(data.sessions||[]).find(item=>String(item.id)===String(sessionId));
+  if(!session||bookingState(session)!=='completed'){showToast('Тренировката не е намерена или още не е проведена.');return}
+  const people=(session.registrations||[]).filter(person=>!person.cancelledAt);
+  document.getElementById('completedInfoTitle').textContent=`${session.title} with ${session.trainer}`;
+  document.getElementById('completedInfoMeta').textContent=`${fmtDDMMYYYY(session.date)} · ${fmtWeekday(session.date)} · ${session.time} · ${session.location}`;
+  document.getElementById('completedInfoCount').textContent=String(people.length);
+  document.getElementById('completedInfoList').innerHTML=people.length?people.map((person,index)=>{
+    const card=completedInfoCardType(person);
+    const registeredAt=fmtRegistrationAt(person.createdAt);
+    return `<div class="completedInfoPerson">
+      <span class="completedInfoNumber">${index+1}.</span>
+      <span class="completedInfoIdentity">
+        <span class="completedInfoNameLine"><span class="completedInfoName">${esc(person.name||'Без име')}</span><span class="completedInfoCard ${card.className}">${card.label}</span></span>
+        <span class="completedInfoPhone">${esc(person.phone||'Без телефон')}</span>
+        ${person.bookedBy?`<span class="completedInfoBookedBy">Записан от: ${esc(person.bookedBy)}</span>`:''}
+      </span>
+      <span class="completedInfoRegistered"><span>Записване</span><strong>${registeredAt}</strong></span>
+    </div>`;
+  }).join(''):'<div class="completedInfoEmpty">Няма записани присъстващи за тази тренировка.</div>';
+  document.getElementById('completedInfoOverlay').classList.add('open');
+}
+function closeCompletedInfo(){document.getElementById('completedInfoOverlay')?.classList.remove('open')}
+document.getElementById('completedInfoOverlay')?.addEventListener('click',event=>{if(event.target.id==='completedInfoOverlay')closeCompletedInfo()});
+document.addEventListener('keydown',event=>{if(event.key==='Escape')closeCompletedInfo()});
 
 const DEFAULT_PAYMENT_RATES={multisport:1.70,individual:3.75};
 const VISIT_CARD_PAYMENT_RATES={card8:3.06,card12:2.54};
