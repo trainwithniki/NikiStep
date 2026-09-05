@@ -2535,6 +2535,12 @@ img{max-width:100%;height:auto}
   83%,100%{left:115%;opacity:0}
 }
 @media(prefers-reduced-motion:reduce){.allTrainingsLink:before{animation:none}}
+.publicRegistrantList{grid-column:1/-1;width:100%;min-width:0;box-sizing:border-box;margin-top:12px;border:1px solid #cbd5ce;border-radius:14px;background:rgba(255,255,255,.8);color:#263c31;text-align:left;cursor:default}
+.publicRegistrantList summary{padding:12px 16px;font-size:15px;font-weight:750;cursor:pointer;min-height:44px;box-sizing:border-box}
+.publicRegistrantList summary:focus-visible{outline:2px solid #16804b;outline-offset:2px;border-radius:14px}
+.publicRegistrantNames{padding:0 16px 14px;font-size:15px;line-height:1.6;overflow-wrap:anywhere;max-height:260px;overflow-y:auto;overscroll-behavior:contain}
+.publicRegistrantNames ol{margin:0;padding-left:24px}
+.publicRegistrantNames li{padding:3px 0}
 </style>
 </head><body><div class="app"><header class="top">
   <div class="mark">N</div>
@@ -2782,6 +2788,31 @@ function trainingCardStatusLabel(st,s){
   return stateLabel(st,s);
 }
 
+const expandedRegistrantLists=new Set();
+function registrantListMarkup(s){
+  return `<details class="publicRegistrantList" data-session-id="${esc(s.id)}" ${expandedRegistrantLists.has(s.id)?'open':''} onclick="event.stopPropagation()" ontoggle="toggleRegistrantList(this)"><summary>Записани</summary><div class="publicRegistrantNames" aria-live="polite">Зареждане…</div></details>`;
+}
+async function updateRegistrantList(details){
+  if(!details.open||details.dataset.loading==='1'||!window.fetchPublicRegistrantNames)return;
+  details.dataset.loading='1';
+  const content=details.querySelector('.publicRegistrantNames');
+  try{
+    const names=await window.fetchPublicRegistrantNames(details.dataset.sessionId);
+    if(!details.isConnected)return;
+    content.innerHTML=names.length?`<ol>${names.map(name=>`<li>${esc(name)}</li>`).join('')}</ol>`:'Все още няма записани.';
+  }catch(_){
+    if(details.isConnected)content.textContent='Списъкът временно не е достъпен. Опитайте отново след малко.';
+  }finally{delete details.dataset.loading;}
+}
+function toggleRegistrantList(details){
+  if(!details.isConnected)return;
+  if(details.open){expandedRegistrantLists.add(details.dataset.sessionId);updateRegistrantList(details);}
+  else expandedRegistrantLists.delete(details.dataset.sessionId);
+}
+setInterval(()=>{
+  if(!document.hidden)document.querySelectorAll('.publicRegistrantList[open]').forEach(updateRegistrantList);
+},15000);
+
 function renderFeatured(){
   const s=nextSession(),box=document.getElementById('featured'),sticky=document.getElementById('sticky');
   if(!s){box.innerHTML='<p>Няма обявени тренировки.</p>';sticky.innerHTML='';sticky.classList.remove('hasOwnBooking');return}
@@ -2839,7 +2870,7 @@ function renderFeatured(){
       </div>
       <div class="capacityBar"><i style="width:${pct}%"></i></div>
     </div>
-  </div>${button}`;
+  </div>${button}${registrantListMarkup(s)}`;
 
   const stickyDate=`${fmtDDMM(s.date)} · ${esc(s.time)}`;
   sticky.classList.toggle('hasOwnBooking',ownBooking);
@@ -3005,6 +3036,7 @@ function sessionCard(s){
 
     ${st==='open'?countdownMarkup(s,true):''}
     ${bookingAction}
+    ${registrantListMarkup(s)}
     ${announcement?`<div class="sessionAnnouncement">${esc(announcement)}</div>`:''}
   `;
 
@@ -3273,6 +3305,6 @@ setInterval(()=>{
 <script src="modal-scroll-lock.js?v=20260822-1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="supabase-sync.js?v=20260823-7"></script>
+<script src="supabase-sync.js?v=20260905-1"></script>
 <script src="public-pwa-install.js?v=20260822-4"></script>
 </body></html>

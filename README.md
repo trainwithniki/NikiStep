@@ -28,6 +28,10 @@ The public **Step с Niki** application can be added from both Safari and Google
 
 ## First-time Supabase setup
 
+### Public registrant names (existing installations)
+
+Run `supabase/migrations/20260905_public_registration_names.sql` once in Supabase **SQL Editor** to enable the public “Записани” dropdown on each training. Do not rerun the whole schema on an existing installation. The new RPC returns only names of non-cancelled registrations for the requested session; phone numbers, cards, timestamps and registration identifiers remain private. Registration table RLS is unchanged. Names are intentionally visible to anyone, including unauthenticated visitors. Open dropdowns refresh every 15 seconds while the page is visible; if the migration has not run or the request fails, an unavailable message is shown without affecting bookings.
+
 1. Open the Supabase project.
 2. Go to **SQL Editor → New query**.
 3. Paste the complete contents of `supabase/schema.sql` and press **Run**.

@@ -14,6 +14,12 @@
     auth: { persistSession: true, storage: authStorage }
   });
   const isAdminPage = /admin(?:\.html)?$/.test(location.pathname);
+  // Public access is deliberately restricted to the names-only RPC, never registrations SELECT.
+  window.fetchPublicRegistrantNames = async function (sessionId) {
+    const result = await client.rpc('public_registration_names', { target_session_id: sessionId });
+    if (result.error) throw result.error;
+    return (result.data || []).map(row => String(row.name || ''));
+  };
   const defaultSiteSettings = { heroText: 'MOVE. SWEAT.\nFEEL GOOD.', heroSubtitle: 'Енергична тренировка с музика, движение и настроение във Fit Body Center.' };
   const defaultPaymentRates = { multisport: 1.70, individual: 3.75 };
   const defaultManualPaymentTemplates = [
