@@ -1031,6 +1031,27 @@ html.authChecking .adminAuthLoading{display:flex}
 .paymentsTotalLabel{position:relative;z-index:1;display:block;margin-top:18px;font-size:11px;font-weight:900;letter-spacing:.11em;color:#aee4ce}
 .paymentsTotal{position:relative;z-index:1;display:flex;align-items:baseline;gap:7px;margin-top:2px}.paymentsTotal strong{font-size:40px;line-height:1;font-weight:950;letter-spacing:-.05em}.paymentsTotal span{font-size:16px;font-weight:900;color:#cce9df}
 .paymentsMonthMeta{position:relative;z-index:1;margin-top:9px;color:#c5dbd4;font-size:11px;font-weight:750}
+.monthlyPaymentReport{margin:12px 0 18px;padding:14px;border:1px solid #d8e5df;border-radius:17px;background:#fff}
+.monthlyPaymentReport h2{margin:0 0 5px;font-size:16px;line-height:1.35}
+.monthlyPaymentReport>p{margin:0 0 11px;color:#707780;font-size:11px;line-height:1.45}
+.monthlyReportGroup{margin-top:8px;border:1px solid #dce6e1;border-radius:12px;overflow:hidden}
+.monthlyReportGroup summary{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;background:#f2f9f5;cursor:pointer;list-style:none}
+.monthlyReportGroup summary::-webkit-details-marker{display:none}
+.monthlyReportGroup summary:after{content:'⌄';color:#176f50}
+.monthlyReportGroup[open] summary:after{content:'⌃'}
+.monthlyReportGroup summary>span{flex:1;min-width:0}
+.monthlyReportGroup summary strong{font-size:14px;color:#176f50}
+.monthlyReportGroup small,.monthlyReportRow small{display:block;margin-top:4px;font-size:11px;color:#737b81;line-height:1.4}
+.monthlyReportGroup summary b{font-size:16px;color:#176f50;white-space:nowrap}
+.monthlyReportBody{padding:0 11px}
+.monthlyReportCounts{padding:10px 0;font-size:11px;color:#52695b;line-height:1.7;border-bottom:1px solid #e8edea}
+.monthlyReportRow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #eef0f2}
+.monthlyReportRow>span{min-width:0;overflow-wrap:anywhere}
+.monthlyReportRow strong{font-size:12px}
+.monthlyReportRow b{font-size:13px;white-space:nowrap}
+.monthlyReportRow.manual strong{color:#bd640d}
+.monthlyReportGrandTotal{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding:12px;border-radius:11px;background:#176f50;color:white;font-size:13px}
+.monthlyReportGrandTotal strong{font-size:18px;white-space:nowrap}
 .paymentsRateLegend{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
 .paymentRate{background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px}.paymentRate span{font-size:11px;color:var(--muted);font-weight:850}.paymentRateEdit{display:flex;align-items:center;gap:4px;font-size:15px;font-weight:950}.paymentRateEdit input{width:66px;border:1px solid #dfe3e7;border-radius:8px;background:#f8f9fa;padding:6px 7px;text-align:right;font-size:15px;font-weight:950;outline:none}.paymentRateEdit input[readonly]{border-color:transparent;background:#eef1f3;color:#5d646c;cursor:not-allowed}.paymentRate.multi .paymentRateEdit{color:#167653}.paymentRate.individual .paymentRateEdit{color:#244d85}.paymentRatesSave{grid-column:1/-1;border:0;border-radius:11px;min-height:40px;background:#202c3b;color:#fff;font-size:12px;font-weight:900;cursor:pointer}.paymentRatesSave.editing{background:#167653}
 .paymentCards{display:flex;flex-direction:column;gap:11px}.paymentCard{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:var(--shadow)}
@@ -1106,6 +1127,7 @@ html.authChecking .adminAuthLoading{display:flex}
   <div class="manualPaymentsSetupNote">За новите шаблони и картите с 8/12 посещения изпълни еднократно Supabase миграцията <strong>20260822_add_payment_templates_and_visit_cards.sql</strong>.</div>
   <div class="registrationPaymentsSetupNote">За да се запазват редактираните тарифи на присъстващите, изпълни Supabase миграцията <strong>20260823_add_registration_payment_overrides.sql</strong>.</div>
   <div class="paymentSaveBar"><span class="paymentSaveStatus saved" id="paymentSaveStatus">Всички промени са запазени.</span><button class="paymentSaveNow" id="paymentSaveNow" type="button" onclick="flushPaymentChanges()" disabled>Запази</button></div>
+  <section class="monthlyPaymentReport" id="monthlyPaymentReport" aria-label="Месечен отчет на плащанията"></section>
   <div class="paymentCards" id="paymentCards"></div>
 </section><div class="appInstallStats" id="appInstallStats" hidden><span class="appInstallStatsIcon" aria-hidden="true">📱</span><div class="appInstallStatsText"><strong id="appInstallStatsCount">0 инсталации на приложението</strong><span id="appInstallStatsLatest">Android: 0 · iOS: 0 · Все още няма отчетена инсталация.</span></div></div></div>
 <div class="overlay" id="manualPaymentOverlay">
@@ -1958,6 +1980,33 @@ function manualPaymentBreakdownHtml(item,summary){
 function manualPaymentEditorHtml(item,summary){
   return manualPaymentCategories(item,summary).map(category=>`<div class="manualPaymentField ${category.type}"><span>${category.label}</span><div class="manualPaymentCountControl"><button type="button" onclick="changeManualPaymentCount('${item.id}','${category.type}',-1)">−</button><strong>${category.count}</strong><button type="button" onclick="changeManualPaymentCount('${item.id}','${category.type}',1)">+</button></div><label>Цена на човек <span><input type="number" min="0" step="0.01" value="${category.rate.toFixed(2)}" onchange="updateManualPayment('${item.id}','${category.field}',this.value)"> €</span></label></div>`).join('');
 }
+function renderMonthlyPaymentReport(completed,manualCompleted,totals,manualTotals){
+  const groups=new Map();
+  const add=(session,summary,manual)=>{
+    const location=String(session.location||'').trim();
+    const stepFL=manual&&(/^step-fl-/i.test(session.templateId||'')||/step\s*fl/i.test(session.title||''));
+    const groupName=stepFL?'STEP FL':/^fit\s*body\s*center$/i.test(location)?'Fit Body Center':location||'Други тренировки';
+    if(!groups.has(groupName))groups.set(groupName,{name:groupName,rows:[],cents:0,multisport:0,individual:0,card8:0,card12:0});
+    const group=groups.get(groupName);
+    group.rows.push({session,summary,manual});
+    group.cents+=Math.round(summary.total*100);
+    for(const type of ['multisport','individual','card8','card12'])group[type]+=summary[type];
+  };
+  completed.forEach((session,index)=>add(session,totals[index],false));
+  manualCompleted.forEach((session,index)=>add(session,manualTotals[index],true));
+  const ordered=[...groups.values()].sort((a,b)=>{
+    const rank=name=>name==='Fit Body Center'?0:name==='STEP FL'?1:2;
+    return rank(a.name)-rank(b.name)||a.name.localeCompare(b.name,'bg');
+  });
+  const report=document.getElementById('monthlyPaymentReport');
+  const openGroups=new Set([...report.querySelectorAll('details[open]')].map(el=>el.dataset.group));
+  const month=paymentMonth.toLocaleDateString('bg-BG',{month:'long',year:'numeric'}).replace(/\s*г\.$/i,'');
+  report.innerHTML=`<h2>Месечен отчет · ${esc(month)}</h2><p>Суми по въведените бройки и тарифи. Броят посещения включва и ръчно добавените хора.</p>`+(ordered.length?ordered.map(group=>{
+    const visits=group.multisport+group.individual+group.card8+group.card12;
+    const rows=group.rows.sort((a,b)=>String(`${b.session.date}T${b.session.time}`).localeCompare(`${a.session.date}T${a.session.time}`));
+    return `<details class="monthlyReportGroup" data-group="${esc(group.name)}" ${openGroups.has(group.name)?'open':''}><summary><span><strong>${esc(group.name)}</strong><small>${rows.length} тренировки · ${visits} посещения</small></span><b>${moneyEUR(group.cents/100)} €</b></summary><div class="monthlyReportBody"><div class="monthlyReportCounts">MultiSport: ${group.multisport} · Без карта: ${group.individual} · Карта 8: ${group.card8} · Карта 12: ${group.card12}</div>${rows.map(({session,summary,manual})=>`<div class="monthlyReportRow ${manual?'manual':''}"><span><strong>${fmtDDMM(session.date)} · ${fmtWeekday(session.date)} · ${esc(session.time)}</strong><small>${esc(session.title)} · ${summary.multisport+summary.individual+summary.card8+summary.card12} посещения${manual?' · Ръчно въведена':''}</small></span><b>${moneyEUR(summary.total)} €</b></div>`).join('')}</div></details>`;
+  }).join('')+`<div class="monthlyReportGrandTotal"><span>Общо за месеца</span><strong>${moneyEUR(ordered.reduce((sum,g)=>sum+g.cents,0)/100)} €</strong></div>`:'<p>Няма въведени плащания за избрания месец.</p>');
+}
 function renderPayments(){
   const cards=document.getElementById('paymentCards');
   if(!cards)return;
@@ -1975,6 +2024,7 @@ function renderPayments(){
   }).sort((a,b)=>String(`${b.date}T${b.time||'00:00'}`).localeCompare(String(`${a.date}T${a.time||'00:00'}`)));
   const totals=completed.map(paymentNumbers);
   const manualTotals=manualCompleted.map(manualPaymentNumbers);
+  renderMonthlyPaymentReport(completed,manualCompleted,totals,manualTotals);
   const monthTotal=totals.reduce((sum,item)=>sum+item.total,0)+manualTotals.reduce((sum,item)=>sum+item.total,0);
   const peopleTotal=totals.reduce((sum,item)=>sum+item.multisport+item.individual+item.card8+item.card12,0)+manualTotals.reduce((sum,item)=>sum+item.multisport+item.individual+item.card8+item.card12,0);
   const trainingCount=completed.length+manualCompleted.length;
