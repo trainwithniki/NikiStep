@@ -1074,7 +1074,7 @@ html.authChecking .adminAuthLoading{display:flex}
 .manualPaymentCardActions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:11px}.manualPaymentEdit,.manualPaymentCardActions .manualPaymentDelete{width:100%;min-height:38px;margin-top:0;border-radius:10px;font-size:11px;font-weight:950;cursor:pointer}.manualPaymentEdit{border:1px solid #bad8ca;background:#eef9f3;color:#176f50}.manualPaymentCardActions .manualPaymentDelete{border:1px solid #efc6cd;background:#fff5f6;color:#ad263d}
 </style>
 
-<link rel="stylesheet" href="admin-history.css?v=20260908-1">
+<link rel="stylesheet" href="admin-history.css?v=20260908-2">
 </head><body>
 
 <div id="adminAuthGate">
@@ -1575,24 +1575,30 @@ function moneyEUR(value){return Number(value||0).toLocaleString('bg-BG',{minimum
 function paymentRates(){const multi=Number(data.paymentRates?.multisport),individual=Number(data.paymentRates?.individual);return {multisport:Number.isFinite(multi)&&multi>=0?multi:DEFAULT_PAYMENT_RATES.multisport,individual:Number.isFinite(individual)&&individual>=0?individual:DEFAULT_PAYMENT_RATES.individual}}
 function switchAdminSection(section){
   const payments=section==='payments';
+  const profilesTab=document.getElementById('profilesTab');
   const history=section==='history'&&!historyTab.hidden;
-  const selected=history?'history':payments?'payments':'training';
+  const profiles=section==='profiles'&&profilesTab&&!profilesTab.hidden;
+  const selected=profiles?'profiles':history?'history':payments?'payments':'training';
   try{localStorage.setItem('nikiAdminActiveSection',selected)}catch{}
   adminShell.classList.toggle('paymentsMode',payments);
   adminShell.classList.toggle('historyMode',history);
-  trainingTab.classList.toggle('active',!payments&&!history);
+  adminShell.classList.toggle('profilesMode',profiles);
+  trainingTab.classList.toggle('active',!payments&&!history&&!profiles);
   paymentsTab.classList.toggle('active',payments);
   historyTab.classList.toggle('active',history);
-  trainingTab.setAttribute('aria-selected',String(!payments&&!history));
+  profilesTab?.classList.toggle('active',profiles);
+  trainingTab.setAttribute('aria-selected',String(!payments&&!history&&!profiles));
   paymentsTab.setAttribute('aria-selected',String(payments));
   historyTab.setAttribute('aria-selected',String(history));
+  profilesTab?.setAttribute('aria-selected',String(profiles));
   if(payments)renderPayments();
   if(history)window.loadAdminHistory?.();
+  if(profiles)window.loadAdminProfiles?.();
 }
 function restoreAdminSection(){
   let section='training';
   try{section=localStorage.getItem('nikiAdminActiveSection')||'training'}catch{}
-  if(section==='history'&&historyTab.hidden)return;
+  if((section==='history'&&historyTab.hidden)||(section==='profiles'&&!document.getElementById('profilesTab')))return;
   switchAdminSection(section);
 }
 function movePaymentMonth(step){paymentMonth=new Date(paymentMonth.getFullYear(),paymentMonth.getMonth()+step,1);renderPayments()}
@@ -2294,7 +2300,7 @@ function askDelete(id){const s=data.sessions.find(x=>x.id===id);if(!s)return;del
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script src="supabase-sync.js?v=20260908-2"></script>
-<script src="admin-history.js?v=20260908-2"></script>
+<script src="admin-history.js?v=20260908-3"></script>
 <script src="admin-pwa-install.js?v=20260823-2"></script>
 <script id="supabase-auth-js">
 (function(){
