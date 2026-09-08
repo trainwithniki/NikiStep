@@ -34,6 +34,8 @@ Run `supabase/migrations/20260908_add_admin_audit_history.sql` once in Supabase 
 
 To add another administrator, first create that person in **Supabase Authentication → Users**. Then the Owner can open **История → Профили и достъп**, enter the same email, choose a display name, color and whether the person may view history.
 
+Run `supabase/migrations/20260908_all_admins_full_access.sql` on installations that already enabled History. Every active NikiStep administrator then receives identical full Owner access automatically, without a separate History password or permission.
+
 ### Public registrant names (existing installations)
 
 Run `supabase/migrations/20260905_public_registration_names.sql` once in Supabase **SQL Editor** to enable the public “Записани” dropdown on each training. Do not rerun the whole schema on an existing installation. The new RPC returns only names of non-cancelled registrations for the requested session; phone numbers, cards, timestamps and registration identifiers remain private. Registration table RLS is unchanged. Names are intentionally visible to anyone, including unauthenticated visitors. Open dropdowns refresh every 15 seconds while the page is visible; if the migration has not run or the request fails, an unavailable message is shown without affecting bookings.
