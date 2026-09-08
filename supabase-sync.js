@@ -527,6 +527,21 @@
       next_audit_color: values.auditColor || null
     }),
     restoreDeletedItem: (entityType, entityId) => client.rpc('owner_restore_deleted_item', { p_entity_type: entityType, p_entity_id: entityId }),
+    async statisticsNameRules() {
+      const [aliases, ignored] = await Promise.all([
+        client.from('statistics_name_aliases').select('alias_key,alias_name,canonical_name').order('alias_name'),
+        client.from('statistics_ignored_pairs').select('pair_key,first_name,second_name').order('first_name')
+      ]);
+      const errors = [aliases.error, ignored.error].filter(Boolean);
+      const missing = errors.some(error => error.code === '42P01' || error.code === 'PGRST205' || /statistics_(name_aliases|ignored_pairs)/i.test(String(error.message || '')));
+      if (missing) return { aliases: [], ignored: [], configured: false, error: null };
+      if (errors.length) return { aliases: [], ignored: [], configured: false, error: errors[0] };
+      return { aliases: aliases.data || [], ignored: ignored.data || [], configured: true, error: null };
+    },
+    saveStatisticsAlias: (aliasKey, aliasName, canonicalName) => client.from('statistics_name_aliases').upsert({ alias_key: String(aliasKey).slice(0, 160), alias_name: String(aliasName).trim().slice(0, 120), canonical_name: String(canonicalName).trim().slice(0, 120), updated_at: new Date().toISOString() }, { onConflict: 'alias_key' }),
+    removeStatisticsAlias: aliasKey => client.from('statistics_name_aliases').delete().eq('alias_key', String(aliasKey)),
+    ignoreStatisticsPair: (pairKey, firstName, secondName) => client.from('statistics_ignored_pairs').upsert({ pair_key: String(pairKey).slice(0, 330), first_name: String(firstName).trim().slice(0, 120), second_name: String(secondName).trim().slice(0, 120), updated_at: new Date().toISOString() }, { onConflict: 'pair_key' }),
+    removeStatisticsIgnoredPair: pairKey => client.from('statistics_ignored_pairs').delete().eq('pair_key', String(pairKey)),
     refresh
   };
 

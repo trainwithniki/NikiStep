@@ -1075,6 +1075,7 @@ html.authChecking .adminAuthLoading{display:flex}
 </style>
 
 <link rel="stylesheet" href="admin-history.css?v=20260908-2">
+<link rel="stylesheet" href="admin-statistics.css?v=20260908-1">
 </head><body>
 
 <div id="adminAuthGate">
@@ -1576,29 +1577,35 @@ function paymentRates(){const multi=Number(data.paymentRates?.multisport),indivi
 function switchAdminSection(section){
   const payments=section==='payments';
   const profilesTab=document.getElementById('profilesTab');
+  const statisticsTab=document.getElementById('statisticsTab');
   const history=section==='history'&&!historyTab.hidden;
   const profiles=section==='profiles'&&profilesTab&&!profilesTab.hidden;
-  const selected=profiles?'profiles':history?'history':payments?'payments':'training';
+  const statistics=section==='statistics'&&!!statisticsTab;
+  const selected=statistics?'statistics':profiles?'profiles':history?'history':payments?'payments':'training';
   try{localStorage.setItem('nikiAdminActiveSection',selected)}catch{}
   adminShell.classList.toggle('paymentsMode',payments);
   adminShell.classList.toggle('historyMode',history);
   adminShell.classList.toggle('profilesMode',profiles);
-  trainingTab.classList.toggle('active',!payments&&!history&&!profiles);
+  adminShell.classList.toggle('statisticsMode',statistics);
+  trainingTab.classList.toggle('active',!payments&&!history&&!profiles&&!statistics);
   paymentsTab.classList.toggle('active',payments);
   historyTab.classList.toggle('active',history);
   profilesTab?.classList.toggle('active',profiles);
-  trainingTab.setAttribute('aria-selected',String(!payments&&!history&&!profiles));
+  statisticsTab?.classList.toggle('active',statistics);
+  trainingTab.setAttribute('aria-selected',String(!payments&&!history&&!profiles&&!statistics));
   paymentsTab.setAttribute('aria-selected',String(payments));
   historyTab.setAttribute('aria-selected',String(history));
   profilesTab?.setAttribute('aria-selected',String(profiles));
+  statisticsTab?.setAttribute('aria-selected',String(statistics));
   if(payments)renderPayments();
   if(history)window.loadAdminHistory?.();
   if(profiles)window.loadAdminProfiles?.();
+  if(statistics)window.loadAdminStatistics?.();
 }
 function restoreAdminSection(){
   let section='training';
   try{section=localStorage.getItem('nikiAdminActiveSection')||'training'}catch{}
-  if((section==='history'&&historyTab.hidden)||(section==='profiles'&&!document.getElementById('profilesTab')))return;
+  if((section==='history'&&historyTab.hidden)||(section==='profiles'&&!document.getElementById('profilesTab'))||(section==='statistics'&&!document.getElementById('statisticsTab')))return;
   switchAdminSection(section);
 }
 function movePaymentMonth(step){paymentMonth=new Date(paymentMonth.getFullYear(),paymentMonth.getMonth()+step,1);renderPayments()}
@@ -2299,8 +2306,9 @@ function askDelete(id){const s=data.sessions.find(x=>x.id===id);if(!s)return;del
 <script src="modal-scroll-lock.js?v=20260822-1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="supabase-sync.js?v=20260908-2"></script>
-<script src="admin-history.js?v=20260908-3"></script>
+<script src="supabase-sync.js?v=20260908-3"></script>
+<script src="admin-history.js?v=20260908-4"></script>
+<script src="admin-statistics.js?v=20260908-1"></script>
 <script src="admin-pwa-install.js?v=20260823-2"></script>
 <script id="supabase-auth-js">
 (function(){
@@ -2319,12 +2327,12 @@ function askDelete(id){const s=data.sessions.find(x=>x.id===id);if(!s)return;del
     event.preventDefault();error.classList.remove('show');btn.disabled=true;btn.textContent='Проверка...';
     const result=await window.nikiAdmin.login((username.value||'').trim(),password.value||'',remember.checked);
     if(result.error){setErr(result.error.message==='Този профил няма администраторски достъп.'?result.error.message:'Грешен имейл или парола.');password.select()}
-    else{password.value='';showAdmin();if(window.renderAll)window.renderAll();window.initializeAdminHistory?.()}
+    else{password.value='';showAdmin();if(window.renderAll)window.renderAll();window.initializeAdminHistory?.();window.initializeAdminStatistics?.()}
     btn.disabled=false;btn.textContent='Вход';
   });
   toggle.addEventListener('click',()=>{const hidden=password.type==='password';password.type=hidden?'text':'password';toggle.textContent=hidden?'🙈':'👁'});
   window.adminLogout=async function(){await window.nikiAdmin.logout();username.value='';password.value='';lockAdmin()};
-  window.nikiAdmin.session().then(access=>{if(access.authorized){showAdmin();window.initializeAdminHistory?.()}else lockAdmin()}).catch(lockAdmin);
+  window.nikiAdmin.session().then(access=>{if(access.authorized){showAdmin();window.initializeAdminHistory?.();window.initializeAdminStatistics?.()}else lockAdmin()}).catch(lockAdmin);
 })();
 </script>
 
