@@ -1,4 +1,5 @@
 -- Run this entire file once in Supabase > SQL Editor.
+-- Then run migrations/20260908_add_admin_audit_history.sql to enable the protected History section.
 
 create extension if not exists pgcrypto;
 

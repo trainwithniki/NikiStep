@@ -28,6 +28,12 @@ The public **Step с Niki** application can be added from both Safari and Google
 
 ## First-time Supabase setup
 
+### Protected administrator history
+
+Run `supabase/migrations/20260908_add_admin_audit_history.sql` once in Supabase **SQL Editor**. It adds the Owner-controlled **История** section, an immutable audit trail and an Owner-only recycle bin. The first existing administrator becomes Owner automatically. Only future administrative changes are logged; existing data is not copied into the audit history. Public registrations and technical updates are excluded, and secrets, cancellation tokens and phone numbers are never written to `audit_logs`.
+
+To add another administrator, first create that person in **Supabase Authentication → Users**. Then the Owner can open **История → Профили и достъп**, enter the same email, choose a display name, color and whether the person may view history.
+
 ### Public registrant names (existing installations)
 
 Run `supabase/migrations/20260905_public_registration_names.sql` once in Supabase **SQL Editor** to enable the public “Записани” dropdown on each training. Do not rerun the whole schema on an existing installation. The new RPC returns only names of non-cancelled registrations for the requested session; phone numbers, cards, timestamps and registration identifiers remain private. Registration table RLS is unchanged. Names are intentionally visible to anyone, including unauthenticated visitors. Open dropdowns refresh every 15 seconds while the page is visible; if the migration has not run or the request fails, an unavailable message is shown without affecting bookings.

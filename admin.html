@@ -1074,6 +1074,7 @@ html.authChecking .adminAuthLoading{display:flex}
 .manualPaymentCardActions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:11px}.manualPaymentEdit,.manualPaymentCardActions .manualPaymentDelete{width:100%;min-height:38px;margin-top:0;border-radius:10px;font-size:11px;font-weight:950;cursor:pointer}.manualPaymentEdit{border:1px solid #bad8ca;background:#eef9f3;color:#176f50}.manualPaymentCardActions .manualPaymentDelete{border:1px solid #efc6cd;background:#fff5f6;color:#ad263d}
 </style>
 
+<link rel="stylesheet" href="admin-history.css?v=20260908-1">
 </head><body>
 
 <div id="adminAuthGate">
@@ -1104,7 +1105,7 @@ html.authChecking .adminAuthLoading{display:flex}
     <div class="adminLoginError" id="adminLoginError">Грешно потребителско име или парола.</div>
   </form>
 </div>
-<div class="shell" id="adminShell"><div class="head"><div><div class="eye">STEP AEROBICS WITH NIKI • FIT BODY CENTER</div><h1>Админ панел</h1></div><div class="adminNavActions"><a class="adminNavBtn" href="./" target="_blank" rel="noopener">← Към сайта</a><button class="btn adminSettingsIcon" type="button" onclick="openSettings()" aria-label="Настройки" title="Настройки">⚙</button><button class="adminLogoutBtn" type="button" onclick="adminLogout()">Изход</button></div></div><div class="adminSectionTabs"><button class="adminSectionTab active" id="trainingTab" type="button" onclick="switchAdminSection('training')">Тренировки</button><button class="adminSectionTab" id="paymentsTab" type="button" onclick="switchAdminSection('payments')">Плащания</button></div><div class="newTrainingRow"><button class="btn primary" onclick="openNew()">+ Нова тренировка</button></div><div id="activeTraining"></div>
+<div class="shell" id="adminShell"><div class="head"><div><div class="eye">STEP AEROBICS WITH NIKI • FIT BODY CENTER</div><h1>Админ панел</h1></div><div class="adminNavActions"><a class="adminNavBtn" href="./" target="_blank" rel="noopener">← Към сайта</a><button class="btn adminSettingsIcon" type="button" onclick="openSettings()" aria-label="Настройки" title="Настройки">⚙</button><button class="adminLogoutBtn" type="button" onclick="adminLogout()">Изход</button></div></div><div class="adminSectionTabs"><button class="adminSectionTab active" id="trainingTab" type="button" onclick="switchAdminSection('training')">Тренировки</button><button class="adminSectionTab" id="paymentsTab" type="button" onclick="switchAdminSection('payments')">Плащания</button><button class="adminSectionTab" id="historyTab" type="button" onclick="switchAdminSection('history')" hidden>История</button></div><div class="newTrainingRow"><button class="btn primary" onclick="openNew()">+ Нова тренировка</button></div><div id="activeTraining"></div>
 <div class="quickTemplates"><div class="quickTemplatesTop"><strong>Бърза тренировка от шаблон</strong><span>Шаблон → избери дата → активирай</span></div><div class="quickTemplateChips" id="quickTemplateChips"></div></div>
 <div class="card">
   <h2>Тренировки</h2>
@@ -1129,7 +1130,7 @@ html.authChecking .adminAuthLoading{display:flex}
   <div class="paymentSaveBar"><span class="paymentSaveStatus saved" id="paymentSaveStatus">Всички промени са запазени.</span><button class="paymentSaveNow" id="paymentSaveNow" type="button" onclick="flushPaymentChanges()" disabled>Запази</button></div>
   <section class="monthlyPaymentReport" id="monthlyPaymentReport" aria-label="Месечен отчет на плащанията"></section>
   <div class="paymentCards" id="paymentCards"></div>
-</section><div class="appInstallStats" id="appInstallStats" hidden><span class="appInstallStatsIcon" aria-hidden="true">📱</span><div class="appInstallStatsText"><strong id="appInstallStatsCount">0 инсталации на приложението</strong><span id="appInstallStatsLatest">Android: 0 · iOS: 0 · Все още няма отчетена инсталация.</span></div></div></div>
+</section><section class="historyView" id="historyView" aria-label="История — защитена административна информация"><div class="historyHeader"><div><h2>История на действията</h2><p>Последните 300 административни действия · часова зона Europe/Sofia</p></div><button class="historyRefresh" id="historyRefresh" type="button" onclick="loadAdminHistory()">Обнови</button></div><section class="historyProfiles" id="historyProfiles" hidden><h3>Профили и достъп</h3><p>Само Owner може да добавя профили, да дава достъп до историята и да избира цветовете.</p><div class="historyAddProfile"><input id="historyNewEmail" type="email" placeholder="Имейл в Supabase Auth" aria-label="Имейл"><input id="historyNewName" type="text" maxlength="80" placeholder="Име" aria-label="Име"><input id="historyNewColor" type="color" value="#176F50" aria-label="Цвят"><label><input id="historyNewAccess" type="checkbox"> История</label><button type="button" onclick="addHistoryProfile()">Добави профил</button></div><div class="historyProfileList" id="historyProfileList"></div></section><div class="historyList" id="historyList"><div class="historyState">Зареждане…</div></div></section><div class="appInstallStats" id="appInstallStats" hidden><span class="appInstallStatsIcon" aria-hidden="true">📱</span><div class="appInstallStatsText"><strong id="appInstallStatsCount">0 инсталации на приложението</strong><span id="appInstallStatsLatest">Android: 0 · iOS: 0 · Все още няма отчетена инсталация.</span></div></div></div>
 <div class="overlay" id="manualPaymentOverlay">
   <form class="editor" id="manualPaymentForm" onsubmit="saveNewManualPayment(event)">
     <div class="handle"></div>
@@ -1574,17 +1575,24 @@ function moneyEUR(value){return Number(value||0).toLocaleString('bg-BG',{minimum
 function paymentRates(){const multi=Number(data.paymentRates?.multisport),individual=Number(data.paymentRates?.individual);return {multisport:Number.isFinite(multi)&&multi>=0?multi:DEFAULT_PAYMENT_RATES.multisport,individual:Number.isFinite(individual)&&individual>=0?individual:DEFAULT_PAYMENT_RATES.individual}}
 function switchAdminSection(section){
   const payments=section==='payments';
-  try{localStorage.setItem('nikiAdminActiveSection',payments?'payments':'training')}catch{}
+  const history=section==='history'&&!historyTab.hidden;
+  const selected=history?'history':payments?'payments':'training';
+  try{localStorage.setItem('nikiAdminActiveSection',selected)}catch{}
   adminShell.classList.toggle('paymentsMode',payments);
-  trainingTab.classList.toggle('active',!payments);
+  adminShell.classList.toggle('historyMode',history);
+  trainingTab.classList.toggle('active',!payments&&!history);
   paymentsTab.classList.toggle('active',payments);
-  trainingTab.setAttribute('aria-selected',String(!payments));
+  historyTab.classList.toggle('active',history);
+  trainingTab.setAttribute('aria-selected',String(!payments&&!history));
   paymentsTab.setAttribute('aria-selected',String(payments));
+  historyTab.setAttribute('aria-selected',String(history));
   if(payments)renderPayments();
+  if(history)window.loadAdminHistory?.();
 }
 function restoreAdminSection(){
   let section='training';
-  try{section=localStorage.getItem('nikiAdminActiveSection')==='payments'?'payments':'training'}catch{}
+  try{section=localStorage.getItem('nikiAdminActiveSection')||'training'}catch{}
+  if(section==='history'&&historyTab.hidden)return;
   switchAdminSection(section);
 }
 function movePaymentMonth(step){paymentMonth=new Date(paymentMonth.getFullYear(),paymentMonth.getMonth()+step,1);renderPayments()}
@@ -2285,7 +2293,8 @@ function askDelete(id){const s=data.sessions.find(x=>x.id===id);if(!s)return;del
 <script src="modal-scroll-lock.js?v=20260822-1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="supabase-sync.js?v=20260823-7"></script>
+<script src="supabase-sync.js?v=20260908-2"></script>
+<script src="admin-history.js?v=20260908-1"></script>
 <script src="admin-pwa-install.js?v=20260823-2"></script>
 <script id="supabase-auth-js">
 (function(){
@@ -2304,12 +2313,12 @@ function askDelete(id){const s=data.sessions.find(x=>x.id===id);if(!s)return;del
     event.preventDefault();error.classList.remove('show');btn.disabled=true;btn.textContent='Проверка...';
     const result=await window.nikiAdmin.login((username.value||'').trim(),password.value||'',remember.checked);
     if(result.error){setErr(result.error.message==='Този профил няма администраторски достъп.'?result.error.message:'Грешен имейл или парола.');password.select()}
-    else{password.value='';showAdmin();if(window.renderAll)window.renderAll()}
+    else{password.value='';showAdmin();if(window.renderAll)window.renderAll();window.initializeAdminHistory?.()}
     btn.disabled=false;btn.textContent='Вход';
   });
   toggle.addEventListener('click',()=>{const hidden=password.type==='password';password.type=hidden?'text':'password';toggle.textContent=hidden?'🙈':'👁'});
   window.adminLogout=async function(){await window.nikiAdmin.logout();username.value='';password.value='';lockAdmin()};
-  window.nikiAdmin.session().then(access=>access.authorized?showAdmin():lockAdmin()).catch(lockAdmin);
+  window.nikiAdmin.session().then(access=>{if(access.authorized){showAdmin();window.initializeAdminHistory?.()}else lockAdmin()}).catch(lockAdmin);
 })();
 </script>
 

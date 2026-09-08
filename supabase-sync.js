@@ -502,6 +502,31 @@
       if (!result.error) cache.manualPaymentTemplates = JSON.parse(JSON.stringify(values));
       return result;
     },
+    historyContext: () => client.rpc('admin_history_context').maybeSingle(),
+    async historyLogs() {
+      const logs = await client.from('audit_logs').select('id,actor_id,actor_email,actor_name,actor_color,action,entity_type,entity_id,details,created_at').order('created_at', { ascending: false }).limit(300);
+      if (logs.error) return { data: null, deleted: [], error: logs.error };
+      const context = await client.rpc('admin_history_context').maybeSingle();
+      if (context.error) return { data: null, deleted: [], error: context.error };
+      let deleted = [];
+      if (context.data?.is_owner) {
+        const trash = await client.from('deleted_records').select('entity_type,entity_id');
+        if (trash.error) return { data: null, deleted: [], error: trash.error };
+        deleted = trash.data || [];
+      }
+      return { data: logs.data || [], deleted, context: context.data, error: null };
+    },
+    adminProfiles: () => client.rpc('owner_list_admin_profiles'),
+    addAdminProfile: values => client.rpc('owner_add_admin_profile', {
+      target_email: values.email, next_display_name: values.displayName || null,
+      next_can_view_history: !!values.canViewHistory, next_audit_color: values.auditColor || null
+    }),
+    updateAdminProfile: values => client.rpc('owner_update_admin_profile', {
+      target_user_id: values.userId, next_display_name: values.displayName || null,
+      next_active: !!values.active, next_can_view_history: !!values.canViewHistory,
+      next_audit_color: values.auditColor || null
+    }),
+    restoreDeletedItem: (entityType, entityId) => client.rpc('owner_restore_deleted_item', { p_entity_type: entityType, p_entity_id: entityId }),
     refresh
   };
 
