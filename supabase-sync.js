@@ -34,6 +34,19 @@
   const isTrue = value => value === true || value === 'true' || value === 1 || value === '1';
   const readReceipts = () => { try { return JSON.parse(localStorage.getItem(bookingReceiptsKey) || '{}'); } catch (_) { return {}; } };
   const writeReceipts = receipts => localStorage.setItem(bookingReceiptsKey, JSON.stringify(receipts));
+  const sessionStartsAt = session => new Date(`${session.date}T${String(session.time || '00:00').slice(0, 5)}:00`);
+  const pruneCompletedReceipts = sessions => {
+    const receipts = readReceipts();
+    const now = Date.now();
+    let changed = false;
+    (sessions || []).forEach(session => {
+      if (receipts[session.id] && sessionStartsAt(session).getTime() <= now) {
+        delete receipts[session.id];
+        changed = true;
+      }
+    });
+    if (changed) writeReceipts(receipts);
+  };
   const readLocalTrainingTemplates = () => {
     try {
       const value = JSON.parse(localStorage.getItem(trainingTemplatesStorageKey) || '[]');
@@ -253,6 +266,7 @@
         session.registrations = Array.from({ length: Number(row.registration_count) }, (_, index) => ({ id: `occupied-${index}` }));
         return session;
       });
+      pruneCompletedReceipts(sessions);
     }
     let siteSettings = { ...defaultSiteSettings };
     const settingsResult = await client.from('site_settings').select('key,value').in('key', ['hero_text', 'hero_subtitle']);
@@ -354,7 +368,7 @@
           cancelTokens.set(registration.id, cancelToken);
           if (!registration.friendBooking) {
             const receipts = readReceipts();
-            receipts[session.id] = { registrationId: registration.id, token: cancelToken, sessionId: session.id, name: registration.name, createdAt: new Date().toISOString() };
+            receipts[session.id] = { registrationId: registration.id, token: cancelToken, sessionId: session.id, name: registration.name, createdAt: new Date().toISOString(), sessionStartsAt: sessionStartsAt(session).toISOString() };
             writeReceipts(receipts);
           }
         }
