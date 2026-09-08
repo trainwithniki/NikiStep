@@ -226,12 +226,16 @@ do $$
 declare table_name text;
 begin
   foreach table_name in array array['sessions','registrations','site_settings','payment_adjustments','payment_config','registration_payment_overrides','manual_payment_sessions','manual_payment_templates','training_templates','app_admins'] loop
-    execute format('drop trigger if exists admin_audit_%I on public.%I',table_name,table_name);
-    execute format('create trigger admin_audit_%I after insert or update or delete on public.%I for each row execute function public.record_admin_audit()',table_name,table_name);
+    if to_regclass('public.' || table_name) is not null then
+      execute format('drop trigger if exists admin_audit_%I on public.%I',table_name,table_name);
+      execute format('create trigger admin_audit_%I after insert or update or delete on public.%I for each row execute function public.record_admin_audit()',table_name,table_name);
+    end if;
   end loop;
   foreach table_name in array array['sessions','registrations','site_settings','payment_adjustments','payment_config','registration_payment_overrides','manual_payment_sessions','manual_payment_templates','training_templates'] loop
-    execute format('drop trigger if exists archive_deleted_%I on public.%I',table_name,table_name);
-    execute format('create trigger archive_deleted_%I before delete on public.%I for each row execute function public.archive_deleted_admin_record()',table_name,table_name);
+    if to_regclass('public.' || table_name) is not null then
+      execute format('drop trigger if exists archive_deleted_%I on public.%I',table_name,table_name);
+      execute format('create trigger archive_deleted_%I before delete on public.%I for each row execute function public.archive_deleted_admin_record()',table_name,table_name);
+    end if;
   end loop;
 end $$;
 
@@ -324,24 +328,18 @@ begin
   select * into archived from public.deleted_records where entity_type=p_entity_type and entity_id=p_entity_id;
   if not found then raise exception 'Deleted record not found'; end if;
 
-  case p_entity_type
-    when 'sessions' then insert into public.sessions select (jsonb_populate_record(null::public.sessions,archived.row_data)).*;
-    when 'registrations' then
-      if not exists(select 1 from public.sessions where id=archived.parent_id) then raise exception 'Parent session is missing'; end if;
-      insert into public.registrations select (jsonb_populate_record(null::public.registrations,archived.row_data)).*;
-    when 'site_settings' then insert into public.site_settings select (jsonb_populate_record(null::public.site_settings,archived.row_data)).*;
-    when 'payment_adjustments' then
-      if not exists(select 1 from public.sessions where id=archived.parent_id) then raise exception 'Parent session is missing'; end if;
-      insert into public.payment_adjustments select (jsonb_populate_record(null::public.payment_adjustments,archived.row_data)).*;
-    when 'payment_config' then insert into public.payment_config select (jsonb_populate_record(null::public.payment_config,archived.row_data)).*;
-    when 'registration_payment_overrides' then
-      if not exists(select 1 from public.registrations where id=archived.parent_id) then raise exception 'Parent registration is missing'; end if;
-      insert into public.registration_payment_overrides select (jsonb_populate_record(null::public.registration_payment_overrides,archived.row_data)).*;
-    when 'manual_payment_sessions' then insert into public.manual_payment_sessions select (jsonb_populate_record(null::public.manual_payment_sessions,archived.row_data)).*;
-    when 'manual_payment_templates' then insert into public.manual_payment_templates select (jsonb_populate_record(null::public.manual_payment_templates,archived.row_data)).*;
-    when 'training_templates' then insert into public.training_templates select (jsonb_populate_record(null::public.training_templates,archived.row_data)).*;
-    else raise exception 'Unsupported entity type';
-  end case;
+  if p_entity_type not in ('sessions','registrations','site_settings','payment_adjustments','payment_config','registration_payment_overrides','manual_payment_sessions','manual_payment_templates','training_templates') then
+    raise exception 'Unsupported entity type';
+  end if;
+  if to_regclass('public.' || p_entity_type) is null then raise exception 'Target table is missing'; end if;
+  if p_entity_type in ('registrations','payment_adjustments') and not exists(select 1 from public.sessions where id=archived.parent_id) then
+    raise exception 'Parent session is missing';
+  end if;
+  if p_entity_type = 'registration_payment_overrides' and not exists(select 1 from public.registrations where id=archived.parent_id) then
+    raise exception 'Parent registration is missing';
+  end if;
+  execute format('insert into public.%I select * from jsonb_populate_record(null::public.%I, $1)',p_entity_type,p_entity_type)
+  using archived.row_data;
   restored_count := 1;
   delete from public.deleted_records where entity_type=p_entity_type and entity_id=p_entity_id;
 
