@@ -2821,7 +2821,9 @@ function renderFeatured(){
   const [yy,mm,dd]=s.date.split('-');
   const announcement=String(s.announcement||'').trim();
   const featuredClass=st==='open'?'featured-open':st==='completed'?'featured-completed':st==='closed'?'featured-closed':'featured-upcoming';
-  const ownBooking=!!window.nikiBookings?.has(s.id);
+  // A completed booking is history, not an active personal booking.
+  // This also lets the next session show its own normal booking action.
+  const ownBooking=st!=='completed'&&!!window.nikiBookings?.has(s.id);
   const bookingInfo=`<div class="ownBookingSummary"><strong>✓ Записали сте се за ${esc(s.title)} with ${esc(s.trainer)}</strong><span>📍 ${esc(s.location)} · ${fmtDDMM(s.date)} – ${dayNameTitle(s.date)} · ${esc(s.time)}</span></div>`;
   const button = ownBooking
     ? `${bookingInfo}<div class="ownBookingActions"><button class="mainBtn cancelBookingBtn" onclick="openCancelBooking('${s.id}')">ОТПИШИ СЕ</button><button class="mainBtn friendBookingBtn" onclick="openFriendBook('${s.id}')">ЗАПИШИ ПРИЯТЕЛ</button></div>`
@@ -3001,7 +3003,7 @@ function sessionCard(s){
   el.className='session '+st;
   const announcement=String(s.announcement||'').trim();
 
-  const ownBooking=!!window.nikiBookings?.has(s.id);
+  const ownBooking=st!=='completed'&&!!window.nikiBookings?.has(s.id);
   const bookingAction = ownBooking
     ? `<div class="sessionBookAction ownBookingActions"><button class="sessionBookBtn cancelBookingBtn" onclick="event.stopPropagation();openCancelBooking('${s.id}')">ОТПИШИ СЕ</button><button class="sessionBookBtn friendBookingBtn" onclick="event.stopPropagation();openFriendBook('${s.id}')">ЗАПИШИ ПРИЯТЕЛ</button></div>`
     : st==='open'
