@@ -4,9 +4,14 @@ create table if not exists public.statistics_name_aliases (
   alias_key text primary key check (char_length(alias_key) between 1 and 160),
   alias_name text not null check (char_length(trim(alias_name)) between 1 and 120),
   canonical_name text not null check (char_length(trim(canonical_name)) between 1 and 120),
+  canonical_key text check (canonical_key is null or char_length(canonical_key) between 1 and 160),
   updated_by uuid references auth.users(id) on delete set null default auth.uid(),
   updated_at timestamptz not null default now()
 );
+
+-- Safe to run again if an earlier version of this migration was executed.
+-- This makes a merge apply to one concrete person, rather than every matching name.
+alter table public.statistics_name_aliases add column if not exists canonical_key text;
 
 create table if not exists public.statistics_ignored_pairs (
   pair_key text primary key check (char_length(pair_key) between 3 and 330),
@@ -62,7 +67,9 @@ begin
   item_data:=case when tg_op='DELETE' then old_data else new_data end;
   insert into public.audit_logs(actor_id,actor_email,actor_name,actor_color,action,entity_type,entity_id,details)
   values(actor.user_id,coalesce(nullif(actor.email,''),auth_email,'unknown'),actor.display_name,actor.audit_color,tg_op,tg_table_name,
-    coalesce(item_data->>'alias_key',item_data->>'pair_key'),
+    -- The internal matching keys can contain a phone-based identity.  Audit logs
+    -- deliberately store only an irreversible identifier and the safe name label.
+    case when tg_table_name='statistics_name_aliases' then md5(coalesce(item_data->>'alias_key','')) else md5(coalesce(item_data->>'pair_key','')) end,
     jsonb_build_object('label',case when tg_table_name='statistics_name_aliases' then coalesce(item_data->>'alias_name','Име')||' → '||coalesce(item_data->>'canonical_name','Име') else coalesce(item_data->>'first_name','Име')||' / '||coalesce(item_data->>'second_name','Име') end,'date',null,'time',null,'changes',changes));
   if tg_op='DELETE' then return old; else return new; end if;
 end;

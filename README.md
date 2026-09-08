@@ -38,7 +38,7 @@ Run `supabase/migrations/20260908_all_admins_full_access.sql` on installations t
 
 ### Attendance statistics
 
-Run `supabase/migrations/20260908_add_attendance_statistics.sql` once to persist administrator decisions about similar participant names. The **Статистика** tab counts non-cancelled registrations from completed trainings, groups results by training month and suggests names that differ by one character. An administrator can merge them under either spelling or mark them as different people. These decisions are admin-only, shared across devices and recorded in the protected audit history.
+Run `supabase/migrations/20260908_add_attendance_statistics.sql` to persist administrator decisions about similar participant names. The **Статистика** tab counts non-cancelled registrations from completed trainings, groups results by training month and suggests names that differ by one character. An administrator can merge them under either spelling or mark them as different people. Merges are scoped to the selected person (using their saved contact identity when available), so the same first name on another person is not affected. The updated migration is safe to run again if an earlier version was already applied. These decisions are admin-only, shared across devices and recorded in the protected audit history.
 
 ### Public registrant names (existing installations)
 
