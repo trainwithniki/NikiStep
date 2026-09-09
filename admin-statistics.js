@@ -176,15 +176,10 @@
     const sourceIdentities = identities(records);
     renderManualMerge(sourceIdentities);
     const current = records.filter(item => item.month === selectedMonth);
-    const totalVisits = new Map();
-    records.forEach(record => {
-      const canonicalKey = resolveIdentity(record.sourceKey);
-      totalVisits.set(canonicalKey, (totalVisits.get(canonicalKey) || 0) + 1);
-    });
     const aggregated = new Map();
     current.forEach(record => {
       const canonicalKey = resolveIdentity(record.sourceKey);
-      const item = aggregated.get(canonicalKey) || { key: canonicalKey, name: canonicalLabel(canonicalKey, sourceIdentities), count: 0, total: totalVisits.get(canonicalKey) || 0, names: new Set(), phones: new Set(), sources: new Set() };
+      const item = aggregated.get(canonicalKey) || { key: canonicalKey, name: canonicalLabel(canonicalKey, sourceIdentities), count: 0, names: new Set(), phones: new Set(), sources: new Set() };
       item.count++;
       item.names.add(record.name);
       if (phoneKey(record.phone)) item.phones.add(phoneKey(record.phone));
@@ -196,7 +191,7 @@
       : b.count - a.count || a.name.localeCompare(b.name, 'bg'));
     document.getElementById('statisticsSummary').innerHTML = `<div class="statisticsMetric"><span>Посещения</span><strong>${current.length}</strong></div><div class="statisticsMetric"><span>Различни хора</span><strong>${people.length}</strong></div><div class="statisticsMetric"><span>Тренировки</span><strong>${new Set(current.map(item => item.sessionId)).size}</strong></div>`;
     document.getElementById('statisticsPeople').innerHTML = '<div class="statisticsPeopleTitle"><span>Посещения по име</span><label class="statisticsSort">Подреди <select onchange="selectStatisticsSort(this.value)" aria-label="Подреди статистиката"><option value="visits" ' + (sortMode === 'visits' ? 'selected' : '') + '>По посещения</option><option value="name" ' + (sortMode === 'name' ? 'selected' : '') + '>По име</option></select></label></div>' + (people.length
-      ? people.map((person, index) => `<div class="statisticsPerson"><span class="statisticsPersonNo">${index + 1}.</span><div class="statisticsPersonName"><strong>${esc(person.name)}</strong>${person.phones?.size ? `<small class="statisticsPersonPhone">${esc([...person.phones].map(formatPhone).join(' · '))}</small>` : ''}${person.names.size > 1 ? `<small>Обединени имена: ${esc([...person.names].join(', '))}</small>` : ''}</div><div class="statisticsVisits"><strong>${person.count}</strong><span>за месеца</span><small>Общо: ${person.total}</small></div></div>`).join('')
+      ? people.map((person, index) => `<div class="statisticsPerson"><span class="statisticsPersonNo">${index + 1}.</span><div class="statisticsPersonName"><strong>${esc(person.name)}</strong>${person.phones?.size ? `<small class="statisticsPersonPhone">${esc([...person.phones].map(formatPhone).join(' · '))}</small>` : ''}${person.names.size > 1 ? `<small>Обединени имена: ${esc([...person.names].join(', '))}</small>` : ''}</div><div class="statisticsVisits"><strong>${person.count}</strong></div></div>`).join('')
       : '<div class="statisticsEmpty">Няма посещения за този месец.</div>');
 
     const pairs = similarPairs(sourceIdentities, new Set(current.map(item => item.sourceKey)));
