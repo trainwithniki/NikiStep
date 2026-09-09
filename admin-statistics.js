@@ -1,6 +1,7 @@
 (function () {
   'use strict';
   let selectedMonth = '';
+  let sortMode = 'visits';
   let rules = { aliases: [], ignored: [], configured: false };
   let busy = false;
 
@@ -9,9 +10,19 @@
   const fromToken = value => decodeURIComponent(String(value ?? ''));
   const nameKey = value => String(value || '').normalize('NFKC').trim().toLocaleLowerCase('bg-BG').replace(/\s+/g, ' ').slice(0, 140);
   const phoneKey = value => String(value || '').replace(/\D/g, '').slice(-24);
+  const formatPhone = value => {
+    const phone = phoneKey(value);
+    if (!phone) return '';
+    if (phone.length === 9 && phone.startsWith('0')) return `${phone.slice(0, 3)} ${phone.slice(3, 6)} ${phone.slice(6)}`;
+    if (phone.length === 12 && phone.startsWith('359')) return `+359 ${phone.slice(3, 5)} ${phone.slice(5, 8)} ${phone.slice(8)}`;
+    return `+${phone}`;
+  };
   const sourceKeyFor = person => {
     const phone = phoneKey(person.phone);
-    return phone.length >= 7 ? `phone:${phone}` : `name:${nameKey(person.name)}`;
+    const name = nameKey(person.name);
+    // A profile is a concrete written registration. Equal names or equal phones
+    // are deliberately shown as a review suggestion instead of silently merging.
+    return phone.length >= 7 ? `phone:${phone}|name:${name}` : `name:${name}`;
   };
   const sourcePairKey = (first, second) => [String(first), String(second)].sort().join('|');
   const sessionDateTime = session => new Date(`${session.date}T${String(session.time || '00:00').slice(0, 5)}:00`);
@@ -33,7 +44,7 @@
         <details class="statisticsManualMerge" id="statisticsManualMerge"><summary>Обедини хора ръчно</summary><div class="statisticsManualMergeBody"><p>Избери конкретния човек, който е използвал различно име, и към кой профил да се отнесе. При наличен телефон правилото важи само за този човек.</p><select id="statisticsMergeSource" aria-label="Човек с различно име"></select><select id="statisticsMergeTarget" aria-label="Обедини към"></select><button type="button" onclick="mergeStatisticsFromSelects()">Обедини</button></div></details>
         <div class="statisticsSummary" id="statisticsSummary"></div>
         <div class="statisticsPeople" id="statisticsPeople"></div>
-        <details class="statisticsMatches" id="statisticsMatches"><summary>Провери сходни имена <span id="statisticsMatchCount"></span></summary><div id="statisticsMatchList"></div></details>
+        <details class="statisticsMatches" id="statisticsMatches"><summary>Провери възможни съвпадения <span id="statisticsMatchCount"></span></summary><div id="statisticsMatchList"></div></details>
         <details class="statisticsRules" id="statisticsRules"><summary>Запазени решения за имена</summary><div id="statisticsRuleList"></div></details>
       </section>`);
   }
@@ -73,7 +84,8 @@
     const bySource = new Map((rules.aliases || []).map(item => [item.alias_key, item]));
     let key = sourceKey;
     for (let index = 0; index < 10; index++) {
-      const rule = bySource.get(key);
+      const phoneOnlyKey = key.startsWith('phone:') ? key.split('|')[0] : '';
+      const rule = bySource.get(key) || (phoneOnlyKey ? bySource.get(phoneOnlyKey) : null);
       if (!rule) break;
       const next = String(rule.canonical_key || `legacy:${nameKey(rule.canonical_name)}`);
       if (next === key) break;
@@ -84,12 +96,16 @@
 
   function labelForIdentity(item) {
     const phone = item?.phone || '';
-    return `${item?.name || 'Без име'}${phone ? ` · тел. ••••${phone.slice(-4)}` : ''}`;
+    return `${item?.name || 'Без име'}${phone ? ` · ${formatPhone(phone)}` : ''}`;
   }
 
   function canonicalLabel(key, sourceIdentities) {
     const identity = sourceIdentities.get(key);
     if (identity) return identity.name;
+    if (key.startsWith('phone:') && !key.includes('|')) {
+      const phoneIdentity = [...sourceIdentities.values()].find(item => item.key.startsWith(`${key}|`));
+      if (phoneIdentity) return phoneIdentity.name;
+    }
     const direct = (rules.aliases || []).find(item => item.alias_key === key);
     return direct?.canonical_name || 'Без име';
   }
@@ -108,6 +124,15 @@
     return previous[second.length];
   }
 
+  function matchReason(first, second) {
+    if (first.phone && second.phone && first.phone === second.phone) return 'Съвпада телефон';
+    if (nameKey(first.name) === nameKey(second.name)) return 'Съвпада име';
+    const firstText = nameKey(first.name).replace(/[^\p{L}\p{N}]/gu, '');
+    const secondText = nameKey(second.name).replace(/[^\p{L}\p{N}]/gu, '');
+    if (Math.min(firstText.length, secondText.length) >= 4 && firstText[0] === secondText[0] && levenshtein(firstText, secondText) <= 1) return 'Сходни имена';
+    return '';
+  }
+
   function similarPairs(sourceIdentities, currentSourceKeys) {
     const identitiesList = [...sourceIdentities.values()];
     const ignored = new Set((rules.ignored || []).map(item => item.pair_key));
@@ -118,10 +143,8 @@
         if (resolveIdentity(first.key) === resolveIdentity(second.key)) continue;
         if (!currentSourceKeys.has(first.key) && !currentSourceKeys.has(second.key)) continue;
         if (ignored.has(sourcePairKey(first.key, second.key))) continue;
-        const firstText = nameKey(first.name).replace(/[^\p{L}\p{N}]/gu, '');
-        const secondText = nameKey(second.name).replace(/[^\p{L}\p{N}]/gu, '');
-        if (Math.min(firstText.length, secondText.length) < 4 || firstText[0] !== secondText[0]) continue;
-        if (levenshtein(firstText, secondText) <= 1) result.push({ first, second });
+        const reason = matchReason(first, second);
+        if (reason) result.push({ first, second, reason });
       }
     }
     return result.slice(0, 20);
@@ -156,22 +179,25 @@
     const aggregated = new Map();
     current.forEach(record => {
       const canonicalKey = resolveIdentity(record.sourceKey);
-      const item = aggregated.get(canonicalKey) || { key: canonicalKey, name: canonicalLabel(canonicalKey, sourceIdentities), count: 0, names: new Set(), sources: new Set() };
+      const item = aggregated.get(canonicalKey) || { key: canonicalKey, name: canonicalLabel(canonicalKey, sourceIdentities), count: 0, names: new Set(), phones: new Set(), sources: new Set() };
       item.count++;
       item.names.add(record.name);
+      if (phoneKey(record.phone)) item.phones.add(phoneKey(record.phone));
       item.sources.add(record.sourceKey);
       aggregated.set(canonicalKey, item);
     });
-    const people = [...aggregated.values()].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'bg'));
+    const people = [...aggregated.values()].sort((a, b) => sortMode === 'name'
+      ? a.name.localeCompare(b.name, 'bg') || b.count - a.count
+      : b.count - a.count || a.name.localeCompare(b.name, 'bg'));
     document.getElementById('statisticsSummary').innerHTML = `<div class="statisticsMetric"><span>Посещения</span><strong>${current.length}</strong></div><div class="statisticsMetric"><span>Различни хора</span><strong>${people.length}</strong></div><div class="statisticsMetric"><span>Тренировки</span><strong>${new Set(current.map(item => item.sessionId)).size}</strong></div>`;
-    document.getElementById('statisticsPeople').innerHTML = '<div class="statisticsPeopleTitle">Посещения по име</div>' + (people.length
-      ? people.map((person, index) => `<div class="statisticsPerson"><span class="statisticsPersonNo">${index + 1}.</span><div class="statisticsPersonName"><strong>${esc(person.name)}</strong>${person.names.size > 1 ? `<small>Обединени имена: ${esc([...person.names].join(', '))}</small>` : ''}</div><div class="statisticsVisits"><strong>${person.count}</strong><span>посещения</span></div></div>`).join('')
+    document.getElementById('statisticsPeople').innerHTML = '<div class="statisticsPeopleTitle"><span>Посещения по име</span><label class="statisticsSort">Подреди <select onchange="selectStatisticsSort(this.value)" aria-label="Подреди статистиката"><option value="visits" ' + (sortMode === 'visits' ? 'selected' : '') + '>По посещения</option><option value="name" ' + (sortMode === 'name' ? 'selected' : '') + '>По име</option></select></label></div>' + (people.length
+      ? people.map((person, index) => `<div class="statisticsPerson"><span class="statisticsPersonNo">${index + 1}.</span><div class="statisticsPersonName"><strong>${esc(person.name)}</strong>${person.phones?.size ? `<small class="statisticsPersonPhone">${esc([...person.phones].map(formatPhone).join(' · '))}</small>` : ''}${person.names.size > 1 ? `<small>Обединени имена: ${esc([...person.names].join(', '))}</small>` : ''}</div><div class="statisticsVisits"><strong>${person.count}</strong><span>посещения</span></div></div>`).join('')
       : '<div class="statisticsEmpty">Няма посещения за този месец.</div>');
 
     const pairs = similarPairs(sourceIdentities, new Set(current.map(item => item.sourceKey)));
     document.getElementById('statisticsMatchCount').textContent = `(${pairs.length})`;
     document.getElementById('statisticsMatches').hidden = !pairs.length;
-    document.getElementById('statisticsMatchList').innerHTML = pairs.map(pair => `<div class="statisticsMatch"><div class="statisticsMatchQuestion">„${esc(labelForIdentity(pair.first))}“ и „${esc(labelForIdentity(pair.second))}“ един и същ човек ли са?</div><div class="statisticsMatchActions"><button class="merge" type="button" onclick="mergeStatisticPeople('${token(pair.second.key)}','${token(pair.first.key)}')">Обедини като „${esc(pair.first.name)}“</button><button class="merge" type="button" onclick="mergeStatisticPeople('${token(pair.first.key)}','${token(pair.second.key)}')">Обедини като „${esc(pair.second.name)}“</button><button class="separate" type="button" onclick="ignoreStatisticPeople('${token(pair.first.key)}','${token(pair.second.key)}')">Различни хора</button></div></div>`).join('');
+    document.getElementById('statisticsMatchList').innerHTML = pairs.map(pair => `<div class="statisticsMatch"><div class="statisticsMatchQuestion"><span class="statisticsMatchReason">${esc(pair.reason)}</span> „${esc(labelForIdentity(pair.first))}“ и „${esc(labelForIdentity(pair.second))}“ един и същ човек ли са?</div><div class="statisticsMatchActions"><button class="merge" type="button" onclick="mergeStatisticPeople('${token(pair.second.key)}','${token(pair.first.key)}')">Обедини като „${esc(pair.first.name)}“</button><button class="merge" type="button" onclick="mergeStatisticPeople('${token(pair.first.key)}','${token(pair.second.key)}')">Обедини като „${esc(pair.second.name)}“</button><button class="separate" type="button" onclick="ignoreStatisticPeople('${token(pair.first.key)}','${token(pair.second.key)}')">Различни хора</button></div></div>`).join('');
     document.getElementById('statisticsSetup').hidden = rules.configured;
     renderRules(sourceIdentities);
   }
@@ -199,6 +225,7 @@
     render();
   };
   window.selectStatisticsMonth = value => { selectedMonth = value; render(); };
+  window.selectStatisticsSort = value => { sortMode = value === 'name' ? 'name' : 'visits'; render(); };
   window.moveStatisticsMonth = step => {
     const months = availableMonths(attendanceRecords());
     const index = months.indexOf(selectedMonth);
