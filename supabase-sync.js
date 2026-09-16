@@ -294,7 +294,8 @@
         const multiSportColumnMissing = /has_multisport/i.test(errorText);
         const friendColumnMissing = /booked_by/i.test(errorText);
         const duplicateBooking = error?.code === '23505' || /one_active_phone|duplicate key/i.test(String(error?.message || error?.details || ''));
-        window.showToast(friendColumnMissing ? 'Настройката „Запиши приятел“ още не е активирана в базата.' : multiSportColumnMissing ? 'MultiSport настройката още не е активирана в базата.' : duplicateBooking ? 'Този телефон вече е записан за тренировката.' : 'Промяната не беше записана.');
+        const bookingAccessDenied = error?.code === '42501' || /row-level security|new row violates/i.test(errorText);
+        window.showToast(friendColumnMissing ? 'Настройката „Запиши приятел“ още не е активирана в базата.' : multiSportColumnMissing ? 'MultiSport настройката още не е активирана в базата.' : duplicateBooking ? 'Този телефон вече е записан за тренировката.' : bookingAccessDenied ? 'Записването не е отворено. Обновете страницата и опитайте отново.' : 'Промяната не беше записана.');
       }
       await refresh().catch(console.error);
       return false;

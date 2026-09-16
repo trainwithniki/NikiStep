@@ -162,9 +162,13 @@ grant execute on function public.is_app_admin() to authenticated;
 create or replace function public.booking_is_open(target public.sessions)
 returns boolean language sql stable
 as $$
-  select now() >= ((target.date + target.time) at time zone 'Europe/Sofia') - make_interval(days => target.booking_days)
-     and now() <  ((target.date + target.time) at time zone 'Europe/Sofia') - make_interval(secs => (target.booking_close_hours * 3600)::double precision)
-     and not target.booking_closed;
+  select not target.booking_closed
+     and now() < ((target.date + target.time) at time zone 'Europe/Sofia')
+     and now() < ((target.date + target.time) at time zone 'Europe/Sofia') - make_interval(secs => (target.booking_close_hours * 3600)::double precision)
+     and (
+       target.force_open
+       or now() >= ((target.date + target.time) at time zone 'Europe/Sofia') - make_interval(days => target.booking_days)
+     );
 $$;
 
 drop policy if exists "sessions public read" on public.sessions;

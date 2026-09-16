@@ -40,6 +40,10 @@ Run `supabase/migrations/20260908_all_admins_full_access.sql` on installations t
 
 Run `supabase/migrations/20260908_add_attendance_statistics.sql` to persist administrator decisions about similar participant names. The **Статистика** tab counts non-cancelled registrations from completed trainings, groups results by training month and suggests names that differ by one character. An administrator can merge them under either spelling or mark them as different people. Merges are scoped to the selected person (using their saved contact identity when available), so the same first name on another person is not affected. The updated migration is safe to run again if an earlier version was already applied. These decisions are admin-only, shared across devices and recorded in the protected audit history.
 
+### Booking fix
+
+Run `supabase/migrations/20260916_fix_force_open_bookings.sql` once. It fixes public registrations for trainings opened early with the admin **Старт** button.
+
 ### Public registrant names (existing installations)
 
 Run `supabase/migrations/20260905_public_registration_names.sql` once in Supabase **SQL Editor** to enable the public “Записани” dropdown on each training. Do not rerun the whole schema on an existing installation. The new RPC returns only names of non-cancelled registrations for the requested session; phone numbers, cards, timestamps and registration identifiers remain private. Registration table RLS is unchanged. Names are intentionally visible to anyone, including unauthenticated visitors. Open dropdowns refresh every 15 seconds while the page is visible; if the migration has not run or the request fails, an unavailable message is shown without affecting bookings.
