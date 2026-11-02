@@ -457,6 +457,12 @@
       if (!result.error) await refresh();
       return result;
     },
+    async updatePaymentRatePeriod(originalDate, period) {
+      const result = await client.from('payment_rate_periods').update({valid_from:period.validFrom,multisport_rate:period.multisport,individual_rate:period.individual,card8_rate:period.card8,card12_rate:period.card12}).eq('valid_from',originalDate).select('valid_from').maybeSingle();
+      if (!result.error && !result.data) return {error:{message:'Тарифата вече не съществува.'}};
+      if (!result.error) await refresh();
+      return result;
+    },
     async saveRegistrationPaymentOverrides(overrides) {
       const allowed = new Set(['multisport', 'individual', 'card8', 'card12']);
       const values = Object.entries(overrides || {}).filter(([, type]) => allowed.has(type));
