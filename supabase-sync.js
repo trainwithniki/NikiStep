@@ -142,7 +142,7 @@
     let sessions;
     let trainingTemplates = [];
     let paymentAdjustments = {};
-    let paymentRates = { ...defaultPaymentRates };
+    let paymentRates = { ...defaultPaymentRates }, paymentRatePeriods = [], paymentRatePeriodsConfigured = false;
     let registrationPaymentOverrides = {};
     let manualPaymentSessions = [];
     let manualPaymentTemplates = JSON.parse(JSON.stringify(defaultManualPaymentTemplates));
@@ -207,6 +207,13 @@
         paymentsConfigured = false;
       } else if (rates.data) {
         paymentRates = { multisport: Number(rates.data.multisport_rate), individual: Number(rates.data.individual_rate) };
+      }
+      const periods = await client.from('payment_rate_periods').select('valid_from,multisport_rate,individual_rate,card8_rate,card12_rate').order('valid_from');
+      if (periods.error) {
+        if (!['42P01','PGRST205'].includes(periods.error.code)) throw periods.error;
+      } else {
+        paymentRatePeriodsConfigured = true;
+        paymentRatePeriods = (periods.data || []).map(p => ({validFrom:p.valid_from,multisport:Number(p.multisport_rate),individual:Number(p.individual_rate),card8:Number(p.card8_rate),card12:Number(p.card12_rate)}));
       }
       const registrationTariffs = await client.from('registration_payment_overrides').select('registration_id,payment_type');
       if (registrationTariffs.error) {
@@ -274,7 +281,7 @@
       if (setting.key === 'hero_text' && setting.value) siteSettings.heroText = String(setting.value);
       if (setting.key === 'hero_subtitle' && setting.value) siteSettings.heroSubtitle = String(setting.value);
     });
-    cache = { sessions, trainingTemplates, siteSettings, paymentAdjustments, paymentRates, registrationPaymentOverrides, manualPaymentSessions, manualPaymentTemplates, installStats, trainingTemplatesConfigured, paymentsConfigured, registrationPaymentOverridesConfigured, manualPaymentsConfigured, manualPaymentTemplatesConfigured };
+    cache = { sessions, trainingTemplates, siteSettings, paymentAdjustments, paymentRates, paymentRatePeriods, paymentRatePeriodsConfigured, registrationPaymentOverrides, manualPaymentSessions, manualPaymentTemplates, installStats, trainingTemplatesConfigured, paymentsConfigured, registrationPaymentOverridesConfigured, manualPaymentsConfigured, manualPaymentTemplatesConfigured };
     ready = true;
     document.documentElement.classList.remove('appLoading');
     if (typeof window.renderAll === 'function') window.renderAll();
@@ -443,6 +450,11 @@
         individual_rate: values.individual, updated_at: new Date().toISOString()
       });
       if (!result.error) cache.paymentRates = values;
+      return result;
+    },
+    async addPaymentRatePeriod(period) {
+      const result = await client.from('payment_rate_periods').insert({valid_from:period.validFrom,multisport_rate:period.multisport,individual_rate:period.individual,card8_rate:period.card8,card12_rate:period.card12});
+      if (!result.error) await refresh();
       return result;
     },
     async saveRegistrationPaymentOverrides(overrides) {

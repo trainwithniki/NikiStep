@@ -1124,7 +1124,7 @@ html.authChecking .adminAuthLoading{display:flex}
     <div class="paymentsMonthMeta" id="paymentsMonthMeta"></div>
   </div>
   <div class="externalPaymentToolbar"><div class="externalPaymentToolbarText"><strong>Тренировка извън платформата</strong><span>Например Fitness Line — със собствени бройки и цени</span></div><button class="externalPaymentAdd" type="button" onclick="openManualPaymentForm()">+ Добави външна тренировка</button></div>
-  <div class="paymentsRateLegend"><div class="paymentRate multi"><span>MultiSport · на човек</span><label class="paymentRateEdit"><input id="multisportRateInput" type="number" min="0" step="0.05" inputmode="decimal" aria-label="Такса MultiSport" readonly> €</label></div><div class="paymentRate individual"><span>Индивидуално · на човек</span><label class="paymentRateEdit"><input id="individualRateInput" type="number" min="0" step="0.05" inputmode="decimal" aria-label="Индивидуална такса" readonly> €</label></div><button class="paymentRatesSave" id="paymentRatesButton" type="button" onclick="togglePaymentRatesEdit()">Редактирай таксите</button></div>
+  <details class="card" style="margin-bottom:12px"><summary style="cursor:pointer;font-weight:900">Тарифи и валидност</summary><p style="font-size:11px">Тарифите се прилагат според датата на тренировката. Първо изпълни миграцията за тарифите в Supabase.</p><div id="paymentRateHistory"></div><div class="paymentsRateLegend"><div class="paymentRate"><span>Валидни от</span><input id="ratesValidFrom" type="date" disabled></div><div class="paymentRate multi"><span>MultiSport</span><label class="paymentRateEdit"><input id="multisportRateInput" type="number" min="0" step="0.01" disabled> €</label></div><div class="paymentRate individual"><span>Без карта</span><label class="paymentRateEdit"><input id="individualRateInput" type="number" min="0" step="0.01" disabled> €</label></div><div class="paymentRate"><span>Карта 8</span><label class="paymentRateEdit"><input id="card8RateInput" type="number" min="0" step="0.01" disabled> €</label></div><div class="paymentRate"><span>Карта 12</span><label class="paymentRateEdit"><input id="card12RateInput" type="number" min="0" step="0.01" disabled> €</label></div><button class="paymentRatesSave" id="paymentRatesButton" type="button" onclick="togglePaymentRatesEdit()">Нови тарифи</button></div></details>
   <div class="paymentsPreviewNote">За да се запазват бройките от карта 8 и карта 12, изпълни Supabase миграцията <strong>20260822_add_visit_card_payment_adjustments.sql</strong>.</div>
   <div class="manualPaymentsSetupNote">За новите шаблони и картите с 8/12 посещения изпълни еднократно Supabase миграцията <strong>20260822_add_payment_templates_and_visit_cards.sql</strong>.</div>
   <div class="registrationPaymentsSetupNote">За да се запазват редактираните тарифи на присъстващите, изпълни Supabase миграцията <strong>20260823_add_registration_payment_overrides.sql</strong>.</div>
@@ -1573,7 +1573,7 @@ const DEFAULT_MANUAL_PAYMENT_TEMPLATES=[
 ];
 let paymentMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);
 function moneyEUR(value){return Number(value||0).toLocaleString('bg-BG',{minimumFractionDigits:2,maximumFractionDigits:2})}
-function paymentRates(){const multi=Number(data.paymentRates?.multisport),individual=Number(data.paymentRates?.individual);return {multisport:Number.isFinite(multi)&&multi>=0?multi:DEFAULT_PAYMENT_RATES.multisport,individual:Number.isFinite(individual)&&individual>=0?individual:DEFAULT_PAYMENT_RATES.individual}}
+function paymentRates(date=new Date().toLocaleDateString('en-CA',{timeZone:'Europe/Sofia'})){const periods=(data.paymentRatePeriods||[]).filter(p=>p.validFrom<=date).sort((a,b)=>b.validFrom.localeCompare(a.validFrom));if(periods.length)return periods[0];const multi=Number(data.paymentRates?.multisport),individual=Number(data.paymentRates?.individual);return {multisport:Number.isFinite(multi)&&multi>=0?multi:DEFAULT_PAYMENT_RATES.multisport,individual:Number.isFinite(individual)&&individual>=0?individual:DEFAULT_PAYMENT_RATES.individual,card8:3.06,card12:2.54}}
 function switchAdminSection(section){
   const payments=section==='payments';
   const profilesTab=document.getElementById('profilesTab');
@@ -1618,10 +1618,10 @@ function registrationPaymentType(person){
   return ['multisport','individual','card8','card12'].includes(override)?override:(person.hasMultisport?'multisport':'individual');
 }
 function registrationPaymentRate(type,rates=paymentRates()){
-  return type==='card8'?VISIT_CARD_PAYMENT_RATES.card8:type==='card12'?VISIT_CARD_PAYMENT_RATES.card12:rates[type]||0;
+  return rates[type]||0;
 }
 function paymentNumbers(session){
-  const rates=paymentRates();
+  const rates=paymentRates(session.date);
   const people=(session.registrations||[]).filter(person=>!person.cancelledAt);
   const registered={multisport:0,individual:0,card8:0,card12:0};
   people.forEach(person=>registered[registrationPaymentType(person)]++);
@@ -1629,7 +1629,7 @@ function paymentNumbers(session){
   const multisport=registered.multisport+extra.multisport;
   const individual=registered.individual+extra.individual;
   const card8=registered.card8+extra.card8,card12=registered.card12+extra.card12;
-  return {people,extra,multisport,individual,card8,card12,total:multisport*rates.multisport+individual*rates.individual+card8*VISIT_CARD_PAYMENT_RATES.card8+card12*VISIT_CARD_PAYMENT_RATES.card12};
+  return {people,extra,multisport,individual,card8,card12,rates,total:multisport*rates.multisport+individual*rates.individual+card8*rates.card8+card12*rates.card12};
 }
 function manualPaymentNumbers(item){
   const multisport=Math.max(0,Number(item.multisportCount)||0);
@@ -1927,21 +1927,19 @@ function deleteManualPayment(id){
   schedulePaymentSave();
 }
 let paymentRatesUnlocked=false;
-function setPaymentRatesLocked(locked){paymentRatesUnlocked=!locked;multisportRateInput.readOnly=locked;individualRateInput.readOnly=locked;paymentRatesButton.textContent=locked?'Редактирай таксите':'Запази и заключи';paymentRatesButton.classList.toggle('editing',!locked)}
+function setPaymentRatesLocked(locked){paymentRatesUnlocked=!locked;['multisportRateInput','individualRateInput','card8RateInput','card12RateInput','ratesValidFrom'].forEach(id=>document.getElementById(id).disabled=locked);paymentRatesButton.textContent=locked?'Нови тарифи':'Запази новите тарифи';paymentRatesButton.classList.toggle('editing',!locked)}
 async function togglePaymentRatesEdit(){
-  if(!paymentRatesUnlocked){setPaymentRatesLocked(false);multisportRateInput.focus();multisportRateInput.select();return}
-  if(await savePaymentRates())setPaymentRatesLocked(true);
-}
-async function savePaymentRates(){
-  const multisport=Number(String(multisportRateInput.value).replace(',','.'));
-  const individual=Number(String(individualRateInput.value).replace(',','.'));
-  if(!Number.isFinite(multisport)||multisport<0||!Number.isFinite(individual)||individual<0){showToast('Въведи валидни положителни такси.');return false}
-  const preview=data.paymentsConfigured===false;if(!preview)data=loadData();data.paymentRates={multisport,individual};
-  renderPayments();
-  if(preview){showToast('Локален преглед — таксите още не са запазени.');return true}
-  const result=await window.nikiAdmin.savePaymentRates(data.paymentRates);
-  if(result.error){showToast('Таксите не бяха запазени.');return false}
-  showToast('Таксите са запазени и заключени.');return true
+  if(!data.paymentRatePeriodsConfigured){showToast('Първо изпълни SQL миграцията за тарифите.');return}
+  if(!paymentRatesUnlocked){setPaymentRatesLocked(false);return}
+  const date=document.getElementById('ratesValidFrom').value;
+  const fields=['multisportRateInput','individualRateInput','card8RateInput','card12RateInput'].map(id=>document.getElementById(id).value);
+  const values=fields.map(v=>Number(String(v).replace(',','.')));
+  if(!date||fields.some(v=>v.trim()==='')||values.some(v=>!Number.isFinite(v)||v<0)){showToast('Попълни дата и валидни цени.');return}
+  const today=new Date().toLocaleDateString('en-CA',{timeZone:'Europe/Sofia'});
+  if(date<today&&!confirm('Тази дата е минала. Отчетите за засегнатите тренировки ще се променят. Продължаваш ли?'))return;
+  const result=await window.nikiAdmin.addPaymentRatePeriod({validFrom:date,multisport:values[0],individual:values[1],card8:values[2],card12:values[3]});
+  if(result.error){showToast(result.error.code==='23505'?'Вече има тарифи за тази дата.':'Тарифите не бяха запазени.');return}
+  data=loadData();setPaymentRatesLocked(true);renderPayments();showToast('Новите тарифи са запазени.');
 }
 let paymentSaveTimer=null,paymentSaveCountdown=null,paymentDirty=false,paymentChangeVersion=0,paymentSaveSeconds=0,paymentSaveUiState='saved';
 function syncPaymentCardSaveButtons(){
@@ -2090,27 +2088,27 @@ function renderPayments(){
   paymentsMonthTitle.textContent=paymentMonth.toLocaleDateString('bg-BG',{month:'long',year:'numeric'}).replace(/\s*г\.$/i,'');
   paymentsMonthTotal.textContent=moneyEUR(monthTotal);
   paymentsMonthMeta.textContent=`${trainingCount} ${trainingCount===1?'проведена тренировка':'проведени тренировки'} · ${peopleTotal} ${peopleTotal===1?'човек':'души'}`;
-  if(document.activeElement!==multisportRateInput)multisportRateInput.value=rates.multisport.toFixed(2);
-  if(document.activeElement!==individualRateInput)individualRateInput.value=rates.individual.toFixed(2);
+  if(!paymentRatesUnlocked){multisportRateInput.value=rates.multisport.toFixed(2);individualRateInput.value=rates.individual.toFixed(2);card8RateInput.value=rates.card8.toFixed(2);card12RateInput.value=rates.card12.toFixed(2);ratesValidFrom.value=new Date().toLocaleDateString('en-CA',{timeZone:'Europe/Sofia'});}
+  paymentRateHistory.innerHTML=(data.paymentRatePeriods||[]).slice().reverse().map(p=>`<p style="font-size:11px">${p.validFrom==='1900-01-01'?'Начални тарифи':esc(p.validFrom)} · MultiSport ${moneyEUR(p.multisport)} € · Без карта ${moneyEUR(p.individual)} € · Карта 8 ${moneyEUR(p.card8)} € · Карта 12 ${moneyEUR(p.card12)} €</p>`).join('');
   adminShell.classList.toggle('paymentsPreviewMode',data.paymentsConfigured===false);
   adminShell.classList.toggle('manualPaymentsPreviewMode',data.manualPaymentsConfigured===false||data.manualPaymentTemplatesConfigured===false);
   adminShell.classList.toggle('registrationPaymentsPreviewMode',data.registrationPaymentOverridesConfigured===false);
   if(!trainingCount){cards.innerHTML='<div class="paymentsEmpty">Няма проведени тренировки през избрания месец.</div>';return}
   const platformCards=completed.map((session,index)=>{
-    const summary=totals[index];
+    const summary=totals[index],rates=summary.rates;
     const registeredRows=summary.people.length?summary.people.map(person=>{
       const type=registrationPaymentType(person);
       return `<div class="paymentPerson"><span class="paymentPersonName">${esc(person.name)}</span><span class="paymentPersonMeta"><select class="paymentTypeSelect ${type}" aria-label="Тарифа за ${esc(person.name)}" onchange="changeRegistrationPaymentType('${session.id}','${person.id}',this.value)"><option value="multisport" ${type==='multisport'?'selected':''}>MultiSport</option><option value="individual" ${type==='individual'?'selected':''}>Индивидуално</option><option value="card8" ${type==='card8'?'selected':''}>Карта 8</option><option value="card12" ${type==='card12'?'selected':''}>Карта 12</option></select><span class="paymentPersonValue">${moneyEUR(registrationPaymentRate(type,rates))} €</span></span></div>`;
     }).join(''):'<div class="paymentPerson"><span class="paymentPersonName">Няма записани участници</span><span class="paymentPersonValue">—</span></div>';
     const manualIndividual=summary.extra.individual?`<div class="paymentPerson manualPaymentRow"><span class="paymentPersonName">Ръчно добавени индивидуални · ${summary.extra.individual}</span><span class="paymentPersonMeta"><span class="paymentPersonValue">${moneyEUR(summary.extra.individual*rates.individual)} €</span><button class="paymentAdjustBtn minus" type="button" onclick="changePaymentExtra('${session.id}','individual',-1)" aria-label="Намали индивидуалните">−</button><button class="paymentAdjustBtn" type="button" onclick="changePaymentExtra('${session.id}','individual',1)" aria-label="Добави индивидуален">+</button><button class="paymentTrashBtn" type="button" onclick="clearPaymentExtra('${session.id}','individual')" aria-label="Изтрий добавените индивидуални">🗑</button></span></div>`:'';
     const manualMulti=summary.extra.multisport?`<div class="paymentPerson manualPaymentRow"><span class="paymentPersonName">Ръчно добавени MultiSport · ${summary.extra.multisport}</span><span class="paymentPersonMeta"><span class="paymentPersonValue">${moneyEUR(summary.extra.multisport*rates.multisport)} €</span><button class="paymentAdjustBtn minus" type="button" onclick="changePaymentExtra('${session.id}','multisport',-1)" aria-label="Намали MultiSport">−</button><button class="paymentAdjustBtn" type="button" onclick="changePaymentExtra('${session.id}','multisport',1)" aria-label="Добави MultiSport">+</button><button class="paymentTrashBtn" type="button" onclick="clearPaymentExtra('${session.id}','multisport')" aria-label="Изтрий добавените MultiSport">🗑</button></span></div>`:'';
-    const manualCard8=summary.extra.card8?`<div class="paymentPerson manualPaymentRow"><span class="paymentPersonName">Ръчно добавени от карта 8 · ${summary.extra.card8}</span><span class="paymentPersonMeta"><span class="paymentPersonValue">${moneyEUR(summary.extra.card8*VISIT_CARD_PAYMENT_RATES.card8)} €</span><button class="paymentAdjustBtn minus" type="button" onclick="changePaymentExtra('${session.id}','card8',-1)" aria-label="Намали карта 8">−</button><button class="paymentAdjustBtn" type="button" onclick="changePaymentExtra('${session.id}','card8',1)" aria-label="Добави от карта 8">+</button><button class="paymentTrashBtn" type="button" onclick="clearPaymentExtra('${session.id}','card8')" aria-label="Изтрий добавените от карта 8">🗑</button></span></div>`:'';
-    const manualCard12=summary.extra.card12?`<div class="paymentPerson manualPaymentRow"><span class="paymentPersonName">Ръчно добавени от карта 12 · ${summary.extra.card12}</span><span class="paymentPersonMeta"><span class="paymentPersonValue">${moneyEUR(summary.extra.card12*VISIT_CARD_PAYMENT_RATES.card12)} €</span><button class="paymentAdjustBtn minus" type="button" onclick="changePaymentExtra('${session.id}','card12',-1)" aria-label="Намали карта 12">−</button><button class="paymentAdjustBtn" type="button" onclick="changePaymentExtra('${session.id}','card12',1)" aria-label="Добави от карта 12">+</button><button class="paymentTrashBtn" type="button" onclick="clearPaymentExtra('${session.id}','card12')" aria-label="Изтрий добавените от карта 12">🗑</button></span></div>`:'';
+    const manualCard8=summary.extra.card8?`<div class="paymentPerson manualPaymentRow"><span class="paymentPersonName">Ръчно добавени от карта 8 · ${summary.extra.card8}</span><span class="paymentPersonMeta"><span class="paymentPersonValue">${moneyEUR(summary.extra.card8*rates.card8)} €</span><button class="paymentAdjustBtn minus" type="button" onclick="changePaymentExtra('${session.id}','card8',-1)" aria-label="Намали карта 8">−</button><button class="paymentAdjustBtn" type="button" onclick="changePaymentExtra('${session.id}','card8',1)" aria-label="Добави от карта 8">+</button><button class="paymentTrashBtn" type="button" onclick="clearPaymentExtra('${session.id}','card8')" aria-label="Изтрий добавените от карта 8">🗑</button></span></div>`:'';
+    const manualCard12=summary.extra.card12?`<div class="paymentPerson manualPaymentRow"><span class="paymentPersonName">Ръчно добавени от карта 12 · ${summary.extra.card12}</span><span class="paymentPersonMeta"><span class="paymentPersonValue">${moneyEUR(summary.extra.card12*rates.card12)} €</span><button class="paymentAdjustBtn minus" type="button" onclick="changePaymentExtra('${session.id}','card12',-1)" aria-label="Намали карта 12">−</button><button class="paymentAdjustBtn" type="button" onclick="changePaymentExtra('${session.id}','card12',1)" aria-label="Добави от карта 12">+</button><button class="paymentTrashBtn" type="button" onclick="clearPaymentExtra('${session.id}','card12')" aria-label="Изтрий добавените от карта 12">🗑</button></span></div>`:'';
     return `<details class="paymentCard" data-session-id="${session.id}" data-payment-sort="${session.date}T${session.time||'00:00'}" ${openCards.has(session.id)?'open':''}>
       <summary class="paymentCardHead"><div><div class="paymentCardDate"><strong>${fmtDDMM(session.date)}</strong><span>${fmtWeekday(session.date)} · ${esc(session.time)}</span></div><p>${esc(session.title)} with ${esc(session.trainer)} · ${esc(session.location)}</p></div><div class="paymentCardAmount"><span>За тренировката</span><strong>${moneyEUR(summary.total)} €</strong></div></summary><div class="paymentCardBody">
-      <div class="paymentBreakdown"><div class="paymentBreakdownItem"><span>MultiSport · ${summary.multisport}</span><strong>${moneyEUR(summary.multisport*rates.multisport)} €</strong></div><div class="paymentBreakdownItem"><span>Индивидуални · ${summary.individual}</span><strong>${moneyEUR(summary.individual*rates.individual)} €</strong></div><div class="paymentBreakdownItem"><span>Карта 8 · ${summary.card8}</span><strong>${moneyEUR(summary.card8*VISIT_CARD_PAYMENT_RATES.card8)} €</strong></div><div class="paymentBreakdownItem"><span>Карта 12 · ${summary.card12}</span><strong>${moneyEUR(summary.card12*VISIT_CARD_PAYMENT_RATES.card12)} €</strong></div></div>
+      <div class="paymentBreakdown"><div class="paymentBreakdownItem"><span>MultiSport · ${summary.multisport}</span><strong>${moneyEUR(summary.multisport*rates.multisport)} €</strong></div><div class="paymentBreakdownItem"><span>Индивидуални · ${summary.individual}</span><strong>${moneyEUR(summary.individual*rates.individual)} €</strong></div><div class="paymentBreakdownItem"><span>Карта 8 · ${summary.card8}</span><strong>${moneyEUR(summary.card8*rates.card8)} €</strong></div><div class="paymentBreakdownItem"><span>Карта 12 · ${summary.card12}</span><strong>${moneyEUR(summary.card12*rates.card12)} €</strong></div></div>
       <div class="paymentPeopleTitle"><span>Присъствали от записванията</span><span>${summary.people.length} души</span></div><div class="paymentPeople">${registeredRows}${manualIndividual}${manualMulti}${manualCard8}${manualCard12}</div>
-      <div class="paymentManual"><strong>Добави човек, който е дошъл без записване</strong><div class="paymentManualButtons"><button class="paymentAddBtn individual" type="button" onclick="changePaymentExtra('${session.id}','individual',1)">Добави индивидуален<small>+1 при всяко натискане</small></button><button class="paymentAddBtn multi" type="button" onclick="changePaymentExtra('${session.id}','multisport',1)">Добави MultiSport<small>+1 при всяко натискане</small></button><button class="paymentAddBtn card8" type="button" onclick="changePaymentExtra('${session.id}','card8',1)">Добави от карта 8<small>+1 · 3.06 €</small></button><button class="paymentAddBtn card12" type="button" onclick="changePaymentExtra('${session.id}','card12',1)">Добави от карта 12<small>+1 · 2.54 €</small></button></div></div>
+      <div class="paymentManual"><strong>Добави човек, който е дошъл без записване</strong><div class="paymentManualButtons"><button class="paymentAddBtn individual" type="button" onclick="changePaymentExtra('${session.id}','individual',1)">Добави индивидуален<small>+1 при всяко натискане</small></button><button class="paymentAddBtn multi" type="button" onclick="changePaymentExtra('${session.id}','multisport',1)">Добави MultiSport<small>+1 при всяко натискане</small></button><button class="paymentAddBtn card8" type="button" onclick="changePaymentExtra('${session.id}','card8',1)">Добави от карта 8<small>+1</small></button><button class="paymentAddBtn card12" type="button" onclick="changePaymentExtra('${session.id}','card12',1)">Добави от карта 12<small>+1</small></button></div></div>
       <button class="paymentCardSaveButton saved" type="button" onclick="flushPaymentChanges()" disabled>Запазено</button>
     </div></details>`;
   }).join('');
@@ -2344,7 +2342,7 @@ function askDelete(id){const s=data.sessions.find(x=>x.id===id);if(!s)return;del
 <script src="modal-scroll-lock.js?v=20260822-1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script src="supabase-sync.js?v=20260916-1"></script>
+<script src="supabase-sync.js?v=20261102-1"></script>
 <script src="admin-history.js?v=20260908-4"></script>
 <script src="admin-statistics.js?v=20260909-4"></script>
 <script src="admin-pwa-install.js?v=20260823-2"></script>
