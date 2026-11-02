@@ -1,4 +1,4 @@
-const CACHE_NAME='niki-apps-v27';
+const CACHE_NAME='niki-apps-v28';
 const APP_SHELL=[
   './',
   './index.html',
